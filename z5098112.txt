@@ -1,0 +1,9 @@
+Word Diary
+Week 1
+Group formed. Matthew has created the Jira Project, named as COMP3900-W18A-let's chat. Daniel has created a google document, together with Matthew, Well and Daniel, I wrote the simple notes for our project in it. Initially we wanted to do only the chatbot project, however our tutor, Ali, suggested us to do an extra project as well because the chatbot project is not too difficult which will not have a high grade. At last, we have chosen the E-Commerce Recommender System with the chatbot. 
+I have discussed about the functions and features that will be included in the product with the team.  I have also talked about the types of the users with the team, which are admin, seller, and buyer.
+Week 2
+Together with Matthew, Well and Daniel, I wrote the user story and sprints section of the proposal in Jira. The epics were concluded from the discussed features of the product, and the epics are Registration, Login, Product Management, Delivery, Sales Tracking, Chat Bot, Purchase, Product Searching, Wishlist, Product Moderation, User Management, and Recommendation System. I have written the acceptance criteria for the issues which under the Login epic.
+Week 3
+Daniel has created a google document for the Proposal, I have start listed the main topics of the proposal and wrote a problem, statement. Daniel, Matthew, and I have chosen an e-commerce platform and wrote some analysis of the websites in a table. I have concluded a problem summary from the websites. I have also added a table that represent the overall features of the websites. 
+Also, I have wrote the user types of the product into the proposal. I have created a Balsamiq Cloud for the storyboard, designed several pages of prototype of the Registration and Login feature for the product. Well said he will be in charge of the rest of the storyboard in Balsamiq because he is not good at writing for proposal.
