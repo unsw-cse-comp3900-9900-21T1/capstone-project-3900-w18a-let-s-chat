@@ -2,6 +2,10 @@ from django.shortcuts import render
 
 # Create your views here.
 
+def store(request):
+	context = {}
+	return render(request, 'store/store.html', context)
+
 def registration(request):
 	context = {}
 	return render(request, 'store/registration.html', context)
@@ -9,10 +13,6 @@ def registration(request):
 def login(request):
 	context = {}
 	return render(request, 'store/login.html', context)
-
-def store(request):
-	context = {}
-	return render(request, 'store/store.html', context)
 
 def product_description(request):
 	context = {}
