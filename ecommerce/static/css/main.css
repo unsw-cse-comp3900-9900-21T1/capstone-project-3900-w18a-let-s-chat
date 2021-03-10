@@ -1,0 +1,166 @@
+body{
+	background-color: hsl(0, 0%, 98%);
+}
+
+h1,h2,h3,h4,h5,h6{
+	color:hsl(0, 0%, 30%);
+}
+
+.box-element{
+	box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+	background-color: #fff;
+	border-radius: 4px;
+	padding: 10px;
+}
+
+.thumbnail{
+	width: 100%;
+	height: 200px;
+	-webkit-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+    -moz-box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+    box-shadow: -1px -3px 5px -2px rgba(214,214,214,1);
+}
+
+.product{
+	border-radius: 0 0 4px 4px;
+}
+
+.bg-dark{
+	background-color: #4f868c!important;
+}
+
+#cart-icon{
+	width:25px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#cart-total{
+	display: block;
+	text-align: center;
+	color:#fff;
+	background-color: red;
+	width: 20px;
+	height: 25px;
+	border-radius: 50%;
+	font-size: 14px;
+}
+
+.col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12{
+	margin-top: 10px;
+}
+
+.btn{
+	border-radius: 0;
+}
+
+.row-image{
+	width: 100px;
+}
+
+.form-field{
+	width:250px;
+	display: inline-block;
+	padding: 5px;
+}
+
+.cart-row{
+	display: flex;
+    align-items: flex-stretch;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ececec;
+
+}
+
+.quantity{
+	display: inline-block;
+	font-weight: 700;
+	padding-right:10px;
+	
+
+}
+
+.chg-quantity{
+	width: 12px;
+	cursor: pointer;
+	display: block;
+	margin-top: 5px;
+	transition:.1s;
+}
+
+.chg-quantity:hover{
+	opacity: .6;
+}
+
+
+.hidden{
+	display: none!important;
+}
+
+/* HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr */
+.rating {
+	display: inline-block;
+	position: relative;
+	height: 25px;
+	line-height: 25px;
+	font-size: 25px;
+  }
+  
+  .rating label {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	cursor: pointer;
+  }
+  
+  .rating label:last-child {
+	position: static;
+  }
+  
+  .rating label:nth-child(1) {
+	z-index: 5;
+  }
+  
+  .rating label:nth-child(2) {
+	z-index: 4;
+  }
+  
+  .rating label:nth-child(3) {
+	z-index: 3;
+  }
+  
+  .rating label:nth-child(4) {
+	z-index: 2;
+  }
+  
+  .rating label:nth-child(5) {
+	z-index: 1;
+  }
+  
+  .rating label input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	opacity: 0;
+  }
+  
+  .rating label .icon {
+	float: left;
+	color: transparent;
+  }
+  
+  .rating label:last-child .icon {
+	color: #000;
+  }
+  
+  .rating:not(:hover) label input:checked ~ .icon,
+  .rating:hover label:hover input ~ .icon {
+	color: #09f;
+  }
+  
+  .rating label input:focus:not(:checked) ~ .icon:last-child {
+	color: #000;
+	text-shadow: 0 0 5px #09f;
+  }
