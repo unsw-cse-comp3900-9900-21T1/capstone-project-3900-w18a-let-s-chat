@@ -53,20 +53,6 @@
 				<hr>
 				<h3>Order Summary</h3>
 				<hr>
-<<<<<<< HEAD
-				<div class="cart-row">
-					<div style="flex:2"><img class="row-image" src="{% static 'images/placeholder.png' %}"></div>
-					<div style="flex:2"><p>Product 1</p></div>
-					<div style="flex:1"><p>$20.00</p></div>
-					<div style="flex:1"><p>x2</p></div>
-				</div>
-				<h5>Items:   2</h5>
-				<h5>Total:   $4</h5>
-			</div>
-		</div>
-	</div>
-{% endblock content %}
-=======
 				{% for item in items %}
 				<div class="cart-row">
 					<div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
@@ -81,4 +67,3 @@
 		</div>
 	</div>
 {% endblock content %}
->>>>>>> data_structure

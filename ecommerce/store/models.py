@@ -1,8 +1,4 @@
 from django.db import models
-<<<<<<< HEAD
-
-# Create your models here.
-=======
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
 
@@ -90,4 +86,3 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return self.address
->>>>>>> data_structure
