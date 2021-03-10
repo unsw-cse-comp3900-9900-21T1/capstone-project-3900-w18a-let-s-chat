@@ -1,13 +1,22 @@
 from django.shortcuts import render
+from django.contrib.auth.forms import CreationUserForm
 
 # Create your views here.
+from .forms import OrderForm, CreateUserForm
 
 def store(request):
 	context = {}
 	return render(request, 'store/store.html', context)
 
 def signup(request):
-	context = {}
+	form = CreateUserForm()
+
+	if request.method == "POST":
+		form = CreationUserForm(request.POST)
+		if form.is_valid():
+			form.save()
+	
+	context = {'form':form}
 	return render(request, 'store/signup.html', context)
 
 def login(request):
