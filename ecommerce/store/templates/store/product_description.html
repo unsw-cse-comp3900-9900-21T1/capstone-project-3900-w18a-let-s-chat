@@ -1,5 +1,39 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h3>Project Description</h3>
+
+    <div class="row">
+        <div style="max-width:40%" class="col-lg-6">
+            <div class="box-element" id="img-box">
+                <img class="img-fluid" src="{% static 'images/placeholder.png' %}"/>
+            </div>
+        </div>
+
+        <div style="min-width:60%;"class="col-lg-6">
+                <div class="box-element" id="info-box">
+                    <h3 id="product-name"> Product Name </h3>
+                            <h5 id="seller-name"> 
+                                <span class="badge bg-dark text-light">Trusted</span>
+                                by Seller Name </h5>
+                    <div class="row">
+                        <div style="min-width: 300px;" class="col-lg-6">
+                            <div style="padding: 10px;" class="card" id="desc-box">
+                                <h4>Description</h4>
+                                <p style="font-size:14px;" id="desc-text">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div style="padding: 10px;" class="card" id="buy-box">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+
+
+    </div>
+
 {% endblock content %}
