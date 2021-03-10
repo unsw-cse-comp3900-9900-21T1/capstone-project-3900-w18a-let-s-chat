@@ -11,6 +11,4 @@ Worked on background section of proposal.
 
 Week 3
 Worked on background section of proposal.
-Filled in acceptance criteria of some user stories in proposal.
-Filled in subtasks for user stories in Jira.
-Finished proposal.
+Filled in acceptance criteria of some user stories in proposal
