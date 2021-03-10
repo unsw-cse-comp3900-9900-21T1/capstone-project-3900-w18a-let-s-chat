@@ -6,7 +6,8 @@ urlpatterns = [
 	#Leave as empty string for base url
 	path('', views.store, name="store"),
     path('signup/', views.signup, name="signup"),
-	path('login/', views.login, name="login"),
+	path('login/', views.loginPage, name="login"),
+    path('logout/', views.logoutUser, name="logout"),
     path('product_description/', views.product_description, name="product_description"),
 	path('cart/', views.cart, name="cart"),
 	path('checkout/', views.checkout, name="checkout"),
