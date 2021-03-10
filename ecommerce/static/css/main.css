@@ -96,6 +96,7 @@ h1,h2,h3,h4,h5,h6{
 
 .hidden{
 	display: none!important;
+<<<<<<< HEAD
 }
 
 /* HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr */
@@ -164,3 +165,6 @@ h1,h2,h3,h4,h5,h6{
 	color: #000;
 	text-shadow: 0 0 5px #09f;
   }
+=======
+}
+>>>>>>> data_structure

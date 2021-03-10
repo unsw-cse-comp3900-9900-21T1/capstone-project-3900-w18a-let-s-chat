@@ -1,0 +1,11 @@
+Week 1:
+Brainstorming project ideas. We came up with the idea of a pet e-commerce site that focuses on the welfare of pets.
+We also decided to combine a chatbot into the e-commerce site so that it could become one of our novel feature. 
+
+Created the Jira project and helped creating the user stories in Jira. 
+
+Week 2:
+Did an analysis of Gumtree as an e-commerce platform. Found some flaws and issues that could be improved on our platform. 
+
+For the proposal, helped created the acceptance criteria for chatbot, sales tracking, delivery, 
+product moderation, wishlist and review. 
