@@ -1,0 +1,14 @@
+Work Diary
+week 1
+We had group meeting on Sunday and discussed about the project topics. 
+We finished most of the user stories by that day.
+
+week 2
+We had group meeting on Saturday and we already copied all the user stories to jira.
+I started to create wireframes to Balsamiq and created links between pages.
+
+week 3 
+I added more pages for buyer and seller to our Balsamiq cloud.
+Add screenshots of the Balsamiq pages to our google doc and add links and descriptions for 
+each feature.
+Completed the proposal together in our Friday meeting.
