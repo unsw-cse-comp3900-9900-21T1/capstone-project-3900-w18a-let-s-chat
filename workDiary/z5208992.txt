@@ -1,0 +1,14 @@
+
+Week 1
+Joined group and decided on basic project topic.
+Made document for taking notes / brainstorming with group.
+Started proposal document.
+
+Week 2
+Group decided on some frameworks and APIs we will be using.
+Created initial user stories with group.
+Worked on background section of proposal.
+
+Week 3
+Worked on background section of proposal.
+Filled in acceptance criteria of some user stories in proposal
