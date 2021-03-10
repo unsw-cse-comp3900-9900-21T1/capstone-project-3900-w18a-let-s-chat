@@ -17,9 +17,9 @@
                                 by Seller Name </h5>
                     <div class="row">
                         <div style="min-width: 300px;" class="col-lg-6">
-                            <div style="padding: 10px;" class="card" id="desc-box">
+                            <div style="padding: 10px; max-height:400px" class="card" id="desc-box">
                                 <h5>Description</h5>
-                                <p style="font-size:14px;" id="desc-text">
+                                <p style="font-size:14px; overflow:scroll;" id="desc-text">
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                                 </p>
                             </div>
@@ -43,12 +43,15 @@
                                 </form>
 
                             </div>
-                            <div style="padding: 10px;" class="card" id="tag-box">
+                            <div style="padding: 10px; max-height:200px" class="card" id="tag-box">
                                 <h6>Tags</h6>
-                                <ul class="list-group list-group-flush">
+                                <ul class="list-group list-group-flush" style="overflow:scroll;">
                                     <li class="list-group-item"> example tag 1</li>
                                     <li class="list-group-item"> example tag 2</li>
                                     <li class="list-group-item"> example tag 3</li>
+                                    <li class="list-group-item"> example tag 4</li>
+                                    <li class="list-group-item"> example tag 5</li>
+                                    <li class="list-group-item"> example tag 6</li>
 
                                 </ul>
                             </div>
@@ -61,8 +64,73 @@
 
 
     </div>
-    <div class="box-element" style="margin-top: 15px;">
+    <div class="box-element" style="margin-top: 15px; height:250px;">
+        <h5>Leave a review</h5>
+        <!--HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr -->
+        <form class="rating">
+            <label>
+              <input type="radio" name="stars" value="1" />
+              <span class="icon">★</span>
+            </label>
+            <label>
+              <input type="radio" name="stars" value="2" />
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+            </label>
+            <label>
+              <input type="radio" name="stars" value="3" />
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+              <span class="icon">★</span>   
+            </label>
+            <label>
+              <input type="radio" name="stars" value="4" />
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+            </label>
+            <label>
+              <input type="radio" name="stars" value="5" />
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+              <span class="icon">★</span>
+            </label>
+          </form>
+          <div>
+              <form>
+                <textarea id="review-box" name="review-box" style="width:100%; height:120px; resize:none; font-size:14px;">Enter your review here...</textarea>
+                <button class="btn btn-outline-secondary" id="add-to-cart" style="font-size: 13px;">
+                    Submit review
+                </button>
+            </form>
+          </div>
+
+    </div>
+    <div class="box-element" style="margin-top: 15px; height:300px;">
         <h5>Reviews</h5>
+        <ul class="list-group" style="overflow:scroll; max-height:85%">
+            <li class="list-group-item">
+                <h6>Reviewer name - review date</h6>
+                <p>This is an example text review</p>
+            </li>
+            <li class="list-group-item">
+                <h6>Reviewer name - review date</h6>
+                <p>This is an example text review</p>
+            </li>
+            <li class="list-group-item">
+                <h6>Reviewer name - review date</h6>
+                <p>This is an example text review</p>
+            </li>
+            <li class="list-group-item">
+                <h6>Reviewer name - review date</h6>
+                <p>This is an example text review</p>
+            </li>
+            
+
+        </ul>
     </div>
 
 {% endblock content %}
