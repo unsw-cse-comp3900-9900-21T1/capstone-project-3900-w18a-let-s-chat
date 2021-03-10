@@ -6,9 +6,9 @@ def store(request):
 	context = {}
 	return render(request, 'store/store.html', context)
 
-def registration(request):
+def signup(request):
 	context = {}
-	return render(request, 'store/registration.html', context)
+	return render(request, 'store/signup.html', context)
 
 def login(request):
 	context = {}
