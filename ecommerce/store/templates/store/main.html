@@ -28,9 +28,14 @@
 	 
 	    </ul>
 	    <div class="form-inline my-2 my-lg-0">
-	     	<a href="/login"class="btn btn-warning">Login</a>
-			<a href="/signup"class="btn btn-warning">Sign Up</a>
-	     	
+			{% if request.user.is_authenticated %}
+				<span class="hello-msg">Hello, {{request.user}}</span>
+  				<span><a class="hello-msg" href="{% url 'logout' %}">Logout</a></span> 
+			{% else %}
+	     		<a href="/login"class="btn btn-warning">Login</a>
+				<a href="/signup"class="btn btn-warning">Sign Up</a>
+			{% endif %}
+	
 	     	<a href="{% url 'cart' %}">
 	    		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
 	    	</a>

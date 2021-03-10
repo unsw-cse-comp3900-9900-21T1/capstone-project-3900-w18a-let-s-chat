@@ -98,6 +98,12 @@ h1,h2,h3,h4,h5,h6{
 	display: none!important;
 }
 
+.hello-msg{
+	font-size: 18px;
+	color: #fff;
+	margin-right: 20px;
+}
+
 /* HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr */
 .rating {
 	display: inline-block;
