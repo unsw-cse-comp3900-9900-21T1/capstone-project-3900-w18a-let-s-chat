@@ -40,7 +40,12 @@
 	    		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
 	    	</a>
 	    	<p id="cart-total">0</p>
-
+			
+			{% if request.user.is_authenticated %}
+				<a>
+					<img  id="user-icon" src="{% static 'images/user_icon.png' %}">
+				</a>
+			{% endif %}
 	    </div>
 	  </div>
 	</nav>

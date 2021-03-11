@@ -24,9 +24,17 @@ def signup(request):
 		if request.method == "POST":
 			form = CreateUserForm(request.POST)
 			if form.is_valid():
-				form.save()
-				user = form.cleaned_data.get('username')
-				messages.success(request, 'Account was created for ' + user)
+				user = form.save()
+				username = form.cleaned_data.get('username')
+
+				messages.success(request, 'Account was created for ' + username)
+
+				# create customer here
+				customer = Customer()
+				customer.user = user
+				customer.nickname = user.username
+				customer.email = user.email
+				customer.save()
 
 				return redirect('login')
 	
