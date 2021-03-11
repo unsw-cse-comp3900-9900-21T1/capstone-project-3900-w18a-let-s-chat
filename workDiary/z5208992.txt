@@ -12,3 +12,6 @@ Worked on background section of proposal.
 Week 3
 Worked on background section of proposal.
 Filled in acceptance criteria of some user stories in proposal
+
+Week 4
+Created HTML templates for product pages, and purchase history page
