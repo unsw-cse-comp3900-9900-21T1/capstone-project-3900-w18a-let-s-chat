@@ -14,6 +14,6 @@ urlpatterns = [
     path('purchase_history/', views.purchase_history, name="purchase_history"),
     path('wishList/', views.wishList, name="wishList"),
     path('watchList/', views.watchList, name="watchList"),
-
+    path('user_profile/', views.userProfile, name="user_profile"),
 
 ]
