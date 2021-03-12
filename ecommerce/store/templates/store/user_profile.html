@@ -1,5 +1,99 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h3>User Profile</h3>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Profile Page</title>
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'fontawesome/css/all.css' %}">
+    </head>
+    <body>
+    
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-img">
+                <img src="{% static 'images/sample_profile_pic1.jpeg' %}" width="200" alt="">
+            </div>
+            <div class="profile-nav-info">
+                <h3 class="user-name">{{request.user.customer.nickname}}</h3>
+                <div class="address">
+                    <p class="state">New York, </p>
+                    <span class="country">USA.</span>
+                </div>
+            </div>
+            <div class="profile-option">
+                <div class="notification">
+                    <i class="fa fa-bell"></i>
+                    <span class="alert-message">1</span>
+                </div>
+            </div>
+        </div>
+        <div class="main-bd">
+            <div class="left-side">
+                <div class="profile-side">
+                    <p class="mobile-no"><i class="fa fa-phone"></i>{{request.user.customer.contactNo}}</p>
+                    <p class="user-mail"><i class="fa fa-envelope"></i>{{request.user.customer.email}}</p>
+                    <div class="user-bio">
+                        <h3>About Me</h3>
+                        <p class="bio">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit atque dolor quidem, ullam, voluptate molestias! Lorem ipsum dolor sit amet.</p>
+                    </div>
+                    <div class="profile-btn">
+                        <button class="chatbtn">
+                            <i class="fa fa-comment"></i> Chat
+                        </button>
+                        <button class="createbtn">
+                            <i class="fa fa-plus"></i>Create
+                        </button>
+                    </div>
+                    <div class="user-rating">
+                        <h3 class="rating">4.5</h3>
+                        <div class="rate">
+                            <div class="stars">
+                                
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            </div>
+                            <span class="no-user"><span>123</span>&nbsp;&nbsp; reviews</span>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="nav">
+                    <ul>
+                        <li onclick="tabs(0)" class="user-product active">Your Products</li>
+                        <li onclick="tabs(1)" class="user-review">Reviews</li>
+                        <li onclick="tabs(2)" class="user-setting">Settings</li>
+                    </ul>
+                </div>
+                <div class="profile-body">
+                    <div class="profile-product tab">
+                        <h1>Your Products</h1>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores iure quae sint magni cupiditate non, quod velit similique ducimus! Impedit dicta, sit officiis rerum. Adipisci ut facere atque nostrum odit dolorum ea cumque modi. Asperiores dolorum, iure odit ad, tempore magnam beatae deleniti soluta quisquam assumenda pariatur incidunt sapiente eaque modi earum. Ab ducimus accusamus recusandae, odio iusto commodi fuga, repellat inventore iure aut libero consequatur sequi nesciunt dolorem ipsam.</p>
+                    </div>
+                    <div class="profile-reviews tab">
+                        <h1>User Reviews</h1>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus id cupiditate libero eius dolore, in rem nulla reiciendis. Qui, vero voluptatum! Quia iusto accusamus corporis, illo, ullam quibusdam maiores assumenda explicabo illum eligendi odit fugiat a, laborum rerum architecto eum ut distinctio. Error quos temporibus at expedita? Optio amet aliquam provident voluptatum minima quidem nemo harum doloremque. Est nihil quisquam quis deserunt repellat, natus, saepe laborum. Ipsum officiis, nisi optio.</p>
+                        
+                    </div>
+                    <div class="profile-settings tab">
+                        <h1>Account Setting</h1>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio, eligendi magnam. Fuga ducimus assumenda, nemo sit, quod eveniet quidem dolorum modi voluptas dignissimos tempore omnis saepe officiis aliquam. Tempore sed voluptatum, illo sit vitae ullam consequatur, architecto enim iusto asperiores cupiditate debitis blanditiis harum quas ad dolor dolores veritatis molestiae! Aperiam, laboriosam! Temporibus modi vero ab quis, qui fuga reiciendis, hic, molestias vel ut recusandae eius nesciunt harum praesentium? Libero.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+        <script src="{% static 'javascript/jquery.js' %}"></script>
+        <script src="{% static 'javascript/main.js' %}"></script>
+    </body>
+    </html>
 {% endblock content %}
