@@ -1,5 +1,6 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block content %}
     <html lang="en">
     <head>
@@ -13,7 +14,7 @@
     <div class="container">
         <div class="profile-header">
             <div class="profile-img">
-                <img src="{% static 'images/sample_profile_pic1.jpeg' %}" width="200" alt="">
+                <img src="{{request.user.customer.image.url}}" width="200" alt="">
             </div>
             <div class="profile-nav-info">
                 <h3 class="user-name">{{request.user.customer.nickname}}</h3>
@@ -34,10 +35,13 @@
                 <div class="profile-side">
                     <p class="mobile-no"><i class="fa fa-phone"></i>{{request.user.customer.contactNo}}</p>
                     <p class="user-mail"><i class="fa fa-envelope"></i>{{request.user.customer.email}}</p>
+                    <!--
                     <div class="user-bio">
                         <h3>About Me</h3>
                         <p class="bio">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit atque dolor quidem, ullam, voluptate molestias! Lorem ipsum dolor sit amet.</p>
                     </div>
+                    -->
+                    <!--
                     <div class="profile-btn">
                         <button class="chatbtn">
                             <i class="fa fa-comment"></i> Chat
@@ -60,7 +64,7 @@
                             <span class="no-user"><span>123</span>&nbsp;&nbsp; reviews</span>
                         </div>
                     </div>
-                    
+                    -->
                 </div>
             </div>
             <div class="right-side">
@@ -74,16 +78,25 @@
                 <div class="profile-body">
                     <div class="profile-product tab">
                         <h1>Your Products</h1>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores iure quae sint magni cupiditate non, quod velit similique ducimus! Impedit dicta, sit officiis rerum. Adipisci ut facere atque nostrum odit dolorum ea cumque modi. Asperiores dolorum, iure odit ad, tempore magnam beatae deleniti soluta quisquam assumenda pariatur incidunt sapiente eaque modi earum. Ab ducimus accusamus recusandae, odio iusto commodi fuga, repellat inventore iure aut libero consequatur sequi nesciunt dolorem ipsam.</p>
                     </div>
                     <div class="profile-reviews tab">
                         <h1>User Reviews</h1>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus id cupiditate libero eius dolore, in rem nulla reiciendis. Qui, vero voluptatum! Quia iusto accusamus corporis, illo, ullam quibusdam maiores assumenda explicabo illum eligendi odit fugiat a, laborum rerum architecto eum ut distinctio. Error quos temporibus at expedita? Optio amet aliquam provident voluptatum minima quidem nemo harum doloremque. Est nihil quisquam quis deserunt repellat, natus, saepe laborum. Ipsum officiis, nisi optio.</p>
-                        
                     </div>
                     <div class="profile-settings tab">
                         <h1>Account Setting</h1>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio, eligendi magnam. Fuga ducimus assumenda, nemo sit, quod eveniet quidem dolorum modi voluptas dignissimos tempore omnis saepe officiis aliquam. Tempore sed voluptatum, illo sit vitae ullam consequatur, architecto enim iusto asperiores cupiditate debitis blanditiis harum quas ad dolor dolores veritatis molestiae! Aperiam, laboriosam! Temporibus modi vero ab quis, qui fuga reiciendis, hic, molestias vel ut recusandae eius nesciunt harum praesentium? Libero.</p>
+                        <div class="edit-profile-info">
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <fieldset class="form-group">
+                                    <legend class="border-bottom mb-4">Profile Info</legend>
+                                    {{ user_form|crispy }}
+                                    {{ user_pic_form|crispy }}
+                                </fieldset>
+                                <div class="form-group">
+                                    <button class="btn btn-outline-info" type="submit">Update</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

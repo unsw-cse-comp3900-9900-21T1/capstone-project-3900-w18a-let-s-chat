@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
-from .forms import OrderForm, CreateUserForm
+from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
 
 def store(request):
 	products = Product.objects.all()
@@ -126,7 +126,23 @@ def watchList(request):
 	return render(request, 'store/watchList.html', context)
 
 def userProfile(request):
+	if request.method == 'POST':
+		user_form = UpdateUserForm(request.POST, instance=request.user.customer)
+		user_pic_form = UpdateUserProfilePic(request.POST, request.FILES, instance=request.user.customer)
+		if user_form.is_valid() and user_pic_form.is_valid():
+			user_form.save()
+			user_pic_form.save()
+			messages.success(request, f'Your account information has been updated!')
+			return redirect('user_profile')
+	else:
+		user_form = UpdateUserForm(instance=request.user.customer)
+		user_pic_form = UpdateUserProfilePic(instance=request.user.customer)
+	
 	orders = request.user.customer.order_set.all()
 
-	context = {'orders':orders}
+	context = {
+		'user_form': user_form,
+		'user_pic_form': user_pic_form,
+		'orders': orders
+		}
 	return render(request, 'store/user_profile.html', context)
