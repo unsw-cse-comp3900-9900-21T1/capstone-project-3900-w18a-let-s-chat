@@ -8,7 +8,7 @@ class Customer(models.Model):
     nickname = models.CharField(max_length=200, null=True)
     email = models.EmailField(max_length=254)
     contactNo = models.CharField(max_length=200, null=True)
-    image = models.ImageField(default='../static/images/user_icon.png', upload_to='../images')
+    image = models.ImageField(default='../images/user_icon.png', upload_to='../images')
 
     def __str__(self):
         return self.nickname

@@ -1,12 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from .models import *
-from django.contrib.auth.forms import UserCreationForm
-
-from django.contrib.auth import authenticate, login, logout
-
 from django.contrib import messages
-
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import render_to_string
 
 # Create your views here.
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
@@ -27,7 +27,7 @@ def signup(request):
 				user = form.save()
 				username = form.cleaned_data.get('username')
 
-				messages.success(request, 'Account was created for ' + username)
+				#messages.success(request, 'Account was created for ' + username)
 
 				# create customer here
 				customer = Customer()
@@ -36,10 +36,44 @@ def signup(request):
 				customer.email = user.email
 				customer.save()
 
-				return redirect('login')
+				template = render_to_string('store/email_template.html', {'name': user.username, 'username': user.username})
+
+				print(settings.EMAIL_HOST_USER)
+				email = EmailMessage(
+					'You have successfully signed up for Petiverse!',
+					template,
+					settings.EMAIL_HOST_USER,
+					[user.email],
+				)
+
+				email.fail_silently = False
+				email.send()
+
+				return redirect('signup_success')
+				# username = user.username
+				# email = user.email
+				# Somehow it just cannot redirect to it when it has parameters
+				# return redirect('signup_success', username, email)
 	
 	context = {'form':form}
 	return render(request, 'store/signup.html', context)
+
+def signup_success(request):
+	# template = render_to_string('store/email_template.html', {'name': username, 'username': username})
+
+	# print(settings.EMAIL_HOST_USER)
+	# email = EmailMessage(
+	# 	'You have successfully signed up for Petiverse!',
+	# 	template,
+	# 	settings.EMAIL_HOST_USER,
+	# 	[email],
+	# )
+
+	# email.fail_silently = False
+	# email.send()
+
+	context = {}
+	return render(request, 'store/signup_success.html', context)
 
 def loginPage(request):
 	if request.user.is_authenticated:
@@ -146,3 +180,4 @@ def userProfile(request):
 		'orders': orders
 		}
 	return render(request, 'store/user_profile.html', context)
+
