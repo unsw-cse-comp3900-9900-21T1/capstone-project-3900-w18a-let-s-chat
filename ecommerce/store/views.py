@@ -95,9 +95,27 @@ def checkout(request):
 	return render(request, 'store/checkout.html', context)
 
 def purchase_history(request):
-	context = {}
-	return render(request, 'store/purchase_history.html', context)
+	if not request.user.is_authenticated:
+		return redirect('login')
 
+	customer = request.user.customer
+	orders = Order.objects.filter(customer=customer)
+	order_items = OrderItem.objects.filter(order__in=orders).order_by('-date_added')
+
+	purchases = []
+	for item in order_items:
+		purchases.append({
+			"name": item.product.name,
+			"seller": item.product.seller,
+			"quantity": item.quantity,
+			"date_added": item.date_added,
+			"image": item.product.imageURL,
+			"price": item.get_total
+		})
+
+	context = {"purchases": purchases}
+	return render(request, 'store/purchase_history.html', context)
+	
 def wishList(request):
 	context = {}
 	return render(request, 'store/wishList.html', context)
