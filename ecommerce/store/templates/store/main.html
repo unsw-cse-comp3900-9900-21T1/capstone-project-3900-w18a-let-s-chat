@@ -11,6 +11,12 @@
 
 	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
 
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<style>
+		img:hover {
+    		cursor: pointer;
+		}
+	</style>
 </head>
 <body>
 
@@ -42,9 +48,14 @@
 	    	<p id="cart-total">0</p>
 			
 			{% if request.user.is_authenticated %}
-				<a>
-					<img  id="user-icon" src="{% static 'images/user_icon.png' %}">
-				</a>
+				<div class="dropdown">
+					<img  id="user-icon" src="{% static 'images/user_icon.png' %}" onclick="myFunction()" >
+					<div id="myDropdown" class="dropdown-content">
+						<a href="/purchase_history">Purchase History</a>
+						<a href="/user_profile">User Profile</a>
+						<a href="#">Link 3</a>
+					</div>
+				</div>
 			{% endif %}
 	    </div>
 	  </div>
@@ -65,5 +76,27 @@
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+	<script>
+	/* When the user clicks on the button, 
+	toggle between hiding and showing the dropdown content */
+	function myFunction() {
+		document.getElementById("myDropdown").classList.toggle("show");
+	}
+
+	// Close the dropdown if the user clicks outside of it
+	window.onclick = function(event) {
+		if (!event.target.matches('#user-icon')) {
+			var dropdowns = document.getElementsByClassName("dropdown-content");
+			var i;
+			for (i = 0; i < dropdowns.length; i++) {
+				var openDropdown = dropdowns[i];
+				if (openDropdown.classList.contains('show')) {
+					openDropdown.classList.remove('show');
+				}
+			}
+		}
+	}
+	</script>
 </body>
 </html>

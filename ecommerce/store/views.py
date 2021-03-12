@@ -106,3 +106,9 @@ def wishList(request):
 def watchList(request):
 	context = {}
 	return render(request, 'store/watchList.html', context)
+
+def userProfile(request):
+	orders = request.user.customer.order_set.all()
+
+	context = {'orders':orders}
+	return render(request, 'store/user_profile.html', context)
