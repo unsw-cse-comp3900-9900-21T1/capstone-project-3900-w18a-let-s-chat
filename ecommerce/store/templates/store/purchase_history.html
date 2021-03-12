@@ -2,4 +2,31 @@
 {% load static %}
 {% block content %}
     <h3>Purchase History</h3>
-{% endblock content %}
+
+    <div class="box-element" style="height:500px;">
+        <ul class="list-group list-group-flush" id="history-list" style="overflow:scroll; height:100%;">
+
+            <!-- An example list item in the purchase history-->
+            <li class="list-group-item" style="border:none; height:150px;">
+                <div class="box-element">
+                    <div class="row">
+                        <div class="col">
+                            <img class="row-image img-fluid" style="height:100%; object-fit:contain;" src="{% static 'images/placeholder.png' %}"/></div>
+                        <div class="col">
+                            <p id="Product-name" style="font-size:14px;font-weight:bold;">Product name</p>
+                            <p id="seller-name" style="font-size:14px;">Seller name</p>
+                            <p id="delivery-time" style="font-size:14px;">Estimated delivery time</p>
+                        </div>
+                        <div class="col" style="display:flex; align-items:center;">
+                            <button class="btn btn-outline-warning" id="cancel-button">Cancel order</button>
+                            <button class="btn btn-outline-secondary" id="contact-button">Contact</button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+    </div>
+
+
+{% endblock content %} 
