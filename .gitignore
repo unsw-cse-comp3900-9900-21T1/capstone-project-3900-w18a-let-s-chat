@@ -29,9 +29,11 @@
 .history
 .ionide
 
+
+## Ecommerce 
+ecommerce/store/__pycache__
+ecommerce/db.sqlite3
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux
 
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
-ecommerce/store/__pycache__
-ecommerce/db.sqlite3
