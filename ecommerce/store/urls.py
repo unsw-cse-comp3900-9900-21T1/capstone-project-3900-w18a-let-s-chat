@@ -16,4 +16,6 @@ urlpatterns = [
     path('watchList/', views.watchList, name="watchList"),
     path('user_profile/', views.userProfile, name="user_profile"),
 
+    
+    path('update_item/', views.updateItem, name="update_item"),
 ]
