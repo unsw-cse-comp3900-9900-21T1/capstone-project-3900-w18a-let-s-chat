@@ -122,6 +122,7 @@ def cart(request):
 		#Create empty cart for now for non-logged in user
 		items = []
 		order = {'get_cart_total':0, 'get_cart_items':0}
+		cartItems = order.get('get_cart_items')
 
 	context = {'items':items, 'order':order, 'cartItems':cartItems}
 	return render(request, 'store/cart.html', context)
@@ -188,11 +189,19 @@ def userProfile(request):
 		user_pic_form = UpdateUserProfilePic(instance=request.user.customer)
 	
 	orders = request.user.customer.order_set.all()
+	# Please don't delete the next three lines 
+	# order is for cart to update the total number of items in cart
+	customer = request.user.customer
+	order, created = Order.objects.get_or_create(customer=customer, complete=False)
+	cartItems = order.get_cart_items
+
+	orders = Order.objects.filter(customer=customer)
 
 	context = {
 		'user_form': user_form,
 		'user_pic_form': user_pic_form,
-		'orders': orders
+		'orders': orders,
+		'cartItems':cartItems
 		}
 	return render(request, 'store/user_profile.html', context)
 
