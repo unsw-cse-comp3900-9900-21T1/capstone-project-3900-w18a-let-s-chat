@@ -19,8 +19,15 @@
             <div class="profile-nav-info">
                 <h3 class="user-name">{{request.user.customer.nickname}}</h3>
                 <div class="address">
-                    <p class="state">New York, </p>
-                    <span class="country">USA.</span>
+                    {% if request.user.customer.shippingaddress.address == "" %}
+                        <p class="address-line">{{request.user.customer.shippingaddress.address}}, </p>
+                        <p class="city">{{request.user.customer.shippingaddress.city}}, </p>
+                        <p class="state">{{request.user.customer.shippingaddress.city}} </p>
+                        <p class="postcode">{{request.user.customer.shippingaddress.postcode}}.</p>
+                    {% else %}
+                        <p class="empty-address">No address</p>
+                    {% endif %}
+                    <!--<span class="country">USA.</span>-->
                 </div>
             </div>
             <div class="profile-option">
