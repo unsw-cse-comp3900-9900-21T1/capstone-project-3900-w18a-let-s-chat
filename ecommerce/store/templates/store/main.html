@@ -29,11 +29,19 @@
 	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
 	    <ul class="navbar-nav mr-auto">
 	      <li class="nav-item active">
-	        <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>
+	        <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>	        
 	      </li>
 	 
 	    </ul>
+	    <div class ="form-inline my-1 my-lg-0">
+			<!-- Search Bar is Here-->
+	        <form action="{% url 'search_result' %}" method="get">
+	        	<input name = "q" type="text" placeholder="Search...">
+	        	<input type="submit" value="Search">
+	        </form>
+	    </div>
 	    <div class="form-inline my-2 my-lg-0">
+
 			{% if request.user.is_authenticated %}
 				<span class="hello-msg">Hello, {{request.user}}</span>
   				<span><a class="hello-msg" href="{% url 'logout' %}">Logout</a></span> 

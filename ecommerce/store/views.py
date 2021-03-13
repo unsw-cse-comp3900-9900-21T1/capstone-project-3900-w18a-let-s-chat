@@ -10,6 +10,9 @@ from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponseNotFound
 
+from django.views.generic import TemplateView, ListView
+
+from django.db.models import Q
 # Create your views here.
 from .forms import OrderForm, CreateUserForm
 
@@ -139,3 +142,13 @@ def userProfile(request):
 
 	context = {'orders':orders}
 	return render(request, 'store/user_profile.html', context)
+
+# search for products or pets here
+class SearchResultView(ListView):
+
+	model = Product
+
+	def get_queryset(self):
+		query = self.request.GET.get('q')
+		product_list = Product.objects.filter(Q(name__icontains=query))
+		return product_list
