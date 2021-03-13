@@ -107,6 +107,24 @@ h1, h2, h3, h4, h5, h6 {
 	margin-left: 15px;
 }
 
+#paypal-icon {
+	width: 45px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#visa-icon {
+	width: 45px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#master-icon {
+	width: 45px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
 .col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12 {
 	margin-top: 10px;
 }

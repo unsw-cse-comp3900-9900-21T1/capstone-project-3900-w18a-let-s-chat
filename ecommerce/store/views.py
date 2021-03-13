@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.http import HttpResponseNotFound
 import json
+import datetime 
 
 # Create your views here.
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
@@ -91,7 +92,6 @@ def loginPage(request):
 			else:
 				messages.info(request, 'Username OR password is incorrect')
 	
-	order = {'get_cart_total':0, 'get_cart_items':0}
 	cartItems = 0
 	context = {'cartItems':cartItems}
 	return render(request, 'store/login.html', context)
@@ -137,6 +137,7 @@ def checkout(request):
 		#Create empty cart for now for non-logged in user
 		items = []
 		order = {'get_cart_total':0, 'get_cart_items':0}
+		cartItems = order.get('get_cart_items')
 
 	context = {'items':items, 'order':order, 'cartItems':cartItems}
 	return render(request, 'store/checkout.html', context)
@@ -148,7 +149,9 @@ def purchase_history(request):
 	customer = request.user.customer
 	# order is for cart to update the total number of items in cart
 	order, created = Order.objects.get_or_create(customer=customer, complete=False)
-	orders = Order.objects.filter(customer=customer)
+
+	# To query the complete orders
+	orders = Order.objects.filter(customer=customer, complete=True)
 	order_items = OrderItem.objects.filter(order__in=orders).order_by('-date_added')
 
 	purchases = []
@@ -161,7 +164,7 @@ def purchase_history(request):
 			"image": item.product.imageURL,
 			"price": item.get_total
 		})
-	print(orders)
+
 	cartItems = order.get_cart_items
 	context = {"purchases": purchases, 'cartItems':cartItems}
 	return render(request, 'store/purchase_history.html', context)
@@ -218,17 +221,19 @@ def updateItem(request):
 
 	orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
-	# Still have enough stock available
-	if product.remaining_unit == 0:
+	# run out of stock
+	if product.remaining_unit == 0 or product.remaining_unit == orderItem.quantity:
 		if action == 'remove':
 			orderItem.quantity -= 1
 
-	elif product.remaining_unit > orderItem.quantity:
+	# Still have enough stock available
+	elif product.remaining_unit != 0 and product.remaining_unit > orderItem.quantity:
 		if action == 'add':
 			orderItem.quantity += 1
 		
 		elif action == 'remove':
 			orderItem.quantity -= 1
+	
 
 	orderItem.save()
 
@@ -238,3 +243,39 @@ def updateItem(request):
 
 
 	return JsonResponse('Item was added', safe=False)
+
+
+def processOrder(request):
+	transaction_id = datetime.datetime.now().timestamp()
+	data = json.loads(request.body)
+
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		total = float(data['form']['total'])
+		order.transaction_id = transaction_id
+
+		# To prevent user change the value through javascript to bypass the checkout checking
+		if total == order.get_cart_total:
+			order.complete = True
+		order.save()
+
+		ShippingAddress.objects.create(
+			customer=customer,
+			order=order,
+			recipient=customer.nickname,
+			address=data['shipping']['address'],
+			city=data['shipping']['city'],
+			state=data['shipping']['state'],
+			postcode=data['shipping']['postcode'],
+		)
+
+		orderItems =  order.orderitem_set.all()
+		for item in orderItems:
+			product = Product.objects.get(id=item.product.id)
+			product.remaining_unit -= item.quantity
+			product.sold_unit = item.quantity
+			product.save()			
+
+
+	return JsonResponse('Payment success', safe=False)
