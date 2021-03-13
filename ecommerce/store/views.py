@@ -125,9 +125,9 @@ def purchase_history(request):
 	context = {"purchases": purchases}
 	return render(request, 'store/purchase_history.html', context)
 	
-def wishList(request):
+def wishlist(request):
 	context = {}
-	return render(request, 'store/wishList.html', context)
+	return render(request, 'store/wishlist.html', context)
 
 # watchlist is a list of auction items that user watch to see
 def watchList(request):
