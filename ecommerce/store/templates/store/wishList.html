@@ -1,5 +1,30 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h3>WishList</h3>
+    <h3>Wishlist</h3>
+
+    <div class="box-element list-box">
+        <ul class="list-group list-group-flush" id="wishlist-list" style="overflow:scroll; height:100%;">
+
+            <!-- Placeholder for wishlist item-->
+            <li class="list-group-item list-box-item">
+                <div class="box-element">
+                    <div class="row">
+                        <div class="col"><img class="row-image img-fluid" style="height:100%; object-fit:contain;" src="{% static 'images/placeholder.png' %}"/></div>
+                        <div class="col">
+                            <p><b>Product name</b></p>
+                            <p id="seller-name" style="font-size:14px;">From seller foo</p>
+                            <p><b>$10 AUD</b></p>
+                        </div>
+                        <div class = "col" style="display:flex; align-items:center;">
+                            <button class="btn btn-outline-primary add-btn">Add to Cart</button>
+                            <button class="btn btn-outline-secondary">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+        </ul>
+    </div>
+
 {% endblock content %}
