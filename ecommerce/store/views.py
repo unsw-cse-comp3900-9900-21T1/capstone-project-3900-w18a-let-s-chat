@@ -125,11 +125,10 @@ def purchase_history(request):
 		return redirect('login')
 
 	customer = request.user.customer
-	# Currently using complete=False for purchase history and cart update 
-	# need to be changed after the checkout process added
-	# order, created = Order.objects.get_or_create(customer=customer, complete=True)
+	# order is for cart to update the total number of items in cart
 	order, created = Order.objects.get_or_create(customer=customer, complete=False)
-	order_items = OrderItem.objects.filter(order__in=order).order_by('-date_added')
+	orders = Order.objects.filter(customer=customer)
+	order_items = OrderItem.objects.filter(order__in=orders).order_by('-date_added')
 
 	purchases = []
 	for item in order_items:
@@ -141,7 +140,7 @@ def purchase_history(request):
 			"image": item.product.imageURL,
 			"price": item.get_total
 		})
-
+	print(orders)
 	cartItems = order.get_cart_items
 	context = {"purchases": purchases, 'cartItems':cartItems}
 	return render(request, 'store/purchase_history.html', context)
