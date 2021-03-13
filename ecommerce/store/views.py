@@ -54,8 +54,9 @@ def signup(request):
 				customer.save()
 
 				return redirect('login')
-	
-	context = {'form':form}
+
+	cartItems = 0
+	context = {'form':form, 'cartItems':cartItems}
 	return render(request, 'store/signup.html', context)
 
 def loginPage(request):
@@ -72,8 +73,10 @@ def loginPage(request):
 				return redirect('store')
 			else:
 				messages.info(request, 'Username OR password is incorrect')
-
-	context = {}
+	
+	order = {'get_cart_total':0, 'get_cart_items':0}
+	cartItems = 0
+	context = {'cartItems':cartItems}
 	return render(request, 'store/login.html', context)
 
 def logoutUser(request):
