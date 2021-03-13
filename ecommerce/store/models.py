@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from taggit.managers import TaggableManager
+from .util.generate_url_slugs import unique_slugify
 
 class Customer(models.Model):
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
@@ -30,7 +31,12 @@ class Product(models.Model):
     # seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     seller = models.CharField(max_length=200)
     tags = TaggableManager()
+    slug_str = models.SlugField(blank=True)
     
+    def save(self, **kwargs):
+        unique_slugify(self, self.name, slug_field_name='slug_str')
+        super(Product, self).save(**kwargs)
+
     def __str__(self):
         return self.name
 
