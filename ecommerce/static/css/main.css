@@ -247,6 +247,15 @@ h1, h2, h3, h4, h5, h6 {
 	text-shadow: 0 0 5px #09f;
 }
 
+.list-box {
+	height: 500px;
+}
+
+.list-box-item {
+	border:none;
+	height:fit-content
+}
+
 /********************** Layout and structure for User Profile page **********************/
 :root {
 	--color: #e40046;
