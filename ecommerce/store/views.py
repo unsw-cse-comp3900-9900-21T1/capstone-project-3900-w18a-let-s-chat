@@ -1,20 +1,18 @@
 from django.shortcuts import render, redirect
 from .models import *
-from django.contrib.auth.forms import UserCreationForm
-
-from django.contrib.auth import authenticate, login, logout
-
 from django.contrib import messages
-
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import render_to_string
 from django.http import JsonResponse
+from django.http import HttpResponseNotFound
 import json
 
-
-from django.http import HttpResponseNotFound
-
 # Create your views here.
-from .forms import OrderForm, CreateUserForm
+from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
 
 def store(request):
 
@@ -53,11 +51,30 @@ def signup(request):
 				customer.email = user.email
 				customer.save()
 
-				return redirect('login')
+				template = render_to_string('store/email_template.html', {'name': user.username, 'username': user.username})
+
+				print(settings.EMAIL_HOST_USER)
+				email = EmailMessage(
+					'You have successfully signed up for Petiverse!',
+					template,
+					settings.EMAIL_HOST_USER,
+					[user.email],
+				)
+
+				email.fail_silently = False
+				email.send()
+
+				return redirect('signup_success')
 
 	cartItems = 0
 	context = {'form':form, 'cartItems':cartItems}
 	return render(request, 'store/signup.html', context)
+
+def signup_success(request):
+
+	context = {}
+	return render(request, 'store/signup_success.html', context)
+
 
 def loginPage(request):
 	if request.user.is_authenticated:
@@ -105,6 +122,7 @@ def cart(request):
 		#Create empty cart for now for non-logged in user
 		items = []
 		order = {'get_cart_total':0, 'get_cart_items':0}
+		cartItems = order.get('get_cart_items')
 
 	context = {'items':items, 'order':order, 'cartItems':cartItems}
 	return render(request, 'store/cart.html', context)
@@ -148,9 +166,9 @@ def purchase_history(request):
 	context = {"purchases": purchases, 'cartItems':cartItems}
 	return render(request, 'store/purchase_history.html', context)
 	
-def wishList(request):
+def wishlist(request):
 	context = {}
-	return render(request, 'store/wishList.html', context)
+	return render(request, 'store/wishlist.html', context)
 
 # watchlist is a list of auction items that user watch to see
 def watchList(request):
@@ -158,14 +176,33 @@ def watchList(request):
 	return render(request, 'store/watchList.html', context)
 
 def userProfile(request):
+	if request.method == 'POST':
+		user_form = UpdateUserForm(request.POST, instance=request.user.customer)
+		user_pic_form = UpdateUserProfilePic(request.POST, request.FILES, instance=request.user.customer)
+		if user_form.is_valid() and user_pic_form.is_valid():
+			user_form.save()
+			user_pic_form.save()
+			messages.success(request, f'Your account information has been updated!')
+			return redirect('user_profile')
+	else:
+		user_form = UpdateUserForm(instance=request.user.customer)
+		user_pic_form = UpdateUserProfilePic(instance=request.user.customer)
+	
+	orders = request.user.customer.order_set.all()
+	# Please don't delete the next three lines 
+	# order is for cart to update the total number of items in cart
 	customer = request.user.customer
 	order, created = Order.objects.get_or_create(customer=customer, complete=False)
 	cartItems = order.get_cart_items
 
-	orders = request.user.customer.order_set.all()
+	orders = Order.objects.filter(customer=customer)
 
-	print(orders)
-	context = {'orders':orders, 'cartItems':cartItems}
+	context = {
+		'user_form': user_form,
+		'user_pic_form': user_pic_form,
+		'orders': orders,
+		'cartItems':cartItems
+		}
 	return render(request, 'store/user_profile.html', context)
 
 def updateItem(request):

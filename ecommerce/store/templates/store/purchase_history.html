@@ -4,11 +4,11 @@
 {%  include 'store/status.html' %}
     <h3>Purchase History</h3>
 
-    <div class="box-element" style="height:500px;">
+    <div class="box-element list-box" >
         <ul class="list-group list-group-flush" id="history-list" style="overflow:scroll; height:100%;">
 
             {% for item in purchases %}
-            <li class="list-group-item" style="border:none; height:fit-content">
+            <li class="list-group-item list-box-item">
                 <div class="box-element">
                     <div class="row">
                         <div class="col">
