@@ -11,6 +11,8 @@ from django.http import JsonResponse
 import json
 
 
+from django.http import HttpResponseNotFound
+
 # Create your views here.
 from .forms import OrderForm, CreateUserForm
 
@@ -78,8 +80,15 @@ def logoutUser(request):
 	logout(request)
 	return redirect('login')
 
-def product_description(request):
-	context = {}
+def product_page(request, slug=None):
+	
+	product_filter = Product.objects.filter(slug_str=slug)
+	if product_filter.count() != 1:
+		return HttpResponseNotFound("404: Product listing was not found")
+	product = product_filter.first()
+
+	
+	context = {"product": product, "tags": product.tags.names()}
 	return render(request, 'store/product_description.html', context)
 
 def cart(request):

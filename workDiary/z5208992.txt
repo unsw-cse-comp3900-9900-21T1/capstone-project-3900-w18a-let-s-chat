@@ -15,3 +15,7 @@ Filled in acceptance criteria of some user stories in proposal
 
 Week 4
 Created HTML templates for product pages, and purchase history page
+Implemented purchase history functionality
+Implemented url slugs for product pages
+Implemented basic functionality for product pages
+
