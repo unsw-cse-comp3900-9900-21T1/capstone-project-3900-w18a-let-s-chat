@@ -11,6 +11,8 @@ from django.http import JsonResponse
 from django.http import HttpResponseNotFound
 import json
 import datetime 
+from django.views.generic import TemplateView, ListView
+from django.db.models import Q
 
 # Create your views here.
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
@@ -274,8 +276,20 @@ def processOrder(request):
 		for item in orderItems:
 			product = Product.objects.get(id=item.product.id)
 			product.remaining_unit -= item.quantity
-			product.sold_unit = item.quantity
+			product.sold_unit += item.quantity
 			product.save()			
 
 
 	return JsonResponse('Payment success', safe=False)
+
+# search for products or pets by name
+class SearchResultView(ListView):
+
+	model = Product
+
+	def get_queryset(self):
+		query = self.request.GET.get('q')
+		if query == "":
+			return Product.objects.none()
+		product_list = Product.objects.filter(Q(name__icontains=query)) 
+		return product_list

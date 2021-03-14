@@ -1,0 +1,13 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <h3>Search Result</h3>
+
+    <u1>
+    	{%for product in object_list%}
+    	<li>
+    		{{product.name}}, {{product.price}}
+    	<li>
+    	{% endfor %}
+    <u1>
+{% endblock content %}
