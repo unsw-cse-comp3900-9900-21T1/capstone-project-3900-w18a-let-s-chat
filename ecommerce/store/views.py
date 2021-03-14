@@ -143,12 +143,15 @@ def userProfile(request):
 	context = {'orders':orders}
 	return render(request, 'store/user_profile.html', context)
 
-# search for products or pets here
+# search for products or pets by name
 class SearchResultView(ListView):
 
 	model = Product
 
 	def get_queryset(self):
 		query = self.request.GET.get('q')
-		product_list = Product.objects.filter(Q(name__icontains=query))
+		if query == "":
+			return Product.objects.none()
+		product_list = Product.objects.filter(Q(name__icontains=query)) 
 		return product_list
+
