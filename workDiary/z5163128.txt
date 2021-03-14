@@ -9,3 +9,9 @@ Did an analysis of Gumtree as an e-commerce platform. Found some flaws and issue
 
 For the proposal, helped created the acceptance criteria for chatbot, sales tracking, delivery, 
 product moderation, wishlist and review. 
+
+Week 3: 
+Added to and cleaned up the user story table. Came up for acceptance criterias for chatbot, sales tracking, delivery, product moderation, wishlist, review
+
+Week 4:
+Working on the search function. Simple product search by name works.

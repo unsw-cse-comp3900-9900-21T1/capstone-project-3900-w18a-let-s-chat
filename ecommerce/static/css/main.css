@@ -21,6 +21,11 @@ h1, h2, h3, h4, h5, h6 {
 	-webkit-box-shadow: -1px -3px 5px -2px rgba(214, 214, 214, 1);
 	-moz-box-shadow: -1px -3px 5px -2px rgba(214, 214, 214, 1);
 	box-shadow: -1px -3px 5px -2px rgba(214, 214, 214, 1);
+	transition: 0.1s all ease-in-out; 
+}
+
+.thumbnail:hover {
+	transform: scale(1.1); 
 }
 
 .product {
@@ -103,6 +108,24 @@ h1, h2, h3, h4, h5, h6 {
 
 #user-icon {
 	width: 25px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#paypal-icon {
+	width: 45px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#visa-icon {
+	width: 45px;
+	display: inline-block;
+	margin-left: 15px;
+}
+
+#master-icon {
+	width: 45px;
 	display: inline-block;
 	margin-left: 15px;
 }
@@ -247,9 +270,18 @@ h1, h2, h3, h4, h5, h6 {
 	text-shadow: 0 0 5px #09f;
 }
 
+.list-box {
+	height: 500px;
+}
+
+.list-box-item {
+	border:none;
+	height:fit-content
+}
+
 /********************** Layout and structure for User Profile page **********************/
 :root {
-	--color: #e40046;
+	--color: #4f868c;
 }
 
 .profile-header {

@@ -12,3 +12,8 @@ I added more pages for buyer and seller to our Balsamiq cloud.
 Add screenshots of the Balsamiq pages to our google doc and add links and descriptions for 
 each feature.
 Completed the proposal together in our Friday meeting.
+
+Week 4
+I created a basic data structure and migrate them into database.
+I also make the cart icon counter to update dynamically.
+Solved plenty merge conflicts and minor issues.
