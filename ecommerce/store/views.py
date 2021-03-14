@@ -276,7 +276,7 @@ def processOrder(request):
 		for item in orderItems:
 			product = Product.objects.get(id=item.product.id)
 			product.remaining_unit -= item.quantity
-			product.sold_unit = item.quantity
+			product.sold_unit += item.quantity
 			product.save()			
 
 
