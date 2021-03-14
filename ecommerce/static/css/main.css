@@ -21,6 +21,11 @@ h1, h2, h3, h4, h5, h6 {
 	-webkit-box-shadow: -1px -3px 5px -2px rgba(214, 214, 214, 1);
 	-moz-box-shadow: -1px -3px 5px -2px rgba(214, 214, 214, 1);
 	box-shadow: -1px -3px 5px -2px rgba(214, 214, 214, 1);
+	transition: 0.1s all ease-in-out; 
+}
+
+.thumbnail:hover {
+	transform: scale(1.1); 
 }
 
 .product {
