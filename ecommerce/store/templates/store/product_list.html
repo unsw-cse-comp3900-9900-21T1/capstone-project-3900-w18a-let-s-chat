@@ -1,0 +1,29 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    <h3>Search Result</h3>
+
+    <u1>
+    	<div class="row">
+    	{%for product in product_list%}
+    		<div class="col-lg-4">
+				<a href = "{% url 'product_page' product.slug_str %}">
+					<img class="thumbnail" src="{{product.imageURL}}">
+				</a>
+				<div class="box-element product">
+					<h6><strong>{{product.name}}</strong></h6>
+					<hr>
+
+					<button data-product="{{product.id}}" data-action="add"
+					class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+					<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
+					<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+
+				</div>
+		</div>
+
+    	{% empty %}
+    		<p5>Search not found</p5>
+    	{% endfor %}
+    <u1>
+{% endblock content %}

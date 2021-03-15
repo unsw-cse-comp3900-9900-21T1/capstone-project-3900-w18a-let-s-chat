@@ -17,6 +17,7 @@ urlpatterns = [
     path('wishlist/', views.wishlist, name="wishlist"),
     path('watchList/', views.watchList, name="watchList"),
     path('user_profile/', views.userProfile, name="user_profile"),
+    path('search_result/', views.searchResult, name="search_result"),
     path('process_order/', views.processOrder, name="process_order"),
     path('new_product/', views.new_product, name='new_product'),
 
@@ -38,4 +39,5 @@ urlpatterns = [
 
     
     path('update_item/', views.updateItem, name="update_item"),
+    path('add_multiple/', views.add_multiple, name="add_multiple"),
 ]
