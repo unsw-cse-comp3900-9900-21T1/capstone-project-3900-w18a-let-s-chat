@@ -160,7 +160,8 @@ dmypy.json
 
 
 ## Ecommerce 
-ecommerce/store/__pycache__
+ecommerce/store/__pycache__/**
+ecommerce/ecommerce/__pycache__/**
 ecommerce/db.sqlite3
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux
 
