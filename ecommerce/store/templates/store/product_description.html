@@ -17,10 +17,10 @@
                                 by {{product.seller}} </h5>
                     <div class="row">
                         <div style="min-width: 300px;" class="col-lg-6">
-                            <p>Estimated delivery: {{product.delivery_period_days_hours_str}}</p>
+                            <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
                             <div style="padding: 10px; max-height:400px" class="card" id="desc-box">
                                 <h5>Description</h5>
-                                <p style="font-size:14px; overflow:scroll; white-space: pre-line;" id="desc-text">
+                                <p style="font-size:14px; overflow:none; white-space: pre-line;" id="desc-text">
                                     {{product.description}}
                                 </p>
                             </div>
@@ -30,7 +30,8 @@
                                 <form>
                                     <div class="row">
                                         <div class="col" style="max-width:30%;">
-                                            <p id="price-text"> ${{product.price|floatformat:2}} AUD</p>
+                                            <p id="price-text"> ${{product.price|floatformat:2}} <strong>AUD</strong></p>
+                                            <p>per unit</p>
                                         </div>
                                         <div class="col" style="max-width:30%;">
                                             <input type="number" id="quantity" min=1 value=1 style="max-width:100%;"/>
