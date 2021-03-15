@@ -4,6 +4,8 @@ from taggit.managers import TaggableManager
 from .util.generate_url_slugs import unique_slugify
 from PIL import Image
 
+import datetime
+
 class Customer(models.Model):
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=200, null=True)
@@ -61,6 +63,11 @@ class Product(models.Model):
         except:
             url = ''
         return url
+
+    @property
+    def delivery_period_days_hours_str(self):
+        secs = self.delivery_period.total_seconds()
+        return f'{int(secs/86400)} days, {int((secs % 86400)/3600)} hours'
 
 class Order(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
