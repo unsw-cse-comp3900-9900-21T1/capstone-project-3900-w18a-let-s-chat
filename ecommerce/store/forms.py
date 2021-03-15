@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 
-from .models import Order, Customer
+from .models import Order, Customer, Product
 
 class OrderForm(ModelForm):
     class Meta:
@@ -25,3 +25,16 @@ class UpdateUserProfilePic(ModelForm):
     class Meta:
         model = Customer
         fields = ['image']
+
+class CreateProductForm(ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'price', 'description', 'isAnimal', 'warranty', 'delivery_period', 'remaining_unit', 'image', 'tags']
+        labels = {
+            'isAnimal': 'Animal?',
+            'remaining_unit': 'Units available',
+            "image": "Choose an image for your listing"}
+     
+    def __init__(self, *args, **kwargs):
+        super(CreateProductForm, self).__init__(*args, **kwargs)
+        #self.fields['image'].required = True

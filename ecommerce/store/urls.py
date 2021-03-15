@@ -18,6 +18,7 @@ urlpatterns = [
     path('watchList/', views.watchList, name="watchList"),
     path('user_profile/', views.userProfile, name="user_profile"),
     path('process_order/', views.processOrder, name="process_order"),
+    path('new_product/', views.new_product, name='new_product'),
 
     path('reset_password/',
         auth_views.PasswordResetView.as_view(template_name="store/password_reset.html"),

@@ -10,7 +10,8 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.http import HttpResponseNotFound
 import json
-import datetime 
+import datetime
+from .forms import CreateProductForm
 
 # Create your views here.
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
@@ -279,3 +280,25 @@ def processOrder(request):
 
 
 	return JsonResponse('Payment success', safe=False)
+
+def new_product(request):
+	if not request.user.is_authenticated:
+		return redirect('login')
+	else:
+
+		if request.method == "POST":
+			form = CreateProductForm(request.POST, request.FILES)
+			if form.is_valid():
+				product = form.save()
+				return redirect(f'/product/{product.slug_str}')
+		
+		else:
+			form = CreateProductForm(initial={
+				'remaining_unit': 1,
+				'price': 10.00,
+				'isAnimal': False
+			})
+
+
+		context = {"form": form}
+		return render(request, 'store/new_product.html', context)
