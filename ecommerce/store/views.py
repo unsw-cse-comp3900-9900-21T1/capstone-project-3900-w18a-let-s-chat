@@ -74,8 +74,8 @@ def signup(request):
 	return render(request, 'store/signup.html', context)
 
 def signup_success(request):
-
-	context = {}
+	cartItems = 0
+	context = {'cartItems':cartItems}
 	return render(request, 'store/signup_success.html', context)
 
 
@@ -168,6 +168,8 @@ def purchase_history(request):
 	purchases = []
 	for item in order_items:
 		purchases.append({
+			"iid":item.id,
+			"id":item.product.id,
 			"name": item.product.name,
 			"seller": item.product.seller,
 			"quantity": item.quantity,
@@ -175,7 +177,7 @@ def purchase_history(request):
 			"image": item.product.imageURL,
 			"price": item.get_total
 		})
-
+		
 	cartItems = order.get_cart_items
 	context = {"purchases": purchases, 'cartItems':cartItems}
 	return render(request, 'store/purchase_history.html', context)
@@ -330,5 +332,34 @@ def add_multiple(request):
 			orderItem.quantity += quantity
 			orderItem.save()	
 
-
 	return JsonResponse('Payment success', safe=False)
+
+def restore(request):
+	data = json.loads(request.body)
+
+	customer = request.user.customer
+	orders = Order.objects.filter(customer=customer, complete=True)
+	order_items = OrderItem.objects.filter(order__in=orders).order_by('-date_added')
+
+	productId = int(data['product'])
+	itemId = int(data['itemId'])
+
+	print('pid:', productId)
+	print('iid:', itemId)
+
+	for item in order_items:
+		if item.product.id == productId and item.id == itemId:
+			product = Product.objects.get(id=productId)
+			if product != None:
+				print(item.quantity)
+				product.remaining_unit += item.quantity
+				product.sold_unit -= item.quantity
+				product.save()
+				item.delete()
+				print("cancel")
+			else:
+				print('none')
+			break
+
+
+	return JsonResponse('Cancelled', safe=False)

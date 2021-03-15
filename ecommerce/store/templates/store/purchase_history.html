@@ -17,10 +17,11 @@
                             <p id="Product-name" style="font-size:14px;"><b>{{item.name}} (x{{item.quantity}})</b></p>
                             <p id="seller-name" style="font-size:14px;">From seller {{item.seller}}</p>
                             <p id="delivery-time" style="font-size:14px;">Purchased on {{item.date_added}}</p>
-                            <p id="delivery-time" style="font-size:14px;"><b>${{item.price|floatformat:2}}</b></p>
+                            <p id="price" style="font-size:14px;"><b>${{item.price|floatformat:2}}</b></p>
                         </div>
                         <div class="col" style="display:flex; align-items:center;">
-                            <button class="btn btn-outline-warning" id="cancel-button">Cancel order</button>
+                            <button data-id={{item.id}} data-iid={{item.iid}}
+                            class="btn btn-outline-warning cancel" id="cancel-button">Cancel order</button>
                             <button class="btn btn-outline-secondary" id="contact-button">Contact</button>
                         </div>
                     </div>
@@ -31,5 +32,38 @@
         </ul>
     </div>
 
+<script type="text/javascript">
 
+    var cancelBtns = document.getElementsByClassName('cancel')
+    
+    for (i = 0; i < cancelBtns.length; i++) {
+        cancelBtns[i].addEventListener('click', function(){
+        var productId = this.dataset.id
+        var itemId = this.dataset.iid
+        restoreData(productId, itemId)
+	    })
+    }
+
+    function restoreData(productId, itemId){
+        console.log('product:', productId)
+        console.log('itemId:', itemId)
+        var url = "/restore/"
+        fetch(url, {
+            method:'POST',
+            headers:{
+                'Content-Type':'applicaiton/json',
+                'X-CSRFToken':csrftoken,
+            }, 
+
+            body:JSON.stringify({'product':productId, "itemId":itemId}),
+            
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log('Data sent:', data);
+            location.reload()
+            })
+    }
+
+</script>
 {% endblock content %} 
