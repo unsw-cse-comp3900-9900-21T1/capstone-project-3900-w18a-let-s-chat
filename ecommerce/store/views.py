@@ -109,8 +109,17 @@ def product_page(request, slug=None):
 		return HttpResponseNotFound("404: Product listing was not found")
 	product = product_filter.first()
 
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		cartItems = order.get_cart_items
+	else:
+		#Create empty cart for now for non-logged in user
+		order = {'get_cart_total':0, 'get_cart_items':0}
+		cartItems = order.get('get_cart_items')
+
 	
-	context = {"product": product, "tags": product.tags.names()}
+	context = {"product": product, "tags": product.tags.names(), "cartItems":cartItems}
 	return render(request, 'store/product_description.html', context)
 
 def cart(request):
@@ -214,8 +223,6 @@ def updateItem(request):
 	data = json.loads(request.body)
 	productId = data['productId']
 	action = data['action']
-	print('Action:', action)
-	print('Product:', productId)
 
 	customer = request.user.customer
 	product = Product.objects.get(id=productId)
@@ -235,16 +242,19 @@ def updateItem(request):
 		
 		elif action == 'remove':
 			orderItem.quantity -= 1
-	
+	else:
+		if action == 'remove':
+			orderItem.quantity -= 1
 
 	orderItem.save()
+	print('Action:', action)
+	print('Product:', productId)
 
 	if orderItem.quantity <= 0:
 		orderItem.delete()
+		print('delete')
 	
-
-
-	return JsonResponse('Item was added', safe=False)
+	return JsonResponse('Item was updated', safe=False)
 
 
 def processOrder(request):
@@ -282,14 +292,43 @@ def processOrder(request):
 
 	return JsonResponse('Payment success', safe=False)
 
-# search for products or pets by name
-class SearchResultView(ListView):
+def searchResult(request):
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		cartItems = order.get_cart_items
+	else:
+		#Create empty cart for now for non-logged in user
+		order = {'get_cart_total':0, 'get_cart_items':0}
+		cartItems = order.get('get_cart_items')
 
-	model = Product
+	query = request.GET.get('q')
 
-	def get_queryset(self):
-		query = self.request.GET.get('q')
-		if query == "":
-			return Product.objects.none()
+	if query == "":
+		product_list = Product.objects.none()
+	else:
 		product_list = Product.objects.filter(Q(name__icontains=query)) 
-		return product_list
+
+	context = {'product_list':product_list, 'cartItems':cartItems}
+	return render(request, 'store/product_list.html', context)
+	# return product_list
+
+def add_multiple(request):
+	data = json.loads(request.body)
+
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		productId = int(data['productId'])
+		quantity = int(data['quantity'])
+		print(quantity)
+		product = Product.objects.get(id=productId)
+		orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+
+		# Still have enough stock available
+		if product.remaining_unit != 0 and product.remaining_unit > orderItem.quantity:
+			orderItem.quantity += quantity
+			orderItem.save()	
+
+
+	return JsonResponse('Payment success', safe=False)
