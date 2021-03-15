@@ -89,6 +89,11 @@ h1, h2, h3, h4, h5, h6 {
 	display: block;
 }
 
+.search_bar {
+	width: 700px;
+	margin-right: 35px;
+}
+
 #cart-icon {
 	width: 25px;
 	display: inline-block;
