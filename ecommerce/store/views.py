@@ -333,7 +333,7 @@ def searchResult(request):
 
 	if query == "":
 		product_list = Product.objects.none()
-	if query.find("seller:") is not -1 :
+	if query.find("seller:") is not -1 or query.find("Seller:") is not -1:
 		sellername = query[7:]
 		#print("seller wanted: " + sellername)
 		if sellername[0] is " ":
