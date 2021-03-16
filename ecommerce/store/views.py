@@ -169,7 +169,6 @@ def purchase_history(request):
 		order_items = OrderItem.objects.filter(order=o).order_by('-date_added')
 
 		for item in order_items:
-			print(item.date_added)
 			purchases.append({
 				"iid":item.id,
 				"product":item.product,
