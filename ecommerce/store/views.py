@@ -33,7 +33,8 @@ def store(request):
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order['get_cart_items']
 
-	products = Product.objects.all()
+	# Only get products that still have units left
+	products = Product.objects.filter(remaining_unit__gt=0)
 	context = {'products':products, 'cartItems':cartItems}
 	return render(request, 'store/store.html', context)
 
@@ -343,8 +344,10 @@ def searchResult(request):
 		else:
 			product_list = Product.objects.filter(Q(seller__icontains=sellername))
 	else:
-		product_list = Product.objects.filter(Q(name__icontains=query)) 
-
+		product_list = Product.objects.filter(Q(name__icontains=query))
+	
+	# Only show products that still have units left
+	product_list = product_list.filter(remaining_unit__gt=0)
 	context = {'product_list':product_list, 'cartItems':cartItems}
 	return render(request, 'store/product_list.html', context)
 	# return product_list
