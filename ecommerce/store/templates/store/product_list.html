@@ -1,29 +1,55 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h3>Search Result</h3>
 
-    <u1>
-    	<div class="row">
-    	{%for product in product_list%}
-    		<div class="col-lg-4">
-				<a href = "{% url 'product_page' product.slug_str %}">
-					<img class="thumbnail" src="{{product.imageURL}}">
-				</a>
-				<div class="box-element product">
-					<h6><strong>{{product.name}}</strong></h6>
-					<hr>
+    <h1>Search Results</h1>
+    <h2>
+    	<div class="btn-group" role="group">
+    		<div class="btn-group">
+		    	<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+		        Buying Format:
+		        </button>
+				    <div class="dropdown-menu">
+					    <a class="dropdown-item" href="#">All listings</a>
+					    <a class="dropdown-item" href="#">Auction only</a>
+					    <a class="dropdown-item" href="#">Fixed price only</a>
+				    </div>
+			</div>
 
-					<button data-product="{{product.id}}" data-action="add"
-					class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-					<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-					<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
-
-				</div>
+			<div class="btn-group">
+				<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+			      Sort by:
+			    </button>
+			    <div class="dropdown-menu">
+				    <a class="dropdown-item" href="#">Sort by relevance</a>
+				    <a class="dropdown-item" href="#">Sort by price (Low To High))</a>
+				    <a class="dropdown-item" href="#">Sort by price (High To Low)</a>
+			    </div>
+			</div>
 		</div>
+	</h2>
 
-    	{% empty %}
-    		<p5>Search not found</p5>
-    	{% endfor %}
-    <u1>
+		<u1>
+	    	<div class="row">
+	    	{%for product in product_list%}
+	    		<div class="col-lg-4">
+					<a href = "{% url 'product_page' product.slug_str %}">
+						<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
+					</a>
+					<div class="box-element product">
+						<h6><strong>{{product.name}}</strong></h6>
+						<hr>
+
+						<button data-product="{{product.id}}" data-action="add"
+						class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+						<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
+						<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+
+					</div>
+			</div>
+
+	    	{% empty %}
+	    		<p5>Search not found</p5>
+	    	{% endfor %}
+	    <u1>
 {% endblock content %}
