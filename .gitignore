@@ -159,7 +159,6 @@ dmypy.json
 .history
 .ionide
 
-
 ## Ecommerce 
 ecommerce/store/__pycache__/*
 ecommerce/db.sqlite3
