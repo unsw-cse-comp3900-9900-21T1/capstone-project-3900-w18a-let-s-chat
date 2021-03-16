@@ -161,24 +161,28 @@ def purchase_history(request):
 	order, created = Order.objects.get_or_create(customer=customer, complete=False)
 
 	# To query the complete orders
-	orders = Order.objects.filter(customer=customer, complete=True)
+	orders = Order.objects.filter(customer=customer, complete=True).order_by('-transaction_id')
 	order_items = OrderItem.objects.filter(order__in=orders).order_by('-date_added')
 
 	purchases = []
-	for item in order_items:
-		purchases.append({
-			"iid":item.id,
-			"product":item.product,
-			"id":item.product.id,
-			"name": item.product.name,
-			"seller": item.product.seller,
-			"quantity": item.quantity,
-			"date_added": item.date_added,
-			# "transaction": order.transaction_id,
-			"estimated": item.product.delivery_period_days_hours_str,
-			"image": item.product.imageURL,
-			"price": item.get_total
-		})
+	for o in orders:
+		order_items = OrderItem.objects.filter(order=o).order_by('-date_added')
+
+		for item in order_items:
+			print(item.date_added)
+			purchases.append({
+				"iid":item.id,
+				"product":item.product,
+				"id":item.product.id,
+				"name": item.product.name,
+				"seller": item.product.seller,
+				"quantity": item.quantity,
+				"date_added": item.date_added,
+				"transaction": o.transaction_id,
+				"estimated": item.product.delivery_period_days_hours_str,
+				"image": item.product.imageURL,
+				"price": item.get_total
+			})
 		
 	cartItems = order.get_cart_items
 	context = {"purchases": purchases, 'cartItems':cartItems}
