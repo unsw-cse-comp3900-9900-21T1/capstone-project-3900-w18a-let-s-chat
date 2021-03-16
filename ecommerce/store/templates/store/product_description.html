@@ -17,9 +17,10 @@
                                 by {{product.seller}} </h5>
                     <div class="row">
                         <div style="min-width: 300px;" class="col-lg-6">
+                            <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
                             <div style="padding: 10px; max-height:400px" class="card" id="desc-box">
                                 <h5>Description</h5>
-                                <p style="font-size:14px; overflow:scroll; white-space: pre-line;" id="desc-text">
+                                <p style="font-size:14px; overflow:none; white-space: pre-line;" id="desc-text">
                                     {{product.description}}
                                 </p>
                             </div>
@@ -29,13 +30,15 @@
                                 <form>
                                     <div class="row">
                                         <div class="col" style="max-width:30%;">
-                                            <p id="price-text"> ${{product.price|floatformat:2}} AUD</p>
+                                            <p id="price-text"> ${{product.price|floatformat:2}} <strong>AUD</strong></p>
+                                            <p>per unit</p>
                                         </div>
                                         <div class="col" style="max-width:30%;">
-                                            <input type="number" id="quantity" min=0 style="max-width:100%;"/>
+                                            <input type="number" id="quantity" min=1 value=1 style="max-width:100%;"/>
                                         </div>
                                         <div class="col">
-                                            <button class="btn btn-outline-primary" id="add-to-cart" style="font-size: 13px;">
+                                            <button data-product="{{product.id}}" 
+                                            class="btn btn-outline-primary" id="add-to-cart" style="font-size: 13px;">
                                                 Add to Cart
                                             </button>
                                         </div>
@@ -130,4 +133,44 @@
         </ul>
     </div>
 
+<script type="text/javascript">
+
+    var quantityInput = document.getElementById('quantity')
+    var addBtn = document.getElementById('add-to-cart')
+    var productId = addBtn.dataset.product
+    
+    quantityInput.addEventListener('submit', function(e){
+        e.preventDefault()
+        console.log('Set Quantity')
+    })
+
+    addBtn.addEventListener('click', function(){
+        submitData()
+    })
+
+    function submitData(){
+        var quantity = quantityInput.value
+        if (quantity == 0) {
+            quantity = 1
+        }
+        console.log('Set quantity:', quantity)
+
+        var url = "/add_multiple/"
+        fetch(url, {
+            method:'POST',
+            headers:{
+                'Content-Type':'applicaiton/json',
+                'X-CSRFToken':csrftoken,
+            }, 
+            body:JSON.stringify({'productId':productId,'quantity':quantity}),
+            
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log('Data sent:', data);
+            location.reload()
+            })
+    }
+
+</script>
 {% endblock content %}
