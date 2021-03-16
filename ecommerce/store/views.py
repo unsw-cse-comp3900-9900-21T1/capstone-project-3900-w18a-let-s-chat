@@ -73,14 +73,11 @@ def signup(request):
 
 				return redirect('signup_success')
 
-	cartItems = 0
-	context = {'form':form, 'cartItems':cartItems}
+	context = {'form':form}
 	return render(request, 'store/signup.html', context)
 
 def signup_success(request):
-	cartItems = 0
-	context = {'cartItems':cartItems}
-	return render(request, 'store/signup_success.html', context)
+	return render(request, 'store/signup_success.html')
 
 
 def loginPage(request):
@@ -98,9 +95,7 @@ def loginPage(request):
 			else:
 				messages.info(request, 'Username OR password is incorrect')
 	
-	cartItems = 0
-	context = {'cartItems':cartItems}
-	return render(request, 'store/login.html', context)
+	return render(request, 'store/login.html')
 
 def logoutUser(request):
 	logout(request)
@@ -173,11 +168,14 @@ def purchase_history(request):
 	for item in order_items:
 		purchases.append({
 			"iid":item.id,
+			"product":item.product,
 			"id":item.product.id,
 			"name": item.product.name,
 			"seller": item.product.seller,
 			"quantity": item.quantity,
 			"date_added": item.date_added,
+			# "transaction": order.transaction_id,
+			"estimated": item.product.delivery_period_days_hours_str,
 			"image": item.product.imageURL,
 			"price": item.get_total
 		})

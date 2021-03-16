@@ -6,4 +6,11 @@
     <p>Your account has been created. A confirmation email has been sent. You may go ahead and log in now.</p>
 
     <a href="/login">Log in</a>
+    
+<script type="text/javascript">
+    if (user == 'AnonymousUser'){
+        document.getElementById('cart-icon').classList.add("hidden");
+        document.getElementById('cart-total').classList.add("hidden");
+    }
+</script>
 {% endblock content %}

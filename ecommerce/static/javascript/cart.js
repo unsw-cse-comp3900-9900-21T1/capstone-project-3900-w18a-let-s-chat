@@ -3,6 +3,8 @@ var updateBtns = document.getElementsByClassName('update-cart')
 for (i = 0; i < updateBtns.length; i++) {
 
 	if (user == 'AnonymousUser'){
+		document.getElementById('cart-icon').classList.add("hidden");
+		document.getElementById('cart-total').classList.add("hidden");
 		updateBtns[i].classList.add("hidden");
 	}
 	else {
