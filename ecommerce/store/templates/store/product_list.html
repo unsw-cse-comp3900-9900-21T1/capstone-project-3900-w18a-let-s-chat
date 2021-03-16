@@ -1,14 +1,14 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h3>Search Result</h3>
+    <h3>Search Results</h3>
 
     <u1>
     	<div class="row">
     	{%for product in product_list%}
     		<div class="col-lg-4">
 				<a href = "{% url 'product_page' product.slug_str %}">
-					<img class="thumbnail" src="{{product.imageURL}}">
+					<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
 				</a>
 				<div class="box-element product">
 					<h6><strong>{{product.name}}</strong></h6>
