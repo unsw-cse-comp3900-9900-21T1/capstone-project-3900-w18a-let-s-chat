@@ -333,6 +333,15 @@ def searchResult(request):
 
 	if query == "":
 		product_list = Product.objects.none()
+	if query.find("seller:") is not -1 :
+		sellername = query[7:]
+		print("seller wanted: " + sellername)
+		if sellername[0] is " ":
+			print("there is a space")
+			sellername2 = sellername[1:]
+			product_list = Product.objects.filter(Q(seller__icontains=sellername2))
+		else:
+			product_list = Product.objects.filter(Q(seller__icontains=sellername))
 	else:
 		product_list = Product.objects.filter(Q(name__icontains=query)) 
 
