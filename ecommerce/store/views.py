@@ -174,7 +174,7 @@ def purchase_history(request):
 				"product":item.product,
 				"id":item.product.id,
 				"name": item.product.name,
-				"seller": item.product.seller,
+				"seller": item.product.seller.nickname,
 				"quantity": item.quantity,
 				"date_added": item.date_added,
 				"transaction": o.transaction_id,
@@ -308,6 +308,7 @@ def new_product(request):
 			form = CreateProductForm(request.POST, request.FILES)
 			if form.is_valid():
 				product = form.save()
+				product.seller = request.user.customer
 				return redirect(f'/product/{product.slug_str}')
 		
 		else:
@@ -341,9 +342,9 @@ def searchResult(request):
 		if sellername[0] == " ":
 			print("there is a space")
 			sellername2 = sellername[1:]
-			product_list = Product.objects.filter(Q(seller__icontains=sellername2))
+			product_list = Product.objects.filter(Q(seller__nickname__icontains=sellername2))
 		else:
-			product_list = Product.objects.filter(Q(seller__icontains=sellername))
+			product_list = Product.objects.filter(Q(seller__nickname__icontains=sellername))
 	
 	elif query.find("tags:") != -1:
 		tagquery = query[5:]
