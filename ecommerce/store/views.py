@@ -335,7 +335,7 @@ def searchResult(request):
 
 	if query == "":
 		product_list = Product.objects.none()
-	if query.find("seller:") != -1 :
+	elif query.find("seller:") != -1 :
 		sellername = query[7:]
 		print("seller wanted: " + sellername)
 		if sellername[0] == " ":
@@ -344,6 +344,42 @@ def searchResult(request):
 			product_list = Product.objects.filter(Q(seller__icontains=sellername2))
 		else:
 			product_list = Product.objects.filter(Q(seller__icontains=sellername))
+	
+	elif query.find("tags:") != -1:
+		tagquery = query[5:]
+		tagqueryfinal = tagquery
+		
+		if tagquery[0] == " ":
+			tagqueryfinal = tagquery[1:]
+		product_list = Product.objects.none()
+
+		taglist = tagqueryfinal.split(',')
+
+		if len(taglist) == 1:
+			product_list = Product.objects.filter(Q(tags__name__icontains=taglist[0]))
+		else:
+
+			tmp1 = Product.objects.none()
+			tmp2 = Product.objects.none()
+			counter = 0;
+			for tag in taglist:
+				tag_checked = tag
+				if tag_checked[0] == " ":
+					tag_checked = tag[1:]
+				print("Tag is: " + tag_checked)
+				if counter == 0:
+					tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
+					counter = 1;
+
+				else:
+					tmp1 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
+
+					product_list = tmp1 & tmp2
+
+					tmp2 = product_list
+
+
+			
 	else:
 		product_list = Product.objects.filter(Q(name__icontains=query))
 	
@@ -366,9 +402,13 @@ def add_multiple(request):
 		orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
 		# Still have enough stock available
-		if product.remaining_unit != 0 and product.remaining_unit > orderItem.quantity:
+		if product.remaining_unit != 0 and product.remaining_unit > (orderItem.quantity + quantity):
 			orderItem.quantity += quantity
-			orderItem.save()	
+			orderItem.save()
+
+		if orderItem.quantity <= 0:
+			orderItem.delete()
+			print('delete')	
 
 	return JsonResponse('Payment success', safe=False)
 
