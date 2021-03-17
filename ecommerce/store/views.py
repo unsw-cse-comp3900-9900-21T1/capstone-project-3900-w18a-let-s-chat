@@ -333,15 +333,41 @@ def searchResult(request):
 
 	if query == "":
 		product_list = Product.objects.none()
-	if query.find("seller:") is not -1 or query.find("Seller:") is not -1:
+	elif query.find("seller:") != -1 or query.find("Seller:") != -1:
 		sellername = query[7:]
 		#print("seller wanted: " + sellername)
-		if sellername[0] is " ":
+		if sellername[0] == " ":
 			#print("there is a space")
 			sellername2 = sellername[1:]
 			product_list = Product.objects.filter(Q(seller__icontains=sellername2))
 		else:
 			product_list = Product.objects.filter(Q(seller__icontains=sellername))
+	
+	elif query.find("tags:") != -1:
+			tag_string = query[5:]
+			tag_string_updated = tag_string
+			if tag_string[0] == " ":
+				tag_string_updated = tag_string[1:]
+
+			tag_list = tag_string_updated.split(',')
+
+			if len(tag_list) == 1:
+				product_list = Product.objects.filter(Q(tags__name__icontains=tag_list[0]))
+			else:
+				tmp1 = Product.objects.none()
+				tmp2 = Product.objects.none()
+				counter = 0;
+				for tag in tag_list:
+
+					if counter == 0:
+						tmp2 = Product.objects.filter(Q(tags__name__icontains=tag))
+						counter = 1
+					tmp1 = Product.objects.filter(Q(tags__name__icontains=tag))
+
+					product_list = tmp1 & tmp2
+
+					tmp2 = product_list
+
 	else:
 		product_list = Product.objects.filter(Q(name__icontains=query)) 
 
