@@ -12,6 +12,7 @@ class Customer(models.Model):
     email = models.EmailField(max_length=254)
     contactNo = models.CharField(max_length=200, null=True)
     image = models.ImageField(default='../images/user_icon.png', upload_to='../images')
+    trusted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.nickname
