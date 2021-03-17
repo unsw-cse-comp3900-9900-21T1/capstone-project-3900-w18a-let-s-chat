@@ -402,9 +402,13 @@ def add_multiple(request):
 		orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
 		# Still have enough stock available
-		if product.remaining_unit != 0 and product.remaining_unit > orderItem.quantity:
+		if product.remaining_unit != 0 and product.remaining_unit > (orderItem.quantity + quantity):
 			orderItem.quantity += quantity
-			orderItem.save()	
+			orderItem.save()
+
+		if orderItem.quantity <= 0:
+			orderItem.delete()
+			print('delete')	
 
 	return JsonResponse('Payment success', safe=False)
 
