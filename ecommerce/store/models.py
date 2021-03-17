@@ -45,8 +45,7 @@ class Product(models.Model):
     image = models.ImageField(null=True, blank=True)
     warranty = models.CharField(max_length=200, null=True)
     delivery_period = models.DurationField()
-    # seller = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    seller = models.CharField(max_length=200)
+    seller = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     tags = TaggableManager()
     slug_str = models.SlugField(blank=True)
     
