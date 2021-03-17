@@ -4,8 +4,8 @@
 {%  include 'store/status.html' %}
     <h3>Purchase History</h3>
 
-    <div class="box-element list-box" >
-        <ul class="list-group list-group-flush" id="history-list" style="overflow:scroll; height:100%;">
+    <div class="container" >
+        <ul  class="list-group list-group-flush" id="history-list" style="overflow:auto; height:100%;">
 
             {% for item in purchases %}
             <li class="list-group-item list-box-item">
@@ -15,13 +15,16 @@
                         <div class="col">
                             <p id="Product-name" style="font-size:14px;"><b>{{item.name}} (x{{item.quantity}})</b></p>
                             <p id="seller-name" style="font-size:14px;">From seller {{item.seller}}</p>
-                            <p id="delivery-time" style="font-size:14px;">Purchased on {{item.date_added}}</p>
+                            <p id="delivery-time" style="font-size:14px;">Estimated date: {{item.estimated}}</p>
+                            <p id="added-time" style="font-size:14px;">Added on {{item.date_added}}</p>
+                            <p id="transaction" style="font-size:14px;">Transaction ID: {{item.transaction}}</p>
                             <p id="price" style="font-size:14px;"><b>${{item.price|floatformat:2}}</b></p>
                         </div>
                         <div class="col" style="display:flex; align-items:center;">
                             <button data-id={{item.id}} data-iid={{item.iid}}
                             class="btn btn-outline-warning cancel" id="cancel-button">Cancel order</button>
                             <button class="btn btn-outline-secondary" id="contact-button">Contact</button>
+                            <a class="btn btn-outline-success" href="{% url 'product_page' item.product.slug_str %}">View</a>
                         </div>
                     </div>
                 </div>
