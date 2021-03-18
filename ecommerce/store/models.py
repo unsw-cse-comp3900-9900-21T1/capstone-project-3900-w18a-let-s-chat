@@ -114,3 +114,26 @@ class ShippingAddress(models.Model):
 
     def __str__(self):
         return self.address
+
+class ProductViewCount(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    count = models.PositiveIntegerField(default=0)
+
+    @staticmethod
+    def log(customer, product):
+        ''' 
+        Log the viewing of a product by a customer.
+        Returns the number of times the given product has been viewed by the customer
+        '''
+
+        view_counter, created = ProductViewCount.objects.get_or_create(
+                                    customer=customer,
+                                    product=product)
+        view_counter.count += 1
+        view_counter.save()
+
+        return view_counter.count
+
+    def __str__(self):
+        return f'Customer: {self.customer}, Product: {self.product}, Count: {self.count}'
