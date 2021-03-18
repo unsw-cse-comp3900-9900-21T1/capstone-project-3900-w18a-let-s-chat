@@ -20,3 +20,6 @@ Implemented url slugs for product pages
 Implemented basic functionality for product pages
 Implemented form page for listing new products
 Minor ui fixes
+
+Week 5
+Implemented counting product page views by each user
