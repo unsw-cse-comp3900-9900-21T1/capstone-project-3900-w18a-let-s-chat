@@ -119,6 +119,7 @@ class ProductViewCount(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     count = models.PositiveIntegerField(default=0)
+    last_viewing = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def log(customer, product):
