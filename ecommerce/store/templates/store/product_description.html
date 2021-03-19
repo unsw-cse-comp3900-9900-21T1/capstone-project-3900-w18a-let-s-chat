@@ -62,11 +62,37 @@
                         </div>
                     </div>
                 </div>
-
         </div>
-
-
     </div>
+
+    <!-- Similar products scroll -->
+    <div class="box-element" style="margin-top: 15px;">
+        <h5>Similar listings you may like</h5>
+        <div class="row" style="display:flex; flex-direction:row; overflow-x:scroll; flex-wrap:nowrap; padding:5px">
+
+            {% for product in similar_items %}
+                <div class="col-lg-4" style="float:left;">
+                    <a href = "{% url 'product_page' product.slug_str %}">
+                        <img class="thumbnail" style="object-fit:cover; " src="{{product.imageURL}}">
+                    </a>
+                    <div class="box-element product">
+                        <h6><strong>{{product.name}}</strong></h6>
+                        <hr>
+
+                        <button data-product="{{product.id}}" data-action="add" 
+                        class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+
+                        <a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
+                        <h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No similar products were found</p>
+            {% endfor %}
+            
+        </div>
+    </div>
+
     <div class="box-element" style="margin-top: 15px; height:250px;">
         <h5>Leave a review</h5>
         <!--HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr -->
