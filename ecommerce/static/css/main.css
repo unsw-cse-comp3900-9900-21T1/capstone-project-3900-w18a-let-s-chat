@@ -605,3 +605,25 @@ button.chatbtn i, button.createbtn i {
 	}
 }
 /********************** End **********************/
+
+
+/***** Horizontal scroll displays ******/
+
+.horizontal-scroll-box {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.horizontal-scroll-container {
+	display: flex;
+	flex-direction: row;
+	overflow-x: scroll;
+	flex-wrap: nowrap;
+	padding: 5px
+}
+
+.horizontal-scroll-item {
+	float: left
+}

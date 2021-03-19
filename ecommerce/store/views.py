@@ -33,15 +33,20 @@ def store(request):
 		for p in products:
 			print(p.name, rec.calculate_similarity(p))
 
+		# Get most recently viewed products
+		view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
+		recent_products = [view_count.product for view_count in view_counts][:10]
+
 	else:
 		#Create empty cart for now for non-logged in user
 		items = []
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order['get_cart_items']
 		# Get all products for now
-		products = products.objects.all()
+		products = Product.objects.all()
+		recent_products = []
 
-	context = {'products':products, 'cartItems':cartItems}
+	context = {'products':products, 'recent': recent_products, 'cartItems':cartItems}
 	return render(request, 'store/store.html', context)
 
 def signup(request):

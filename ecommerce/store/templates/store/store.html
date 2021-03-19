@@ -1,6 +1,35 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
+
+	{% if recent %}
+		<h3>Recently viewed</h3>
+		<div class="box-element horizontal-scroll-box">
+
+			<div class="row horizontal-scroll-container">
+
+				{% for product in recent %}
+					<div class="col-lg-4 horizontal-scroll-item">
+						<a href = "{% url 'product_page' product.slug_str %}">
+							<img class="thumbnail" style="object-fit:cover; " src="{{product.imageURL}}">
+						</a>
+						<div class="box-element product">
+							<h6><strong>{{product.name}}</strong></h6>
+							<hr>
+
+							<button data-product="{{product.id}}" data-action="add" 
+							class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+
+							<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
+							<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+						</div>
+					</div>
+				{% endfor %}
+
+			</div>
+		</div>
+	{% endif %}
+
 	<h3>Recommended for you</h3>
 	<div class="row">
 		{% for product in products %}
