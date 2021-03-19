@@ -17,25 +17,36 @@ from .forms import CreateProductForm
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 
-# Create your views here.
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
+from .recommender import Recommender
 
 def store(request):
 
 	if request.user.is_authenticated:
-			customer = request.user.customer
-			order, created = Order.objects.get_or_create(customer=customer, complete=False)
-			items = order.orderitem_set.all()
-			cartItems = order.get_cart_items
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		items = order.orderitem_set.all()
+		cartItems = order.get_cart_items
+
+		rec = Recommender(request.user.customer)
+		products = rec.get_recommended_products()
+		for p in products:
+			print(p.name, rec.calculate_similarity(p))
+
+		# Get most recently viewed products
+		view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
+		recent_products = [view_count.product for view_count in view_counts][:10]
+
 	else:
 		#Create empty cart for now for non-logged in user
 		items = []
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order['get_cart_items']
+		# Get all products for now
+		products = Product.objects.all()
+		recent_products = []
 
-	# Only get products that still have units left
-	products = Product.objects.filter(remaining_unit__gt=0)
-	context = {'products':products, 'cartItems':cartItems}
+	context = {'products':products, 'recent': recent_products, 'cartItems':cartItems}
 	return render(request, 'store/store.html', context)
 
 def signup(request):
@@ -119,8 +130,15 @@ def product_page(request, slug=None):
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order.get('get_cart_items')
 
+
+	similar_items = product.tags.similar_objects()[:10]
 	
-	context = {"product": product, "tags": product.tags.names(), "cartItems":cartItems}
+	context = {
+		"product": product,
+		"tags": product.tags.names(),
+		"cartItems": cartItems,
+		"similar_items": similar_items
+	}
 	return render(request, 'store/product_description.html', context)
 
 def cart(request):
