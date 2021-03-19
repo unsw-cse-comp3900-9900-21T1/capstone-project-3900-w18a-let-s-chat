@@ -17,8 +17,8 @@ from .forms import CreateProductForm
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 
-# Create your views here.
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
+from .recommender import Recommender
 
 def store(request):
 
@@ -33,8 +33,11 @@ def store(request):
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order['get_cart_items']
 
-	# Only get products that still have units left
-	products = Product.objects.filter(remaining_unit__gt=0)
+	rec = Recommender(request.user.customer)
+	products = rec.get_recommended_products()
+	for p in products:
+		print(p.name, rec.calculate_similarity(p))
+
 	context = {'products':products, 'cartItems':cartItems}
 	return render(request, 'store/store.html', context)
 
