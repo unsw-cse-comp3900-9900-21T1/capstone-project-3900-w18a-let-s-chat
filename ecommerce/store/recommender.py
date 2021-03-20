@@ -46,6 +46,10 @@ class Recommender():
 
         product_dict = {tag: 1 for tag in product.tags.names()}
 
+        # Return zero similarity if either user or product has no tags (eg. new users)
+        if all([count==0 for count in product_dict.values()]) or all([count==0 for count in self.profile_dict.values()]):
+            return 0.0
+
         # Find cosine similarity between two dicts
         numerator = 0.0
         denom_a = 0.0
