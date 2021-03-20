@@ -26,3 +26,4 @@ Implemented counting product page views by each user
 Implemented basic recommendation system
 Implemented 'similar products' display on product pages
 Implemented 'recently viewed' panel on store page
+Added pagination to main store page
