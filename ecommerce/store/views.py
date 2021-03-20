@@ -16,9 +16,18 @@ import datetime
 from .forms import CreateProductForm
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
 from .recommender import Recommender
+
+# Max number of similar products to show on product pages
+max_similar = 10
+# Max number of products to show on recently viewed scroll
+max_recent = 10
+# Number of products on paginated store pages
+paginated_size = 9
+
 
 def store(request):
 
@@ -35,7 +44,7 @@ def store(request):
 
 		# Get most recently viewed products
 		view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
-		recent_products = [view_count.product for view_count in view_counts][:10]
+		recent_products = [view_count.product for view_count in view_counts][:max_recent]
 
 	else:
 		#Create empty cart for now for non-logged in user
@@ -45,8 +54,13 @@ def store(request):
 		# Get all products for now
 		products = Product.objects.all()
 		recent_products = []
+	
+	# Paginate product list
+	paginator = Paginator(products, paginated_size)
+	page_number = request.GET.get('page')
+	paginated_products = paginator.get_page(page_number)
 
-	context = {'products':products, 'recent': recent_products, 'cartItems':cartItems}
+	context = {'products':paginated_products, 'recent': recent_products, 'cartItems':cartItems}
 	return render(request, 'store/store.html', context)
 
 def signup(request):
@@ -131,7 +145,7 @@ def product_page(request, slug=None):
 		cartItems = order.get('get_cart_items')
 
 
-	similar_items = product.tags.similar_objects()[:10]
+	similar_items = product.tags.similar_objects()[:max_similar]
 	
 	context = {
 		"product": product,
@@ -202,9 +216,14 @@ def purchase_history(request):
 				"image": item.product.imageURL,
 				"price": item.get_total
 			})
-		
-	cartItems = order.get_cart_items
-	context = {"purchases": purchases, 'cartItems':cartItems}
+
+	context = {
+		'purchases': purchases,
+		'cartItems': order.get_cart_items,
+		'delivered': orders.count,
+		'pending': Order.objects.filter(customer=customer, complete=False).count,
+		'total_orders': Order.objects.filter(customer=customer).count
+	}
 	return render(request, 'store/purchase_history.html', context)
 	
 def wishlist(request):
@@ -329,6 +348,7 @@ def new_product(request):
 			if form.is_valid():
 				product = form.save()
 				product.seller = request.user.customer
+				product.save()
 				return redirect(f'/product/{product.slug_str}')
 		
 		else:
