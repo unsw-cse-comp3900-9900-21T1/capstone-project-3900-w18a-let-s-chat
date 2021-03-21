@@ -39,7 +39,7 @@
 </head>
 <body>
 
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
 	  <a class="navbar-brand" href="{% url 'store' %}">Petiverse</a>
 	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 	    <span class="navbar-toggler-icon"></span>
@@ -52,21 +52,20 @@
 	      </li>
 	 
 	    </ul>
-	    <div class ="form-inline my-1 my-lg-0">
+
 			<!-- Search Bar is Here-->
 	        <form action="{% url 'search_result' %}" method="get">
 	        	<input class="search_bar" name = "q" type="text" placeholder="Search...", style="border-radius:3px !important; border:none;">
 	        	<!-- <input type="submit" value="Search"> -->
 	        </form>
-	    </div>
-	    <div class="form-inline my-2 my-lg-0">
+
 
 			{% if request.user.is_authenticated %}
-				<span class="hello-msg">Hello, {{request.user.customer.nickname}}</span>
-  				<span><a class="hello-msg" href="{% url 'logout' %}">Logout</a></span> 
+				<span class="hello-msg navbar-text">Hello, {{request.user.customer.nickname}}</span>
+  				<span><a class="hello-msg navbar-text" href="{% url 'logout' %}">Logout</a></span> 
 			{% else %}
-	     		<a href="/login"class="btn btn-warning">Login</a>
-				<a href="/signup"class="btn btn-warning">Sign Up</a>
+	     		<a href="/login" class="btn btn-secondary ">Login</a>
+				<a href="/signup" class="btn btn-secondary">Sign Up</a>
 			{% endif %}
 	
 	     	<a href="{% url 'cart' %}">
@@ -84,7 +83,6 @@
 					</div>
 				</div>
 			{% endif %}
-	    </div>
 	  </div>
 	</nav>
 
