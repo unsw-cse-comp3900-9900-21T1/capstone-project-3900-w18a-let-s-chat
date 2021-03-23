@@ -21,13 +21,18 @@ from django.core.paginator import Paginator
 from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
 from .recommender import Recommender
 
+### Constants ###
+
 # Max number of similar products to show on product pages
 max_similar = 10
 # Max number of products to show on recently viewed scroll
 max_recent = 10
 # Number of products on paginated store pages
 paginated_size = 9
+# Number of recent orders to display under each product on manage listings page
+recent_orders_display_size = 5
 
+#################
 
 def store(request):
 
@@ -481,3 +486,22 @@ def restore(request):
 			break
 
 	return JsonResponse('Cancelled', safe=False)
+
+def my_listings(request):
+	if not request.user.is_authenticated:
+		return redirect('login')
+
+	products = Product.objects.filter(seller=request.user.customer)
+	items = []
+	# Get most recent orders of each product
+	for product in products:
+		order_items = OrderItem.objects.filter(product=product).order_by('-date_added')
+		items.append({
+			'product': product,
+			'recent_orders': order_items[:recent_orders_display_size],
+			'n_orders': order_items.count()
+		})
+
+
+	context = {'items': items}
+	return render(request, 'store/my_listings.html', context)
