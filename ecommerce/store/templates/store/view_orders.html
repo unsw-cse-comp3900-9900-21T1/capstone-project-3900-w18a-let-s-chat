@@ -1,0 +1,107 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+    
+    <div class="row">
+        <a class="btn btn-outline-secondary" href="{% url 'my_listings' %}">Back</a>
+        <h3 style="margin-left:15px;"><a style="color:inherit" href="{% url 'product_page' product.slug_str %}">{{product.name}}</a></h3>
+    </div>
+    
+    <hr>
+
+    <div class="row">
+
+        <div class="col">
+            <div class="col-sm">
+                <div class="card text-center text-white  mb-3">
+                      <div class="card-header">
+                          <h5 class="card-title">Total units sold</h5>
+                      </div>
+                      <div class="card-body">
+                        <h3 class="card-title">{{product.sold_unit}}</h3>
+                      </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="col-sm">
+                <div class="card text-center text-white  mb-3">
+                      <div class="card-header">
+                          <h5 class="card-title">Units remaining</h5>
+                      </div>
+                      <div class="card-body">
+                        <h3 class="card-title">{{product.remaining_unit}}</h3>
+                      </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="col-sm">
+                <div class="card text-center text-white  mb-3">
+                      <div class="card-header">
+                          <h5 class="card-title">Unit price</h5>
+                      </div>
+                      <div class="card-body">
+                        <h3 class="card-title">${{product.price | floatformat:2}}</h3>
+                      </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <h5>Orders</h5>
+    {% if order_items %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Date ordered</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td>{{item.order.customer.nickname}}</td>
+                <td>{{item.quantity}}</td>
+                <td>{{item.order.date_ordered}}</td>
+                <td>{{item.order.customer.email}}</td>
+                <td>{{item.order.customer.contactNo}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No orders were found</p>
+    {% endif %}
+
+
+    <ul class="pagination justify-content-center" style="margin-top:15px;">
+        {% if order_items.has_previous %}
+            <li class="page-item" style="outline:none;"><a class="page-link" href=?page=1>First</a></li>
+            <li class="page-item" style="outline:none;"><a class="page-link" href=?page={{ order_items.previous_page_number }}>Previous</a></li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>
+        {% endif%}
+
+        <li class="page-item">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">{{order_items.number}}</a>
+        </li>
+
+        {% if order_items.has_next %}
+            <li class="page-item"><a class="page-link" href=?page={{ order_items.next_page_number }}>Next</a></li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+            </li>
+        {% endif%}
+    </ul>
+
+{% endblock content %}

@@ -8,7 +8,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseForbidden
 import json
 
 import datetime
@@ -17,8 +17,9 @@ from .forms import CreateProductForm
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
+from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic, EditProductForm
 from .recommender import Recommender
 
 ### Constants ###
@@ -133,10 +134,10 @@ def logoutUser(request):
 
 def product_page(request, slug=None):
 	
-	product_filter = Product.objects.filter(slug_str=slug)
-	if product_filter.count() != 1:
-		return HttpResponseNotFound("404: Product listing was not found")
-	product = product_filter.first()
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
 
 	if request.user.is_authenticated:
 		customer = request.user.customer
@@ -505,3 +506,68 @@ def my_listings(request):
 
 	context = {'items': items}
 	return render(request, 'store/my_listings.html', context)
+
+def view_orders(request, slug=None):
+	if not request.user.is_authenticated:
+		return redirect('login')
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
+	if product.seller != request.user.customer:
+		return HttpResponseForbidden('403: Can only view orders for your own listings')
+
+	order_items = OrderItem.objects.filter(product=product).order_by('-date_added')
+	paginator = Paginator(order_items, 100)
+	page_number = request.GET.get('page')
+	paginated_order_items = paginator.get_page(page_number)
+
+	context = {
+		'product': product,
+		'order_items': paginated_order_items
+	}
+	return render(request, 'store/view_orders.html', context)
+
+def edit_listing(request, slug=None):
+	if not request.user.is_authenticated:
+		return redirect('login')
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
+	if product.seller != request.user.customer:
+		return HttpResponseForbidden('403: Can only edit your own listings')
+
+
+	if request.method == 'POST':
+		form = EditProductForm(request.POST)
+		if form.is_valid():
+			# Update field in product that was not left blank on form
+			print(form.cleaned_data)
+			if form.cleaned_data['name']:
+				product.name = form.cleaned_data['name']
+			if form.cleaned_data['price']:
+				product.price = form.cleaned_data['price']
+			if form.cleaned_data['remaining_unit']:
+				product.remaining_unit = form.cleaned_data['remaining_unit']
+			if form.cleaned_data['description']:
+				product.description = form.cleaned_data['description']
+			if form.cleaned_data['tags'] or form.cleaned_data['clear_existing_tags']:
+				product.tags.set(*form.cleaned_data['tags'], clear=form.cleaned_data['clear_existing_tags'])
+			product.f
+			product.save()
+			return redirect('my_listings')
+	else:
+		form = EditProductForm()
+		# Set placeholder text on fields to product's old values
+		form.fields['name'].widget.attrs['placeholder'] = product.name
+		form.fields['price'].widget.attrs['placeholder'] = product.price
+		form.fields['remaining_unit'].widget.attrs['placeholder'] = product.remaining_unit
+		form.fields['description'].widget.attrs['placeholder'] = product.description
+		form.fields['tags'].widget.attrs['placeholder'] = ', '.join(product.tags.names())
+
+	context = {
+		'form': form,
+		'product': product,
+	}
+	return render(request, 'store/edit_listing.html', context)
