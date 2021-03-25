@@ -20,6 +20,10 @@ urlpatterns = [
     path('search_result/', views.searchResult, name="search_result"),
     path('process_order/', views.processOrder, name="process_order"),
     path('new_product/', views.new_product, name='new_product'),
+    path('my_listings/', views.my_listings, name='my_listings'),
+    path('view_orders/<slug:slug>/', views.view_orders, name="view_orders"),
+    path('edit_listing/<slug:slug>/', views.edit_listing, name="edit_listing"),
+    path('toggle_unlist/<slug:slug>/', views.toggle_unlist, name='toggle_unlist'),
 
     path('reset_password/',
         auth_views.PasswordResetView.as_view(template_name="store/password_reset.html"),

@@ -8,7 +8,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseForbidden
 import json
 
 import datetime
@@ -17,9 +17,12 @@ from .forms import CreateProductForm
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic
+from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic, EditProductForm
 from .recommender import Recommender
+
+### Constants ###
 
 # Max number of similar products to show on product pages
 max_similar = 10
@@ -27,7 +30,10 @@ max_similar = 10
 max_recent = 10
 # Number of products on paginated store pages
 paginated_size = 9
+# Number of recent orders to display under each product on manage listings page
+recent_orders_display_size = 5
 
+#################
 
 def store(request):
 
@@ -42,7 +48,7 @@ def store(request):
 		for p in products:
 			print(p.name, rec.calculate_similarity(p))
 
-		# Get most recently viewed products
+		# Get most recently viewed products - this displays even unlisted items
 		view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
 		recent_products = [view_count.product for view_count in view_counts][:max_recent]
 
@@ -51,8 +57,8 @@ def store(request):
 		items = []
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order['get_cart_items']
-		# Get all products for now
-		products = Product.objects.all()
+		# Get all active products for now
+		products = Product.objects.filter(is_active=True)
 		recent_products = []
 	
 	# Paginate product list
@@ -128,10 +134,10 @@ def logoutUser(request):
 
 def product_page(request, slug=None):
 	
-	product_filter = Product.objects.filter(slug_str=slug)
-	if product_filter.count() != 1:
-		return HttpResponseNotFound("404: Product listing was not found")
-	product = product_filter.first()
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
 
 	if request.user.is_authenticated:
 		customer = request.user.customer
@@ -144,8 +150,8 @@ def product_page(request, slug=None):
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order.get('get_cart_items')
 
-
 	similar_items = product.tags.similar_objects()[:max_similar]
+	similar_items = list(filter(lambda p: p.is_active, similar_items))
 	
 	context = {
 		"product": product,
@@ -424,8 +430,8 @@ def searchResult(request):
 	else:
 		product_list = Product.objects.filter(Q(name__icontains=query))
 	
-	# Only show products that still have units left
-	product_list = product_list.filter(remaining_unit__gt=0)
+	# Only show products that still have units left and aren't unlisted
+	product_list = product_list.filter(remaining_unit__gt=0, is_active=True).distinct()
 	context = {'product_list':product_list, 'cartItems':cartItems}
 	return render(request, 'store/product_list.html', context)
 	# return product_list
@@ -439,7 +445,13 @@ def add_multiple(request):
 		productId = int(data['productId'])
 		quantity = int(data['quantity'])
 		print(quantity)
-		product = Product.objects.get(id=productId)
+		try:
+			product = Product.objects.get(id=productId)
+		except ObjectDoesNotExist:
+			return JsonResponse('Product not found', safe=False)
+		if not product.is_active:
+			return JsonResponse('Product is unlisted', safe=False)
+
 		orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
 		# Still have enough stock available
@@ -481,3 +493,102 @@ def restore(request):
 			break
 
 	return JsonResponse('Cancelled', safe=False)
+
+def my_listings(request):
+	if not request.user.is_authenticated:
+		return redirect('login')
+
+	products = Product.objects.filter(seller=request.user.customer)
+	items = []
+	# Get most recent orders of each product
+	for product in products:
+		order_items = OrderItem.objects.filter(product=product).order_by('-date_added')
+		items.append({
+			'product': product,
+			'recent_orders': order_items[:recent_orders_display_size],
+			'n_orders': order_items.count()
+		})
+
+
+	context = {'items': items}
+	return render(request, 'store/my_listings.html', context)
+
+def view_orders(request, slug=None):
+	if not request.user.is_authenticated:
+		return redirect('login')
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
+	if product.seller != request.user.customer:
+		return HttpResponseForbidden('403: Can only view orders for your own listings')
+
+	order_items = OrderItem.objects.filter(product=product).order_by('-date_added')
+	paginator = Paginator(order_items, 100)
+	page_number = request.GET.get('page')
+	paginated_order_items = paginator.get_page(page_number)
+
+	context = {
+		'product': product,
+		'order_items': paginated_order_items
+	}
+	return render(request, 'store/view_orders.html', context)
+
+def edit_listing(request, slug=None):
+	if not request.user.is_authenticated:
+		return redirect('login')
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
+	if product.seller != request.user.customer:
+		return HttpResponseForbidden('403: Can only edit your own listings')
+
+
+	if request.method == 'POST':
+		form = EditProductForm(request.POST)
+		if form.is_valid():
+			# Update field in product that was not left blank on form
+			print(form.cleaned_data)
+			if form.cleaned_data['name']:
+				product.name = form.cleaned_data['name']
+			if form.cleaned_data['price']:
+				product.price = form.cleaned_data['price']
+			if form.cleaned_data['remaining_unit']:
+				product.remaining_unit = form.cleaned_data['remaining_unit']
+			if form.cleaned_data['description']:
+				product.description = form.cleaned_data['description']
+			if form.cleaned_data['tags'] or form.cleaned_data['clear_existing_tags']:
+				product.tags.set(*form.cleaned_data['tags'], clear=form.cleaned_data['clear_existing_tags'])
+			product.f
+			product.save()
+			return redirect('my_listings')
+	else:
+		form = EditProductForm()
+		# Set placeholder text on fields to product's old values
+		form.fields['name'].widget.attrs['placeholder'] = product.name
+		form.fields['price'].widget.attrs['placeholder'] = product.price
+		form.fields['remaining_unit'].widget.attrs['placeholder'] = product.remaining_unit
+		form.fields['description'].widget.attrs['placeholder'] = product.description
+		form.fields['tags'].widget.attrs['placeholder'] = ', '.join(product.tags.names())
+
+	context = {
+		'form': form,
+		'product': product,
+	}
+	return render(request, 'store/edit_listing.html', context)
+
+def toggle_unlist(request, slug=None):
+	if not request.user.is_authenticated:
+		return redirect('login')
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
+	if product.seller != request.user.customer:
+		return HttpResponseForbidden('403: Can only edit your own listings')
+	
+	product.is_active = not product.is_active
+	product.save()
+	
+	return redirect('my_listings')

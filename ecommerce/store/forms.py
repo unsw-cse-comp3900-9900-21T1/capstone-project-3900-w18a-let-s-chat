@@ -33,8 +33,25 @@ class CreateProductForm(ModelForm):
         labels = {
             'isAnimal': 'Animal?',
             'remaining_unit': 'Units available',
-            "image": "Choose an image for your listing"}
+            'image': 'Choose an image for your listing'
+        }
      
     def __init__(self, *args, **kwargs):
         super(CreateProductForm, self).__init__(*args, **kwargs)
         #self.fields['image'].required = True
+
+class EditProductForm(ModelForm):
+
+    clear_existing_tags = forms.BooleanField(initial=False)
+
+    class Meta:
+        model = Product
+        fields = ['name', 'price', 'remaining_unit', 'description', 'tags']
+        labels = {
+            'remaining_unit': 'Units available',
+            'image': 'Change product image'
+        }
+    def __init__(self, *args, **kwargs):
+        super(EditProductForm, self).__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].required = False

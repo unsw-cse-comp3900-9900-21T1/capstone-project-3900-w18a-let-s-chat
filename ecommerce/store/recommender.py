@@ -47,7 +47,7 @@ class Recommender():
         product_dict = {tag: 1 for tag in product.tags.names()}
 
         # Return zero similarity if either user or product has no tags (eg. new users)
-        if all([count==0 for count in product_dict.values()]) or all([count==0 for count in self.profile_dict.values()]):
+        if all(count==0 for count in product_dict.values()) or all(count==0 for count in self.profile_dict.values()):
             return 0.0
 
         # Find cosine similarity between two dicts
@@ -68,6 +68,6 @@ class Recommender():
         Return a list of the products most similar to the user's profile, that still have units left
         '''
 
-        products = Product.objects.filter(remaining_unit__gt=0)
+        products = Product.objects.filter(remaining_unit__gt=0, is_active=True)
         products = sorted(products, key=lambda p: self.calculate_similarity(p), reverse=True)
         return products[:max_results]

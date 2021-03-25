@@ -2,6 +2,11 @@
 {% load static %}
 {% block content %}
 
+{% if not product.is_active %}
+<div class="alert alert-danger" role="alert">
+    Note: This item has been unlisted by the seller and cannot be purchased
+</div>
+{% endif %}
     <div class="row">
         <div style="max-width:40%" class="col-lg-6">
             <div class="box-element" id="img-box">

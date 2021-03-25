@@ -1,0 +1,57 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+
+<h3>Manage my listings</h3>
+
+<div class="box-element">
+    <div class="accordion accordion-flush" id="accordion">
+        
+        {% for item in items %}
+        <div class="card">
+        <div class="card-header" id="heading{{ forloop.counter }}">
+            <h2 class="mb-0">
+            <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}">
+                <h6 style="float:left"><strong>{{item.product.name}}</strong> {% if not item.product.is_active %}<span class="badge bg-warning"> Unlisted</span>{% endif %}</h6>
+                <p style="float:right">Units left: {{item.product.remaining_unit}}</p>
+
+            </button>
+            </h2>
+        </div>
+    
+        <div id="collapse{{ forloop.counter }}" class="collapse {% if forloop.counter == 1 %} show {% endif %}" data-parent="#accordion">
+            <div class="card-body">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'view_orders' item.product.slug_str %}"> View all orders <span class="badge rounded-pill bg-primary" style="color:white">{{item.n_orders}}</span></a>
+                <a class="btn btn-outline-success btn-sm" href="{% url 'product_page' item.product.slug_str %}"> View product page</a>
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'edit_listing' item.product.slug_str %}">Edit your listing</a>
+                
+                <a class="btn btn-outline-warning btn-sm" href="{% url 'toggle_unlist' item.product.slug_str %}"> {% if item.product.is_active %} Unlist item {% else %} Relist item {% endif %}</a>
+                <hr>
+                <h6><strong>Most recent orders</strong></h6>
+                <ol class="list-group">
+
+                    {% for order_item in item.recent_orders %}
+                    <li class="list-group-item">
+                        <h6 style="margin-bottom:15px;"><strong>{{order_item.order.customer.nickname}}</strong></h6>
+                        <p>Quantity: {{order_item.quantity}}</p>
+                        <p>Contact Details: {{order_item.order.customer.email}}{%if order_item.order.customer.contactNo%}, {{order_item.order.customer.contactNo}}{%endif%}</p>
+                        <p>Date ordered: {{order_item.order.date_ordered}}</p>
+                    </li>
+                    {% empty %}
+                    <p>No sales found</p>
+                    {% endfor %}
+
+                </ol>
+            </div>
+        </div>
+        </div>
+        {% empty %}
+        <p>You haven't listed any products yet</p>
+        {% endfor %}
+
+    </div>
+</div>
+
+  
+
+{% endblock content %}
