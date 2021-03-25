@@ -48,6 +48,7 @@ class Product(models.Model):
     seller = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     tags = TaggableManager()
     slug_str = models.SlugField(blank=True)
+    is_active = models.BooleanField(default=True)
     
     def save(self, **kwargs):
         unique_slugify(self, self.name, slug_field_name='slug_str')

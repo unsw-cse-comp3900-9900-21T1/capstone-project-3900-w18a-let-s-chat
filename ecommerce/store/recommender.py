@@ -68,6 +68,6 @@ class Recommender():
         Return a list of the products most similar to the user's profile, that still have units left
         '''
 
-        products = Product.objects.filter(remaining_unit__gt=0)
+        products = Product.objects.filter(remaining_unit__gt=0, is_active=True)
         products = sorted(products, key=lambda p: self.calculate_similarity(p), reverse=True)
         return products[:max_results]

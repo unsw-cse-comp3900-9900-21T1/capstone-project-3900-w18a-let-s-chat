@@ -48,7 +48,7 @@ def store(request):
 		for p in products:
 			print(p.name, rec.calculate_similarity(p))
 
-		# Get most recently viewed products
+		# Get most recently viewed products - this displays even unlisted items
 		view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
 		recent_products = [view_count.product for view_count in view_counts][:max_recent]
 
@@ -57,8 +57,8 @@ def store(request):
 		items = []
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order['get_cart_items']
-		# Get all products for now
-		products = Product.objects.all()
+		# Get all active products for now
+		products = Product.objects.filter(is_active=True)
 		recent_products = []
 	
 	# Paginate product list
@@ -150,8 +150,8 @@ def product_page(request, slug=None):
 		order = {'get_cart_total':0, 'get_cart_items':0}
 		cartItems = order.get('get_cart_items')
 
-
 	similar_items = product.tags.similar_objects()[:max_similar]
+	similar_items = list(filter(lambda p: p.is_active, similar_items))
 	
 	context = {
 		"product": product,
@@ -430,8 +430,8 @@ def searchResult(request):
 	else:
 		product_list = Product.objects.filter(Q(name__icontains=query))
 	
-	# Only show products that still have units left
-	product_list = product_list.filter(remaining_unit__gt=0)
+	# Only show products that still have units left and aren't unlisted
+	product_list = product_list.filter(remaining_unit__gt=0, is_active=True).distinct()
 	context = {'product_list':product_list, 'cartItems':cartItems}
 	return render(request, 'store/product_list.html', context)
 	# return product_list
@@ -445,7 +445,13 @@ def add_multiple(request):
 		productId = int(data['productId'])
 		quantity = int(data['quantity'])
 		print(quantity)
-		product = Product.objects.get(id=productId)
+		try:
+			product = Product.objects.get(id=productId)
+		except ObjectDoesNotExist:
+			return JsonResponse('Product not found', safe=False)
+		if not product.is_active:
+			return JsonResponse('Product is unlisted', safe=False)
+
 		orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
 		# Still have enough stock available
@@ -571,3 +577,18 @@ def edit_listing(request, slug=None):
 		'product': product,
 	}
 	return render(request, 'store/edit_listing.html', context)
+
+def toggle_unlist(request, slug=None):
+	if not request.user.is_authenticated:
+		return redirect('login')
+	try:
+		product = Product.objects.get(slug_str=slug)
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('404: Product listing was not found')
+	if product.seller != request.user.customer:
+		return HttpResponseForbidden('403: Can only edit your own listings')
+	
+	product.is_active = not product.is_active
+	product.save()
+	
+	return redirect('my_listings')
