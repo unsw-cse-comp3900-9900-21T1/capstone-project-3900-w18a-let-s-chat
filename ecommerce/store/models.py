@@ -29,12 +29,6 @@ class Customer(models.Model):
             img.save(self.image.path)
 
 
-# class Tag(models.Model):
-#     name = models.CharField(max_length=200)
-
-#     def __str__(self):
-#         return self.name
-
 class Product(models.Model):
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=30, decimal_places=2)
