@@ -560,7 +560,7 @@ def edit_listing(request, slug=None):
 				product.description = form.cleaned_data['description']
 			if form.cleaned_data['tags'] or form.cleaned_data['clear_existing_tags']:
 				product.tags.set(*form.cleaned_data['tags'], clear=form.cleaned_data['clear_existing_tags'])
-			product.f
+
 			product.save()
 			return redirect('my_listings')
 	else:
