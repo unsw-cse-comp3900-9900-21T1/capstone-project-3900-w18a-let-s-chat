@@ -363,9 +363,11 @@ def new_product(request):
 				'price': 10.00,
 				'isAnimal': False
 			})
+		
+		order, created = Order.objects.get_or_create(customer=request.user.customer, complete=False)
+		cartItems = order.get_cart_items
 
-
-		context = {"form": form}
+		context = {"form": form, 'cartItems':cartItems}
 		return render(request, 'store/new_product.html', context)
   
 def searchResult(request):
@@ -382,54 +384,42 @@ def searchResult(request):
 
 	if query == "":
 		product_list = Product.objects.none()
-	elif query.find("seller:") != -1 :
-		sellername = query[7:]
-		print("seller wanted: " + sellername)
-		if sellername[0] == " ":
-			print("there is a space")
-			sellername2 = sellername[1:]
-			product_list = Product.objects.filter(Q(seller__nickname__icontains=sellername2))
-		else:
-			product_list = Product.objects.filter(Q(seller__nickname__icontains=sellername))
-	
-	elif query.find("tags:") != -1:
-		tagquery = query[5:]
-		tagqueryfinal = tagquery
-		
-		if tagquery[0] == " ":
-			tagqueryfinal = tagquery[1:]
-		product_list = Product.objects.none()
-
-		taglist = tagqueryfinal.split(',')
-
-		if len(taglist) == 1:
-			product_list = Product.objects.filter(Q(tags__name__icontains=taglist[0]))
-		else:
-
-			tmp1 = Product.objects.none()
-			tmp2 = Product.objects.none()
-			counter = 0;
-			for tag in taglist:
-				tag_checked = tag
-				if tag_checked[0] == " ":
-					tag_checked = tag[1:]
-				print("Tag is: " + tag_checked)
-				if counter == 0:
-					tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
-					counter = 1;
-
-				else:
-					tmp1 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
-
-					product_list = tmp1 & tmp2
-
-					tmp2 = product_list
-
-
-			
 	else:
-		product_list = Product.objects.filter(Q(name__icontains=query))
-	
+		
+		if query.find(",") != -1:
+			taglist = query.split(',')
+
+			if len(taglist) == 1:
+				product_list = Product.objects.filter(Q(tags__name__icontains=taglist[0]))
+			else:
+
+				tmp1 = Product.objects.none()
+				tmp2 = Product.objects.none()
+				counter = 0;
+				for tag in taglist:
+					tag_checked = tag
+					if tag_checked[0] == " ":
+						tag_checked = tag[1:]
+					print("Tag is: " + tag_checked)
+					if counter == 0:
+						tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
+						counter = 1;
+
+					else:
+						tmp1 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
+
+						product_list = tmp1 & tmp2
+
+						tmp2 = product_list
+
+		else:
+			product_list = Product.objects.filter(Q(name__icontains=query))
+			if not product_list:
+				product_list = Product.objects.filter(Q(seller__nickname__icontains=query))
+
+				if not product_list:
+					product_list = Product.objects.filter(Q(tags__name__icontains=query))
+
 	# Only show products that still have units left and aren't unlisted
 	product_list = product_list.filter(remaining_unit__gt=0, is_active=True).distinct()
 	context = {'product_list':product_list, 'cartItems':cartItems}
@@ -498,7 +488,12 @@ def my_listings(request):
 	if not request.user.is_authenticated:
 		return redirect('login')
 
-	products = Product.objects.filter(seller=request.user.customer)
+	# order is for cart to update the total number of items in cart
+	customer = request.user.customer
+	order, created = Order.objects.get_or_create(customer=customer, complete=False)
+	cartItems = order.get_cart_items
+
+	products = Product.objects.filter(seller=customer)
 	items = []
 	# Get most recent orders of each product
 	for product in products:
@@ -510,7 +505,7 @@ def my_listings(request):
 		})
 
 
-	context = {'items': items}
+	context = {'items': items, 'cartItems':cartItems}
 	return render(request, 'store/my_listings.html', context)
 
 def view_orders(request, slug=None):
@@ -572,9 +567,13 @@ def edit_listing(request, slug=None):
 		form.fields['description'].widget.attrs['placeholder'] = product.description
 		form.fields['tags'].widget.attrs['placeholder'] = ', '.join(product.tags.names())
 
+
+	order, created = Order.objects.get_or_create(customer=request.user.customer, complete=False)
+	cartItems = order.get_cart_items
 	context = {
 		'form': form,
 		'product': product,
+		'cartItems':cartItems
 	}
 	return render(request, 'store/edit_listing.html', context)
 
