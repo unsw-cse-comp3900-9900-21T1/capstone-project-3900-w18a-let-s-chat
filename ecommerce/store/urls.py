@@ -45,4 +45,6 @@ urlpatterns = [
     path('update_item/', views.updateItem, name="update_item"),
     path('add_multiple/', views.add_multiple, name="add_multiple"),
     path('restore/', views.restore, name="restore"),
+    path('chatbot/', views.chat_view, name="chat_view"),
+    path('index', views.index_view, name='index'),
 ]
