@@ -582,15 +582,16 @@ def edit_listing(request, slug=None):
 	}
 	return render(request, 'store/edit_listing.html', context)
 
-def toggle_unlist(request, slug=None):
+def toggle_unlist(request):
 	if not request.user.is_authenticated:
-		return redirect('login')
+		return JsonResponse(data={}, status=401)
 	try:
+		slug = request.POST.get('slug_str', '')
 		product = Product.objects.get(slug_str=slug)
 	except ObjectDoesNotExist:
-		return HttpResponseNotFound('404: Product listing was not found')
+		return JsonResponse(data={}, status=404)
 	if product.seller != request.user.customer:
-		return HttpResponseForbidden('403: Can only edit your own listings')
+		return JsonResponse(data={}, status=403)
 	
 	product.is_active = not product.is_active
 	product.save()
