@@ -12,20 +12,21 @@
         <div class="card-header" id="heading{{ forloop.counter }}">
             <h2 class="mb-0">
             <button class="btn btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}">
-                <h6 style="float:left"><strong>{{item.product.name}}</strong> {% if not item.product.is_active %}<span class="badge bg-warning"> Unlisted</span>{% endif %}</h6>
+                <h6 class="item-heading" style="float:left"><strong>{{item.product.name}}</strong> {% if not item.product.is_active %}<span class="badge bg-warning unlisted-badge"> Unlisted</span>{% endif %}</h6>
                 <p style="float:right">Units left: {{item.product.remaining_unit}}</p>
 
             </button>
             </h2>
         </div>
     
-        <div id="collapse{{ forloop.counter }}" class="collapse {% if forloop.counter == 1 %} show {% endif %}" data-parent="#accordion">
+        <div id="collapse{{ forloop.counter }}" class="collapse {% if forloop.counter == 1 %} show {% endif %}" data-parent="#accordion" data-slug="{{item.product.slug_str}}" data-active="{{item.product.is_active | lower}}">
             <div class="card-body">
                 <a class="btn btn-outline-primary btn-sm" href="{% url 'view_orders' item.product.slug_str %}"> View all orders <span class="badge rounded-pill bg-primary" style="color:white">{{item.n_orders}}</span></a>
                 <a class="btn btn-outline-success btn-sm" href="{% url 'product_page' item.product.slug_str %}"> View product page</a>
                 <a class="btn btn-outline-secondary btn-sm" href="{% url 'edit_listing' item.product.slug_str %}">Edit your listing</a>
                 
-                <a class="btn btn-outline-warning btn-sm" href="{% url 'toggle_unlist' item.product.slug_str %}"> {% if item.product.is_active %} Unlist item {% else %} Relist item {% endif %}</a>
+    
+                <btn class="btn btn-outline-warning btn-sm btn-relist"> {% if item.product.is_active %} Unlist item {% else %} Relist item {% endif %}</btn>
                 <hr>
                 <h6><strong>Most recent orders</strong></h6>
                 <ol class="list-group">
@@ -52,6 +53,38 @@
     </div>
 </div>
 
-  
+<script src="{% static 'javascript/jquery.js' %}"></script>
+<script>
 
+    $(".btn-relist").click(function() {
+        console.log("clicked!");
+        var btn = $(this);
+        var collapse = btn.closest(".collapse");
+        var slug_str = collapse.data("slug");
+        var heading = collapse.closest(".card").find(".item-heading");
+        console.log(collapse, heading.find(".unlisted-badge"), slug_str);
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'toggle_unlist' %}",
+            data: {
+                "slug_str": slug_str,
+                "csrfmiddlewaretoken": "{{ csrf_token }}"
+            },
+            "dataType": "json",
+            success: function(response) {
+                if (collapse.data("active")) {
+                    btn.text("Relist item");
+                    heading.append('<span class="badge bg-warning unlisted-badge"> Unlisted</span>');
+                } else {
+                    btn.text("Unlist item");
+                    heading.find(".unlisted-badge").remove();
+                }
+                collapse.data("active", !collapse.data("active"));
+            }
+        });
+    });
+
+</script>
+  
 {% endblock content %}
