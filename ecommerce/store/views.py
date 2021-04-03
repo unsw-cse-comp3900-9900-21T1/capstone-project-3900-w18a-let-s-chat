@@ -11,11 +11,9 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.views.decorators.http import require_http_methods
-import dialogflow
 import os
 import sys
 import json
-import requests
 import datetime
 import re
 from uuid import uuid4
