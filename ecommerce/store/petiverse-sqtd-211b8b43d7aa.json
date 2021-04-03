@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "petiverse-sqtd",
+  "private_key_id": "211b8b43d7aa87c5964fa395a9e752b3b933f9bf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQZnRLGx8lXb6R\nWX16d6Vpxb5+TV0fGaYM0lcCs2sXe/ygbvpKJ02wM8PqeqvuQyjXj+Z3Xl6igsI+\nZm0Lok8ALFxzi2d4Q3Gcmgj35LEH65xViC6LH/Sr6vJ+o+ZUOWEQDOB4pbnl/xw+\nZI7c5J801+hx7t6AQk3YGDlJqEFfNTVE0Y0qVSWvCCEXevnWozS3JNPYEotyv9tO\nWRhGpIFgdYEnOJ40N49jOy71D3AzpfVc23bgDTts6C5KG9dBcGHu10I5Vv4tu2o3\nd9Pyhe83DJyApBa3fAutMvBm75PMKFVv7dRcDarGsZxdh8qdOkFUNY9bldpenJiM\nAObL+dLXAgMBAAECggEATbnYp+Z+sFYNbHKfHR0gwZlyGfNKxv2u89tDfotiZsjk\niQW7LgsIq64y5PJJy7yasANIpr64tw3j2pgjFZK8ukjRVnro5W7qIclFjQdri5Ox\npCj9iwApJjGjrd39Wu5nqC/VTMoq0oBajV699d8DDhd054F61QVluTIXs8QgVZx6\ns0zXT5WwWjLWTvKCtQmw4fWX6yUJ7WVxe6n5oOo4PZuIBSJM5E9WrFap72pN1Bgq\nN3qam+v2S6kOuKOHVPcwsjtZ4LXNDUDc4BkIb4A5mitD0BOzHHZq0M+JrkJoPhq4\nCotI8MQHPm9SqadT6B6c4Z5oCb4VQYMJ5AVEtFG5uQKBgQD9K0r0BJuK62/q+RG2\nb9efY3xxgQGDYVKMOSCMr5mgK8O8NnOKx5XEmZra3pKH5ueFvssimT/ci5q6TSy3\ny4T1iOHCxtAFZQDatrvwu/cKUXzbnQF4E96TWhdF0NRCWqLBcKdAqciNOFf9nxST\n3MPCPMOtRA9pKarWYe8gnFeuhQKBgQDSuwI1b8g0fjTohibNlMThlj4HUamoqWw7\nPsjoJOUkgmYHq3GCPzTpUh8zIJz2ulZJKbz7PLXdvLnWdivA3uN07fx+LfDOtkvr\nNTjZlSAl29f6VPjwZHHghYXnH9nq1Kmy/CwTBTLBbXqRdsfypkDMsle2wGrFit1X\neMO1bttAqwKBgQC+6b/LBhJ5jxPFwO8/gVW7x10Xhu4qMeD7BzVpgh46b+ZZ70Hw\nPJPPPvpM5JzhSRn8fKVYwPIskUYsCXiYXSw1sHR22lASUVl0lWpinowrxsl+Hwb1\nkx48RirYpiL6qrijYR1vINmwzPVlt2ngGxGwTvxMk89/QUGoCxA1qlBgtQKBgH/z\nvu6VVfnRm+yH8C2ppDXZVQZ6pkpbvPToNXMHW/7kEnGbvss397en/nu71LLXB6da\n6X2fKkpd2nUGwaBVdcS88C/pUysgc054vXEX5DI4n5ZHW/QS+TY7vMdOhrHYuMWN\n6nEOGfhqsh57AgMqwXPI4gt8IBicLbN8B1E143kLAoGAJbS3fwlJvogQhpPj6j8n\nnXNIA5PE1istjTSGXcUWJsQFL4h703RyTHHZeMEVgYaItf/ty/SkBrYFrCuXYIhc\nK+XTQI4FluDRwa7nt1D9YBBZcN+JDmnu5UZCSUukzyoG7+ton3FPKsL07kxOjEwF\nctcOXggg/OPNXfZuNmMpq14=\n-----END PRIVATE KEY-----\n",
+  "client_email": "petiverse@petiverse-sqtd.iam.gserviceaccount.com",
+  "client_id": "103590179262960703495",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/petiverse%40petiverse-sqtd.iam.gserviceaccount.com"
+}

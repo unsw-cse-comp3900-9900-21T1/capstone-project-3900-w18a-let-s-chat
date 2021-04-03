@@ -1,5 +1,7 @@
+from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from taggit.managers import TaggableManager
 from .util.generate_url_slugs import unique_slugify
 from PIL import Image
@@ -133,3 +135,4 @@ class ProductViewCount(models.Model):
 
     def __str__(self):
         return f'Customer: {self.customer}, Product: {self.product}, Count: {self.count}'
+

@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from . import views
@@ -45,4 +47,7 @@ urlpatterns = [
     path('update_item/', views.updateItem, name="update_item"),
     path('add_multiple/', views.add_multiple, name="add_multiple"),
     path('restore/', views.restore, name="restore"),
+    # path('chat_index/', views.index_view, name='index'),
+    # path('chat/', views.chat_view, name="chat_view"),
+    path('webhook/', views.webhook, name="webhook"),
 ]
