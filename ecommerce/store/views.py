@@ -50,8 +50,8 @@ def store(request):
 
         rec = Recommender(request.user.customer)
         products = rec.get_recommended_products()
-        for p in products:
-            print(p.name, rec.calculate_similarity(p))
+        # for p in products:
+        #     print(p.name, rec.calculate_similarity(p))
 
         # Get most recently viewed products - this displays even unlisted items
         view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
@@ -440,7 +440,7 @@ def add_multiple(request):
         orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
         # Still have enough stock available
-        if product.remaining_unit != 0 and product.remaining_unit > (orderItem.quantity + quantity):
+        if product.remaining_unit != 0 and product.remaining_unit >= (orderItem.quantity + quantity):
             orderItem.quantity += quantity
             orderItem.save()
 
@@ -448,7 +448,7 @@ def add_multiple(request):
             orderItem.delete()
             print('delete')	
 
-    return JsonResponse('Payment success', safe=False)
+    return JsonResponse('added', safe=False)
 
 def restore(request):
     data = json.loads(request.body)
@@ -460,20 +460,21 @@ def restore(request):
     productId = int(data['product'])
     itemId = int(data['itemId'])
 
-    print('pid:', productId)
-    print('iid:', itemId)
+    # print('pid:', productId)
+    # print('iid:', itemId)
 
     for item in order_items:
         if item.product.id == productId and item.id == itemId:
-            product = Product.objects.get(id=productId)
-            if product != None:
-                print(item.quantity)
+    
+            try:
+                product = Product.objects.get(id=productId)
+                # print(item.quantity)
                 product.remaining_unit += item.quantity
                 product.sold_unit -= item.quantity
                 product.save()
                 item.delete()
-                print("cancel")
-            else:
+                # print("cancel")
+            except Product.DoesNotExist:
                 print('none')
             break
 

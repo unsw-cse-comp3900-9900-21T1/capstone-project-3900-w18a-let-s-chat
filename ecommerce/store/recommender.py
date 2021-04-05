@@ -35,7 +35,7 @@ class Recommender():
             for tag in order_item.product.tags.names():
                 profile[tag] = float(profile.get(tag, 0) + (1 * purchase_weighting))
 
-        print('User profile:', profile)
+        # print('User profile:', profile)
         return profile
 
     def calculate_similarity(self, product):
