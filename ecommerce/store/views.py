@@ -409,6 +409,7 @@ def new_product(request):
         return render(request, 'store/new_product.html', context)
   
 def searchResult(request):
+    print('here')
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
@@ -417,9 +418,9 @@ def searchResult(request):
         #Create empty cart for now for non-logged in user
         order = {'get_cart_total':0, 'get_cart_items':0}
         cartItems = order.get('get_cart_items')
-
+    
     query = request.GET.get('q')
-
+    
     if query == "":
         product_list = Product.objects.none()
     else:
@@ -433,7 +434,7 @@ def searchResult(request):
 
                 tmp1 = Product.objects.none()
                 tmp2 = Product.objects.none()
-                counter = 0;
+                counter = 0
                 for tag in taglist:
                     tag_checked = tag
                     if tag_checked[0] == " ":
@@ -441,7 +442,7 @@ def searchResult(request):
                     print("Tag is: " + tag_checked)
                     if counter == 0:
                         tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
-                        counter = 1;
+                        counter = 1
 
                     else:
                         tmp1 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
@@ -483,7 +484,7 @@ def add_multiple(request):
         orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
         # Still have enough stock available
-        if product.remaining_unit != 0 and product.remaining_unit > (orderItem.quantity + quantity):
+        if product.remaining_unit != 0 and product.remaining_unit >= (orderItem.quantity + quantity):
             orderItem.quantity += quantity
             orderItem.save()
 
@@ -753,7 +754,7 @@ def add_bid(request):
 
 def check_auction_time():
 	threading.Timer(10.0, check_auction_time).start()
-	print("checking auction time")
+	# print("checking auction time")
 	products = Product.objects.all()
 	for product in products:
 		if product.is_active == True:
