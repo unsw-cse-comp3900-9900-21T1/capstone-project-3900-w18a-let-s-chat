@@ -35,12 +35,14 @@
                     <div class="row">
                         <div style="min-width: 300px;" class="col-lg-6">
                             <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
-                            <strong>End time: </strong>
-                            <div id='event-box'>{{product.end_date|date:"M d, Y H:m:s"}}</div>
-                            <div><strong>Auction time left:</strong></div>
-                            <div id="countdown-box">
-                                <div class="spinner-border" role="status"></div>
-                            </div>
+                            {% if product.selling_type == "auction" %}
+                                <strong>End time: </strong>
+                                <div id='event-box'>{{product.end_date|date:"M d, Y H:m:s"}}</div>
+                                <div><strong>Auction time left:</strong></div>
+                                <div id="countdown-box">
+                                    <div class="spinner-border" role="status"></div>
+                                </div>
+                            {% endif %}
                             <div style="padding: 10px; max-height:400px" class="card" id="desc-box">
                                 <h5>Description</h5>
                                 <p style="font-size:14px; overflow:none; white-space: pre-line;" id="desc-text">
@@ -48,7 +50,6 @@
                                 </p>
                             </div>
                         </div>
-                        <script src="{% static 'javascript/timer.js' %}"></script>
                         <div class="col-lg-6">
                             <div style="padding: 10px; margin-bottom:10px;" class="card" id="buy-box">
                                 <form>
@@ -212,7 +213,10 @@
         var addBtn = document.getElementById('add-to-cart')
         var bidBtn = document.getElementById('place-bid')
         var productId = addBtn.dataset.product
-        var productId_bid = bidBtn.dataset.product
+        if ("{{product.selling_type}}" == "auction") {
+            var productId_bid = bidBtn.dataset.product
+            
+        }
         var highest_bidder = "{{request.user.customer}}"
         window.console.log(bidBtn)
         window.console.log(highest_bidder)
@@ -226,9 +230,11 @@
             submitData()
         })
 
-        bidBtn.addEventListener('click', function(){
-            addBid()
-        })
+        if ("{{product.selling_type}}" == "auction") {
+            bidBtn.addEventListener('click', function(){
+                addBid()
+            })
+        }
 
         function submitData(){
             var quantity = quantityInput.value
@@ -277,6 +283,8 @@
     }
 
 </script>
-<script src="{% static 'javascript/timer.js' %}"></script>
+{% if product.selling_type == "auction" %}
+    <script src="{% static 'javascript/timer.js' %}"></script>
+{% endif %}
 
 {% endblock content %}
