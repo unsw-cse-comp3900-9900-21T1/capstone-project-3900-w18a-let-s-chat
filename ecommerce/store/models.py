@@ -8,6 +8,11 @@ from PIL import Image
 
 import datetime
 
+SELLING_CHOICES = [
+    ('sale', 'Sales'),
+    ('auction', 'Auctions')
+]
+
 class Customer(models.Model):
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=200, null=True)
@@ -33,7 +38,11 @@ class Customer(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
+    selling_type = models.CharField(max_length=10, choices=SELLING_CHOICES, default='sale')
     price = models.DecimalField(max_digits=30, decimal_places=2)
+    starting_bid = models.DecimalField(max_digits=30, decimal_places=2, default=0)
+    end_date = models.DateTimeField(default=timezone.now(), blank=True, null=True)
+    highest_bidder = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='bidder')
     remaining_unit = models.IntegerField()
     sold_unit = models.IntegerField(default=0)
     isAnimal = models.BooleanField(default=False,null=True, blank=True)
@@ -96,7 +105,10 @@ class OrderItem(models.Model):
 
 	@property
 	def get_total(self):
-		total = self.product.price * self.quantity
+		if self.product.selling_type == "sale":
+			total = self.product.price * self.quantity
+		else:
+			total = self.product.starting_bid
 		return total
 
 class ShippingAddress(models.Model):

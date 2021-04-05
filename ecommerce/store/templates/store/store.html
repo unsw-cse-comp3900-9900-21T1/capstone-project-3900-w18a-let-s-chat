@@ -17,11 +17,17 @@
 							<h6><strong>{{product.name}}</strong></h6>
 							<hr>
 
-							<button data-product="{{product.id}}" data-action="add" 
-							class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+							{% if product.selling_type == "sale" %}
+								<button data-product="{{product.id}}" data-action="add" 
+								class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+							{% endif %}
 
 							<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-							<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+							{% if product.selling_type == "sale" %}
+								<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+							{% else %}
+								<h4 style="display: inline-block; float: right"><strong>Bid</strong> ${{product.starting_bid|floatformat:2}}</h4>
+							{% endif %}
 						</div>
 					</div>
 				{% endfor %}
@@ -41,12 +47,17 @@
 				<h6><strong>{{product.name}}</strong></h6>
 				<hr>
 
-				<button data-product="{{product.id}}" data-action="add" 
-				class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+				{% if product.selling_type == "sale" %}
+					<button data-product="{{product.id}}" data-action="add" 
+					class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+				{% endif %}
 
 				<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-				<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
-
+				{% if product.selling_type == "sale" %}
+					<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+				{% else %}
+					<h4 style="display: inline-block; float: right"><strong>Bid</strong> ${{product.starting_bid|floatformat:2}}</h4>
+				{% endif %}
 			</div>
 		</div>
 		{% endfor %}
