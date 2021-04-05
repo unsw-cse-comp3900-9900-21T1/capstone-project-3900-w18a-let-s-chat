@@ -15,6 +15,9 @@
         padding: 10px;
         margin-top: 10px;
     }
+    #event-box{
+        display:none;
+    }
 </style>
     <div class="row">
         <div style="max-width:40%" class="col-lg-6">
@@ -37,7 +40,8 @@
                             <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
                             {% if product.selling_type == "auction" %}
                                 <strong>End time: </strong>
-                                <div id='event-box'>{{product.end_date|date:"M d, Y H:m:s"}}</div>
+                                <div id='event-box'>{{product.end_date|date:"U"}}</div>
+                                <div>{{product.end_date}}</div>
                                 <div><strong>Auction time left:</strong></div>
                                 <div id="countdown-box">
                                     <div class="spinner-border" role="status"></div>
