@@ -46,9 +46,7 @@ def store(request):
 
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
+        cartItems = cart_items(customer)
 
         rec = Recommender(request.user.customer)
         products = rec.get_recommended_products()
@@ -60,10 +58,7 @@ def store(request):
         recent_products = [view_count.product for view_count in view_counts][:max_recent]
 
     else:
-        #Create empty cart for now for non-logged in user
-        items = []
-        order = {'get_cart_total':0, 'get_cart_items':0}
-        cartItems = order['get_cart_items']
+        cartItems = 0
         # Get all active products for now
         products = Product.objects.filter(is_active=True)
         recent_products = []
@@ -148,14 +143,12 @@ def product_page(request, slug=None):
 
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        cartItems = order.get_cart_items
+        cartItems = cart_items(customer)
 
         ProductViewCount.log(customer, product)
     else:
         #Create empty cart for now for non-logged in user
-        order = {'get_cart_total':0, 'get_cart_items':0}
-        cartItems = order.get('get_cart_items')
+        cartItems = 0
 
     similar_items = product.tags.similar_objects()[:max_similar]
     similar_items = list(filter(lambda p: p.is_active, similar_items))
@@ -204,9 +197,9 @@ def purchase_history(request):
         return redirect('login')
 
     customer = request.user.customer
-    # order is for cart to update the total number of items in cart
-    order, created = Order.objects.get_or_create(customer=customer, complete=False)
-
+    # cartItems to update the total number of items in cart
+    cartItems = cart_items(customer)
+    
     # To query the complete orders
     orders = Order.objects.filter(customer=customer, complete=True).order_by('-transaction_id')
     order_items = OrderItem.objects.filter(order__in=orders).order_by('-date_added')
@@ -232,7 +225,7 @@ def purchase_history(request):
 
     context = {
         'purchases': purchases,
-        'cartItems': order.get_cart_items,
+        'cartItems': cartItems,
         'delivered': orders.count,
         'pending': Order.objects.filter(customer=customer, complete=False).count,
         'total_orders': Order.objects.filter(customer=customer).count
@@ -262,11 +255,10 @@ def userProfile(request):
         user_pic_form = UpdateUserProfilePic(instance=request.user.customer)
     
     orders = request.user.customer.order_set.all()
-    # Please don't delete the next three lines 
+    # Please don't delete the next two lines 
     # order is for cart to update the total number of items in cart
     customer = request.user.customer
-    order, created = Order.objects.get_or_create(customer=customer, complete=False)
-    cartItems = order.get_cart_items
+    cartItems = cart_items(customer)
 
     orders = Order.objects.filter(customer=customer)
 
@@ -370,9 +362,8 @@ def new_product(request):
                 'price': 10.00,
                 'isAnimal': False
             })
-        
-        order, created = Order.objects.get_or_create(customer=request.user.customer, complete=False)
-        cartItems = order.get_cart_items
+        customer = request.user.customer
+        cartItems = cart_items(customer)
 
         context = {"form": form, 'cartItems':cartItems}
         return render(request, 'store/new_product.html', context)
@@ -380,12 +371,9 @@ def new_product(request):
 def searchResult(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        cartItems = order.get_cart_items
+        cartItems = cart_items(customer)
     else:
-        #Create empty cart for now for non-logged in user
-        order = {'get_cart_total':0, 'get_cart_items':0}
-        cartItems = order.get('get_cart_items')
+        cartItems = 0
 
     query = request.GET.get('q')
 
@@ -497,8 +485,7 @@ def my_listings(request):
 
     # order is for cart to update the total number of items in cart
     customer = request.user.customer
-    order, created = Order.objects.get_or_create(customer=customer, complete=False)
-    cartItems = order.get_cart_items
+    cartItems = cart_items(customer)
 
     products = Product.objects.filter(seller=customer)
     items = []
@@ -529,10 +516,11 @@ def view_orders(request, slug=None):
     paginator = Paginator(order_items, 100)
     page_number = request.GET.get('page')
     paginated_order_items = paginator.get_page(page_number)
-
+    cartItems = cart_items(request.user.customer)
     context = {
         'product': product,
-        'order_items': paginated_order_items
+        'order_items': paginated_order_items,
+        'cartItems': cartItems
     }
     return render(request, 'store/view_orders.html', context)
 
@@ -575,8 +563,7 @@ def edit_listing(request, slug=None):
         form.fields['tags'].widget.attrs['placeholder'] = ', '.join(product.tags.names())
 
 
-    order, created = Order.objects.get_or_create(customer=request.user.customer, complete=False)
-    cartItems = order.get_cart_items
+    cartItems = cart_items(request.user.customer)
     context = {
         'form': form,
         'product': product,
@@ -688,3 +675,10 @@ def inquiry_product (parameters):
         product =parameters.get('pet_food')
     
     return product
+
+def cart_items (customer):
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+    items = order.orderitem_set.all()
+    items = order.get_cart_items
+    
+    return items
