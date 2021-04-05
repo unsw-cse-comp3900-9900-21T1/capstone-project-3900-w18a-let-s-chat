@@ -3,34 +3,81 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<h3>List a new product</h3>
-<div class="box-element">
-    <form method="post" novalidate enctype="multipart/form-data">
-        {% csrf_token %}
+<head>
+    <style>
+        #starting_bid{
+            display:none;
+        }
+    
+        #end_date{
+            display:none;
+        }
+    </style>
+</head>
 
-        <div class="row">
-            <div class="col-lg-4" style="min-width:50%;">
-                {{form.name | as_crispy_field}}
-            </div>
-            <div class="col-lg-4">
-                {{form.price | as_crispy_field}}
-            </div>
-            <div class="col-lg-4">
-                {{form.isAnimal | as_crispy_field}}
-            </div>
-            <div class="col-lg-4">
-                {{form.remaining_unit | as_crispy_field}}
-            </div>
-        </div>       
-        {{form.warranty | as_crispy_field}}
-        {{form.delivery_period | as_crispy_field}}
-        {{form.description | as_crispy_field}}
-        {{form.tags | as_crispy_field}}
-        {{form.image | as_crispy_field}}
-        <button type="submit" class="btn btn-success">Confirm product listing</button>
+<body>
+    <h3>List a new product</h3>
+    <div class="box-element">
+        <form method="post" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
 
-    </form>
-</div>
+            <div class="row">
+                <div class="col-lg-4" style="min-width:50%;">
+                    {{form.name | as_crispy_field}}
+                </div>
+                <div class="col-lg-4">
+                    <label for="selling-type">Selling Type</label>
+                    <select class="form-control" id="selling-type">
+                        <option value="sale">Sales</option>
+                        <option value="auction">Auctions</option>
+                    </select>
+                    {{form.selling_type | as_crispy_field}}
+                </div>
+                <div class="col-lg-4" id="price">
+                    {{form.price | as_crispy_field}}
+                </div>
+                <div class="col-lg-4" id="starting_bid">
+                    {{form.starting_bid | as_crispy_field}}
+                </div>
+                <div class="col-lg-4" id="end_date">
+                    {{form.end_date | as_crispy_field}}
+                </div>
+                <div class="col-lg-4">
+                    {{form.isAnimal | as_crispy_field}}
+                </div>
+                <div class="col-lg-4">
+                    {{form.remaining_unit | as_crispy_field}}
+                </div>
+            </div>       
+            {{form.warranty | as_crispy_field}}
+            {{form.delivery_period | as_crispy_field}}
+            {{form.description | as_crispy_field}}
+            {{form.tags | as_crispy_field}}
+            {{form.image | as_crispy_field}}
+            <button type="submit" class="btn btn-success">Confirm product listing</button>
 
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $("#selling-type").change(function () {
+            show_hide();
+            });
 
+        function show_hide(){
+            if ($("#selling-type").val() == 'auction' ) {
+                $("#id_selling_type").attr("value", "auction");
+                document.getElementById("price").style.display = 'none';
+                document.getElementById("starting_bid").style.display = 'block';
+                document.getElementById("end_date").style.display = 'block';
+            } else if ($("#selling-type").val() == 'sale' ) {
+                $("#id_selling_type").attr("value", "sale");
+                document.getElementById("price").style.display = 'block';
+                document.getElementById("starting_bid").style.display = 'none';
+                document.getElementById("end_date").style.display = 'none';
+            }
+        }
+
+    </script>
+</body>
 {% endblock content %}

@@ -1,4 +1,3 @@
-
 import math
 
 from .models import Product, Customer, ProductViewCount, Order, OrderItem

@@ -7,6 +7,15 @@
     Note: This item has been unlisted by the seller and cannot be purchased
 </div>
 {% endif %}
+
+<style>
+    #messages{
+        background-color: grey;
+        color: #fff;
+        padding: 10px;
+        margin-top: 10px;
+    }
+</style>
     <div class="row">
         <div style="max-width:40%" class="col-lg-6">
             <div class="box-element" id="img-box">
@@ -26,6 +35,14 @@
                     <div class="row">
                         <div style="min-width: 300px;" class="col-lg-6">
                             <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
+                            {% if product.selling_type == "auction" %}
+                                <strong>End time: </strong>
+                                <div id='event-box'>{{product.end_date|date:"M d, Y H:m:s"}}</div>
+                                <div><strong>Auction time left:</strong></div>
+                                <div id="countdown-box">
+                                    <div class="spinner-border" role="status"></div>
+                                </div>
+                            {% endif %}
                             <div style="padding: 10px; max-height:400px" class="card" id="desc-box">
                                 <h5>Description</h5>
                                 <p style="font-size:14px; overflow:none; white-space: pre-line;" id="desc-text">
@@ -38,17 +55,33 @@
                                 <form>
                                     <div class="row">
                                         <div class="col" style="max-width:30%;">
-                                            <p id="price-text"> ${{product.price|floatformat:2}} <strong>AUD</strong></p>
-                                            <p>per unit</p>
+                                            {% if product.selling_type == "sale" %}
+                                                <p id="price-text"> ${{product.price|floatformat:2}} <strong>AUD</strong></p>
+                                                <p>per unit</p>
+                                            {% else %}
+                                                <p id="starting-bid-text"><strong>Current bid</strong>  ${{product.starting_bid|floatformat:2}} <strong>AUD</strong></p>
+                                                <p>per unit</p>
+                                            {% endif %}
                                         </div>
                                         <div class="col" style="max-width:30%;">
                                             <input type="number" id="quantity" min=1 value=1 style="max-width:100%;"/>
                                         </div>
                                         <div class="col">
-                                            <button data-product="{{product.id}}" 
-                                            class="btn btn-outline-primary" id="add-to-cart" style="font-size: 13px;">
-                                                Add to Cart
-                                            </button>
+                                            {% if product.selling_type == "sale" %}
+                                                <button data-product="{{product.id}}" 
+                                                class="btn btn-outline-primary" id="add-to-cart" style="font-size: 13px;">
+                                                    Add to Cart
+                                                </button>
+                                            {% else %}
+                                                <input id="starting_bid" placeholder="Bid">
+                                                <button href="#" id="place-bid" 
+                                                class="btn btn-primary" data-product="{{product.id}}">
+                                                Place Bid
+                                                </button>
+                                                {% for message in messages %}
+                                                <p id="messages">{{message}}</p>
+                                                {% endfor %}
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </form>
@@ -173,10 +206,20 @@
         document.getElementById('add-to-cart').classList.add("hidden");
         document.getElementById('cart-icon').classList.add("hidden");
 		document.getElementById('cart-total').classList.add("hidden");
+        document.getElementById('place-bid').classList.add("hidden");
 	} else {
         var quantityInput = document.getElementById('quantity')
+        var starting_bid = document.getElementById('starting_bid')
         var addBtn = document.getElementById('add-to-cart')
+        var bidBtn = document.getElementById('place-bid')
         var productId = addBtn.dataset.product
+        if ("{{product.selling_type}}" == "auction") {
+            var productId_bid = bidBtn.dataset.product
+            
+        }
+        var highest_bidder = "{{request.user.customer}}"
+        window.console.log(bidBtn)
+        window.console.log(highest_bidder)
         
         quantityInput.addEventListener('submit', function(e){
             e.preventDefault()
@@ -186,6 +229,12 @@
         addBtn.addEventListener('click', function(){
             submitData()
         })
+
+        if ("{{product.selling_type}}" == "auction") {
+            bidBtn.addEventListener('click', function(){
+                addBid()
+            })
+        }
 
         function submitData(){
             var quantity = quantityInput.value
@@ -210,7 +259,32 @@
                 location.reload()
                 })
         }
+
+        function addBid(){
+            var new_bid = starting_bid.value
+            console.log('New Bid:', new_bid)
+
+            var url = "/add_bid/"
+            fetch(url, {
+                method:'POST',
+                headers:{
+                    'Content-Type':'applicaiton/json',
+                    'X-CSRFToken':csrftoken,
+                }, 
+                body:JSON.stringify({'productId':productId_bid,'new_bid':new_bid, 'highest_bidder':highest_bidder}),
+                
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Data sent:', data);
+                location.reload()
+                })
+        }
     }
 
 </script>
+{% if product.selling_type == "auction" %}
+    <script src="{% static 'javascript/timer.js' %}"></script>
+{% endif %}
+
 {% endblock content %}

@@ -50,4 +50,5 @@ urlpatterns = [
     # path('chat_index/', views.index_view, name='index'),
     # path('chat/', views.chat_view, name="chat_view"),
     path('webhook/', views.webhook, name="webhook"),
+    path('add_bid/', views.add_bid, name="add_bid"),
 ]

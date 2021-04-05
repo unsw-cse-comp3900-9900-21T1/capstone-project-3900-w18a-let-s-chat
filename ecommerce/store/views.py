@@ -16,6 +16,7 @@ import sys
 import json
 import datetime
 import re
+import threading
 from uuid import uuid4
 
 from django.views.decorators.csrf import csrf_exempt
@@ -339,7 +340,36 @@ def processOrder(request):
             product.remaining_unit -= item.quantity
             product.sold_unit += item.quantity
             product.save()			
+            if product.selling_type == "sale":
+                total_price = product.price * item.quantity
+            else:
+                total_price = product.starting_bid
 
+            seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
+
+            print(settings.EMAIL_HOST_USER)
+            email = EmailMessage(
+                'Your product has been sold!',
+                seller_template,
+                settings.EMAIL_HOST_USER,
+                [product.seller.email],
+            )
+
+            email.fail_silently = False
+            email.send()
+
+            seller_template = render_to_string('store/email_processOrder_to_buyer.html', {'name': customer.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
+
+            print(settings.EMAIL_HOST_USER)
+            email = EmailMessage(
+                'Your have purchased a product successfully!',
+                seller_template,
+                settings.EMAIL_HOST_USER,
+                [customer.email],
+            )
+
+            email.fail_silently = False
+            email.send()
 
     return JsonResponse('Payment success', safe=False)
 
@@ -390,7 +420,7 @@ def searchResult(request):
 
                 tmp1 = Product.objects.none()
                 tmp2 = Product.objects.none()
-                counter = 0;
+                counter = 0
                 for tag in taglist:
                     tag_checked = tag
                     if tag_checked[0] == " ":
@@ -398,7 +428,7 @@ def searchResult(request):
                     print("Tag is: " + tag_checked)
                     if counter == 0:
                         tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
-                        counter = 1;
+                        counter = 1
 
                     else:
                         tmp1 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
@@ -545,6 +575,8 @@ def edit_listing(request, slug=None):
                 product.name = form.cleaned_data['name']
             if form.cleaned_data['price']:
                 product.price = form.cleaned_data['price']
+            if form.cleaned_data['end_date']:
+                product.end_date = form.cleaned_data['end_date']
             if form.cleaned_data['remaining_unit']:
                 product.remaining_unit = form.cleaned_data['remaining_unit']
             if form.cleaned_data['description']:
@@ -683,3 +715,77 @@ def cart_items (customer):
     items = order.get_cart_items
     
     return items
+def add_bid(request):
+	data = json.loads(request.body)
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		all_customer = Customer.objects.all()
+		productId = int(data['productId'])
+		new_bid = int(data['new_bid'])
+		for each_customer in all_customer:
+			if each_customer.nickname == data['highest_bidder']:
+				highest_bidder = each_customer
+				
+		try:
+			product = Product.objects.get(id=productId)
+		except ObjectDoesNotExist:
+			return JsonResponse('Product not found', safe=False)
+		if not product.is_active:
+			return JsonResponse('Product is unlisted', safe=False)
+
+		if new_bid > product.starting_bid:
+			product.starting_bid = new_bid
+			product.highest_bidder = highest_bidder
+			messages.success(request, f'You have successfully placed a bid!')
+			product.save()
+			return JsonResponse('You have successfully placed a bid!', safe=False)
+		else:
+			messages.error(request, f'The bid must be greater than the current bid!')
+			return JsonResponse('The bid must be greater than the current bid!', safe=False)
+
+def check_auction_time():
+	threading.Timer(10.0, check_auction_time).start()
+	# print("checking auction time")
+	products = Product.objects.all()
+	for product in products:
+		if product.is_active == True:
+			if product.selling_type == "auction":
+				if datetime.datetime.now() >= product.end_date.replace(tzinfo=None):
+					print("datetime_now: " + str(datetime.datetime.now()))
+					print("end_date: " + str(product.end_date.replace(tzinfo=None)))
+					bidder = product.highest_bidder
+					order, created = Order.objects.get_or_create(customer=bidder, complete=False)
+
+					orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+					orderItem.quantity += 1
+					orderItem.save()
+
+					product.is_active = False
+					product.save()
+					seller_template = render_to_string('store/email_auctionEnd_to_buyer.html', {'name': product.highest_bidder.nickname, 'product': product.name, 'price': product.starting_bid})
+
+					email = EmailMessage(
+						'You have win the Auction!',
+						seller_template,
+						settings.EMAIL_HOST_USER,
+						[product.highest_bidder.email],
+					)
+
+					email.fail_silently = False
+					email.send()
+
+					seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'bidder': product.highest_bidder.nickname, 'product': product.name, 'price': product.starting_bid})
+
+					print(settings.EMAIL_HOST_USER)
+					email = EmailMessage(
+						'Your product has ended!',
+						seller_template,
+						settings.EMAIL_HOST_USER,
+						[product.seller.email],
+					)
+
+					email.fail_silently = False
+					email.send()
+
+check_auction_time()

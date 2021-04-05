@@ -35,14 +35,20 @@
 					
 					<div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
 					<div style="flex:2"><p>{{item.product.name}}</p></div>
-					<div style="flex:1"><p>${{item.product.price|floatformat:2}}</p></div>
+					{% if item.product.selling_type == "sale" %}
+						<div style="flex:1"><p>${{item.product.price|floatformat:2}}</p></div>
+					{% else %}
+						<div style="flex:1"><p>${{item.product.starting_bid|floatformat:2}}</p></div>
+					{% endif %}
 					<div style="flex:1">
 						<p class="quantity">{{item.quantity}}</p>
-						<div class="quantity">
-							<img data-product="{{item.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
-					
-							<img data-product="{{item.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
-						</div>
+						{% if item.product.selling_type == "sale" %}
+							<div class="quantity">
+								<img data-product="{{item.product.id}}" data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
+						
+								<img data-product="{{item.product.id}}" data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
+							</div>
+						{% endif %}
 					</div>
 					<div style="flex:1"><p>${{item.get_total|floatformat:2}}</p></div>
 				</div>
