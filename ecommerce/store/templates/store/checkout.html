@@ -1,6 +1,16 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
+<style>
+    #loading{
+		display:none;
+    }
+</style>
+	<div class="d-flex justify-content-center">
+		<div class="spinner-border" role="status" id="loading">
+		<span class="sr-only">Loading...</span>
+		</div>
+	</div>
      <div class="row">
 		<div class="col-lg-6">
 			<div class="box-element" id="form-wrapper">
@@ -87,16 +97,17 @@
 	})
 
 	document.getElementById('paypal-icon').addEventListener('click',function(e){
-			submitFormData()
+		submitFormData()
 	})
 	document.getElementById('visa-icon').addEventListener('click',function(e){
-			submitFormData()
+		submitFormData()
 	})
 	document.getElementById('master-icon').addEventListener('click',function(e){
-			submitFormData()
+		submitFormData()
 	})
 
 	function submitFormData(){
+		document.getElementById("loading").style.display = 'block';
 		console.log('Payment icon clicked')
 		var userFormData = {
 			'name':null,
