@@ -788,4 +788,4 @@ def check_auction_time():
 					email.fail_silently = False
 					email.send()
 
-check_auction_time()
+# check_auction_time()
