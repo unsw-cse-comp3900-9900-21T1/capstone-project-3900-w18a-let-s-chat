@@ -616,7 +616,7 @@ def toggle_unlist(request):
     product.is_active = not product.is_active
     product.save()
     
-    return redirect('my_listings')
+    return JsonResponse(data={}, status=200)
 
 # ---------------------Chatbot section-------------------------#
 

@@ -62,7 +62,6 @@
         var collapse = btn.closest(".collapse");
         var slug_str = collapse.data("slug");
         var heading = collapse.closest(".card").find(".item-heading");
-        console.log(collapse, heading.find(".unlisted-badge"), slug_str);
 
         $.ajax({
             type: "POST",
