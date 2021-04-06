@@ -15,10 +15,8 @@
         <div class="row">
             {% if product.selling_type == "sale" %}
                 <div class="col-lg-4">{{form.price | as_crispy_field }}</div>
-            {% else %}
-                <div class="col-lg-4">{{form.end_date | as_crispy_field }}</div>
+                <div class="col-lg-4">{{form.remaining_unit | as_crispy_field }}</div>
             {% endif %}
-            <div class="col-lg-4">{{form.remaining_unit | as_crispy_field }}</div>
         </div>
         {{form.description | as_crispy_field}}
         {{form.tags | as_crispy_field}}
