@@ -21,3 +21,7 @@ Solved plenty merge conflicts and minor issues.
 Week 5
 Add to cart functionalities now working for product description and search result pages.
 Cancel button in purchase history now is functioning as expected.
+
+Week 7
+Created and tested a basic chatbot to answer user question.
+Make modification on searchResult for future uses.

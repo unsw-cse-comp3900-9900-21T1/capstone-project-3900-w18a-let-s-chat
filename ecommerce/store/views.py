@@ -733,11 +733,15 @@ def add_bid(request):
 			return JsonResponse('Product is unlisted', safe=False)
 
 		if new_bid > product.starting_bid:
-			product.starting_bid = new_bid
-			product.highest_bidder = highest_bidder
-			messages.success(request, f'You have successfully placed a bid!')
-			product.save()
-			return JsonResponse('You have successfully placed a bid!', safe=False)
+			if customer == product.seller:
+				messages.error(request, f'You cannot place a bid to your own product!')
+				return JsonResponse('The bid must be greater than the current bid!', safe=False)
+			else:
+				product.starting_bid = new_bid
+				product.highest_bidder = highest_bidder
+				messages.success(request, f'You have successfully placed a bid!')
+				product.save()
+				return JsonResponse('You have successfully placed a bid!', safe=False)
 		else:
 			messages.error(request, f'The bid must be greater than the current bid!')
 			return JsonResponse('The bid must be greater than the current bid!', safe=False)
