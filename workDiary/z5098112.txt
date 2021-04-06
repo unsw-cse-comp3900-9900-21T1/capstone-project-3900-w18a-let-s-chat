@@ -14,3 +14,22 @@ Also, I have wrote the user types of the product into the proposal. I have creat
 
 Week4
 Created the basic coding for the product and uploaded to github, which includes all website templates of the website, the main html that will be extended by other html files, the navbar imported from bootstrap, etc. After well has finish the following data structure, I have created the registration and login authentication for the website, with formatted html pages by css.
+
+Week5
+Splitted the sprint 2 work into several parts, which I am responsible for the selling features, auction features and more email features.
+
+Week7
+Daniel has completed the new listing features and manage listings features, I then made some changes to his files so that it works well with my auctions features.
+I have added new fields for the product class in models.py for auction features, which are selling_type, starting_bid, end_date, and highest_bidder.
+I have finished implementing all of the auction and email features:
+  - Buyer can now place bid to the auctions.
+  - A timer has been made so it countdowns til the end of the auction.
+  - Emails will be sent to both buyers and sellers once a payment has been made.
+  - Emails will be sent to both highest bidder and sellers once an auction has ended.
+  - Once an auction has ended, the product will be added to the highest bidder's cart.
+
+Week8
+After the online meeting, some changes has been made:
+  - Seller now cannot place bid to their own product.
+  - Seller now cannot modify the end date and quantity of the auction product.
+  - User profile has deleted the "Your Products" tag.
