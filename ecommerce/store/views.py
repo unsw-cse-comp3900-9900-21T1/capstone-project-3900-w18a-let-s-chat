@@ -751,7 +751,7 @@ def check_auction_time():
 	for product in products:
 		if product.is_active == True:
 			if product.selling_type == "auction":
-				if datetime.datetime.now() >= product.end_date.replace(tzinfo=None):
+				if datetime.datetime.utcnow() >= product.end_date.replace(tzinfo=None):
 					print("datetime_now: " + str(datetime.datetime.now()))
 					print("end_date: " + str(product.end_date.replace(tzinfo=None)))
 					bidder = product.highest_bidder
