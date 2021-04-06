@@ -575,8 +575,6 @@ def edit_listing(request, slug=None):
                 product.name = form.cleaned_data['name']
             if form.cleaned_data['price']:
                 product.price = form.cleaned_data['price']
-            if form.cleaned_data['end_date']:
-                product.end_date = form.cleaned_data['end_date']
             if form.cleaned_data['remaining_unit']:
                 product.remaining_unit = form.cleaned_data['remaining_unit']
             if form.cleaned_data['description']:
