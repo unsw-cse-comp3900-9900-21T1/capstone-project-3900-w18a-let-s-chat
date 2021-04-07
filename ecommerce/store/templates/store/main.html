@@ -79,7 +79,7 @@
 			<!-- Dropdown menu -->
 			{% if request.user.is_authenticated %}
 				<div class="dropdown">
-					<i class="bi-person-circle" id="user-icon" onclick="myFunction()" ></i>
+					<i class="bi-person-circle" id="user-icon" onclick="toggleDropdown()" ></i>
 					<div id="myDropdown" class="dropdown-content">
 						<a href="/new_product"><i class="bi-plus-square dropdown-icon"></i>New listing</a>
 						<a href="/my_listings"><i class="bi-card-checklist dropdown-icon"></i>Manage my listings</a>
@@ -118,7 +118,7 @@
 	<script>
 	/* When the user clicks on the button, 
 	toggle between hiding and showing the dropdown content */
-	function myFunction() {
+	function toggleDropdown() {
 		document.getElementById("myDropdown").classList.toggle("show");
 	}
 
