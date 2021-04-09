@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from .models import *
+from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -208,7 +209,7 @@ def purchase_history(request):
     purchases = []
     for o in orders:
         order_items = OrderItem.objects.filter(order=o).order_by('-date_added')
-
+        # print(order_items.estimated_date)
         for item in order_items:
             purchases.append({
                 "iid":item.id,
@@ -217,9 +218,9 @@ def purchase_history(request):
                 "name": item.product.name,
                 "seller": item.product.seller.nickname,
                 "quantity": item.quantity,
-                "date_added": item.date_added,
+                "date_ordered": o.date_ordered,
                 "transaction": o.transaction_id,
-                "estimated": item.product.delivery_period_days_hours_str,
+                "estimated": item.product.estimated_date,
                 "image": item.product.imageURL,
                 "price": item.get_total
             })
@@ -278,6 +279,7 @@ def updateItem(request):
 
     customer = request.user.customer
     product = Product.objects.get(id=productId)
+    
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
 
     orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
@@ -305,6 +307,7 @@ def updateItem(request):
     if orderItem.quantity <= 0:
         orderItem.delete()
         print('delete')
+        
     
     return JsonResponse('Item was updated', safe=False)
 
@@ -322,6 +325,7 @@ def processOrder(request):
         # To prevent user change the value through javascript to bypass the checkout checking
         if total == order.get_cart_total:
             order.complete = True
+            order.date_ordered = timezone.now()
         order.save()
 
         ShippingAddress.objects.create(
@@ -339,6 +343,7 @@ def processOrder(request):
             product = Product.objects.get(id=item.product.id)
             product.remaining_unit -= item.quantity
             product.sold_unit += item.quantity
+            product.estimated_date = timezone.now() + product.delivery_period
             product.save()			
             if product.selling_type == "sale":
                 total_price = product.price * item.quantity

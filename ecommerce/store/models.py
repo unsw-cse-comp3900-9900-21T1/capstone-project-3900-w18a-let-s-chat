@@ -6,8 +6,7 @@ from taggit.managers import TaggableManager
 from .util.generate_url_slugs import unique_slugify
 from PIL import Image
 
-import datetime
-
+import datetime 
 SELLING_CHOICES = [
     ('sale', 'Sales'),
     ('auction', 'Auctions')
@@ -52,6 +51,7 @@ class Product(models.Model):
     delivery_period = models.DurationField()
     seller = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     tags = TaggableManager()
+    estimated_date = models.DateTimeField(editable=False, blank=True, null=True)
     slug_str = models.SlugField(blank=True)
     is_active = models.BooleanField(default=True)
     
@@ -77,7 +77,7 @@ class Product(models.Model):
 
 class Order(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
-	date_ordered = models.DateTimeField(auto_now_add=True)
+	date_ordered = models.DateTimeField(editable=False, blank=True, null=True)
 	complete = models.BooleanField(default=False)
 	transaction_id = models.CharField(max_length=100, null=True)
 
