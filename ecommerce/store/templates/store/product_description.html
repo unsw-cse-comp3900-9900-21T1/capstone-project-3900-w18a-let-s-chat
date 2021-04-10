@@ -435,7 +435,7 @@
 
         $.ajax({
             type: "POST",
-            url: "{% url 'toggle_review_react' %}",
+            url: "{% url 'edit_review' %}",
             data: {
                 author: "{{request.user.customer}}",
                 slug_str: slug,
