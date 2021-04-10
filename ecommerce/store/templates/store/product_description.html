@@ -32,10 +32,22 @@
                     <h3 id="product-name"> {{product.name}} </h3>
                             <h5 id="seller-name"> 
                                 {% if product.seller.trusted %}
-                                    <span class="badge bg-dark text-light">Trusted</span>
+                                    <span class="badge bg-dark text-light"><i class="bi-award-fill"></i> Trusted</span>
                                 {% endif %}
                                 by {{product.seller.nickname}}
                             </h5>
+                            <h6 id="product-star-rating" data-rating="{{product.avg_rating}}">
+                                <span id="review-count-text"> 
+                                    {% if product.reviews.count == 0 %}
+                                    No reviews yet
+                                    {% elif product.reviews.count == 1 %}
+                                    ({{product.avg_rating | floatformat:1}}) from {{product.reviews.count}} review
+                                    {% else %}
+                                    ({{product.avg_rating | floatformat:1}}) from {{product.reviews.count}} reviews
+                                    {% endif %}
+                                </span>
+                            </h6>
+
                     <div class="row">
                         <div style="min-width: 300px;" class="col-lg-6">
                             <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
@@ -135,75 +147,360 @@
         </div>
     </div>
 
-    <div class="box-element" style="margin-top: 15px; height:250px;">
-        <h5>Leave a review</h5>
-        <!--HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr -->
-        <form class="rating">
-            <label>
-              <input type="radio" name="stars" value="1" />
-              <span class="icon">★</span>
-            </label>
-            <label>
-              <input type="radio" name="stars" value="2" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-            </label>
-            <label>
-              <input type="radio" name="stars" value="3" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>   
-            </label>
-            <label>
-              <input type="radio" name="stars" value="4" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-            </label>
-            <label>
-              <input type="radio" name="stars" value="5" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-            </label>
-          </form>
-          <div>
-              <form>
-                <textarea id="review-box" name="review-box" style="width:100%; height:120px; resize:none; font-size:14px;" placeholder="Enter your review here..."></textarea>
-                <button class="btn btn-outline-secondary" id="add-to-cart" style="font-size: 13px;">
-                    Submit review
-                </button>
-            </form>
-          </div>
+    {% if not is_owner %}
+        {% if user_review %}
+            <div class="box-element" style="margin-top: 15px; overflow:auto;">
+                <h5>Your review</h5>
+                
+                <div class="card" id="previous-review-card" style="padding:10px;" data-rating="{{user_review.rating}}">
+                    <div class="review-star-div"></div>
+                    <p id="previous-review-text">{{user_review.text}}</p>
+                    <div>
+                        <btn class="btn btn-outline-secondary btn-sm" id="btn-edit-review">Edit</btn>
+                        <btn class="btn btn-outline-danger btn-sm" id="btn-delete-review">Delete</a>
+                    </div>
+                </div>
+                <div class="card" id="edit-review-card" style="padding:10px; display:none;">
+                    <form id="edit-review-form">
+                        <input type="hidden" name="slug_str" value="{{product.slug_str}}">
 
-    </div>
-    <div class="box-element" style="margin-top: 15px; height:300px;">
+                        <!--HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr -->
+                        <!--Template if statements are used to set the reviews old star rating to 'checked'-->
+                        <div class="rating">
+                            <label>
+                                <input type="radio" name="rating" value="1" {%if user_review.rating == 1%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="2" {%if user_review.rating == 2%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="3"{%if user_review.rating == 3%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>   
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="4" {%if user_review.rating == 4%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="5" {%if user_review.rating == 5%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                            </label>
+                        </div>
+                        <textarea id="edit-review-box" name="text" style="width:100%; height:200px;  font-size:14px; padding:5px;">{{user_review.text}}</textarea>
+                        <div>
+                            <input type="submit" class="btn btn-outline-primary btn-sm" id="btn-save-changes-review" value="Save"></btn>
+                            <btn class="btn btn-outline-secondary btn-sm" id="btn-cancel-changes-review">Cancel</a>
+                        </div>
+                    </form>
+                    
+                </div>
+
+            </div>
+        {% else %}
+
+        <div class="box-element" style="margin-top: 15px; overflow:auto;">
+            <h5>Leave a review</h5>
+            <form id="review-form">
+                <div class="alert alert-warning review-alert" role="alert" id="review-empty-alert" style="display:none"><i class='bi-exclamation-circle'></i> Review cannot be left empty</div>
+                <div class="alert alert-warning review-alert" role="alert" id="review-long-alert" style="display:none"><i class='bi-exclamation-circle'></i> Review is too long! Try to be more concise</div>
+                <div class="alert alert-warning review-alert" role="alert" id="review-rating-alert" style="display:none"><i class='bi-exclamation-circle'></i> Please select a star rating</div>
+                <input type="hidden" name="slug_str" value="{{product.slug_str}}">
+
+                <div class="rating">
+                    <label>
+                        <input type="radio" name="rating" value="1" />
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="2" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="3" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>   
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="4" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="5" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                </div>
+                
+            <div>
+
+                <textarea id="review-box" name="text" style="width:100%; height:200px;  font-size:14px; padding:5px;" placeholder="Enter your review here..."></textarea>
+                <input type="submit" class="btn btn-outline-secondary" style="font-size: 13px;" value="Submit review"></input>
+                </form>
+            </div>
+
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="box-element" style="margin-top: 15px; margin-bottom:15px;">
         <h5>Reviews</h5>
-        <ul class="list-group" style="overflow:scroll; max-height:85%">
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            
+        <ul class="list-group" style="overflow:scroll;">
+            {% for review_item in reviews %}
 
+            <li class="list-group-item review" data-rating="{{review_item.review.rating}}" data-score="{{review_item.review.score}}" data-review-id="{{review_item.review.id}}">
+                <div class="review-star-div">
+                </div>
+                <h6>
+                    <b>
+                        {% if review_item.review.author.trusted %}<span class="badge bg-dark text-light rounded-pill"><i class="bi-award-fill"></i> Trusted</span>{% endif %}
+                        {% if review_item.review.edited %}<span class="badge bg-info text-light rounded-pill"><i class="bi-exclamation-circle-fill"></i> Edited</span>{% endif %}
+
+                        {{review_item.review.author.nickname}}
+                    </b>
+                     | {{review_item.review.date_posted}}</h6>
+                <p class="review-text">{{review_item.review.text}}</p>
+                <div class="card" style="display:inline-block">
+                    <btn class="btn bi-hand-thumbs-up-fill review-react like {%if review_item.liked%}react-active{%endif%}"></btn>
+                    <span class="score-display">{{review_item.review.score}}</span>
+                    <btn class="btn bi-hand-thumbs-down-fill review-react dislike {%if review_item.disliked%}react-active{%endif%}"></btn>
+                </div>
+                
+            </li>
+
+            {% empty %}
+            <p>No reviews for this listing were found</p>
+            {% endfor %}
         </ul>
     </div>
 
+<!-- Handle reviews -->
+<script src="{% static 'javascript/jquery.js' %}"></script>
+<script type="text/javascript">
+    
+    const maxRating = 5;
+
+    // Draw average rating stars
+    $("#product-star-rating").each(function() {
+
+        var text = $(this).find("#review-count-text");
+        text.remove();
+
+        var rating = $(this).data("rating");
+        var i;
+        for (i = 0; i < Math.floor(rating); i++)
+            $(this).append('<i class="bi-star-fill"></i>');
+        if (rating - i >= 0.5) {
+            $(this).append('<i class="bi-star-half"></i>');
+            i++;
+        }
+        for (; i < maxRating; i++)
+            $(this).append('<i class="bi-star"></i>');
+
+        $(this).append(text);
+    });
+
+    // Draw stars above each review
+    $(".review").each(function() {
+        var rating = $(this).data("rating");
+        var starBar = $(this).find(".review-star-div");
+        var i;
+        for (i = 0; i < rating; i++)
+            starBar.append('<i class="bi-star-fill" style="color:#09f"></i>');
+        for (; i < maxRating; i++)
+            starBar.append('<i class="bi-star"></i>');
+    });
+
+    // Handle submission of new review
+    $("#review-form").submit(function(e) {
+        e.preventDefault();
+        $(".review-alert").hide();
+
+        var reviewText = $(this).find('[name=text]').val();
+        var slug = $(this).find('[name=slug_str]').val();
+        var reviewRating = $(this).find('input[name=rating]:checked').val();
+        var invalid = false;
+
+        if (reviewText.length == 0) {
+            $("#review-empty-alert").show();
+            invalid = true;
+        }
+        if (reviewText.length >= 1000) {
+            $("#review-long-alert").show();
+            invalid = true;
+        }
+        if (reviewRating == null) {
+            $("#review-rating-alert").show();
+            invalid = true;
+        }
+
+        if (invalid) return;
+
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'new_review' %}",
+            data: {
+                slug_str: slug,
+                rating: reviewRating,
+                text: reviewText,
+
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("Successfully posted review");
+                location.reload();
+
+            }
+        });
+        
+    });
+
+    // Draw details on user's existing review
+    $("#previous-review-card").each(function() {
+        var rating = $(this).data("rating");
+        var starBar = $(this).find(".review-star-div");
+        var i;
+        for (i = 0; i < rating; i++)
+            starBar.append('<i class="bi-star-fill" style="color:#09f"></i>');
+        for (; i < maxRating; i++)
+            starBar.append('<i class="bi-star"></i>');
+        starBar.append("<span> | {{user_review.date_posted}}</span>");
+    });
+
+    // Handle deleting your review
+    $("#btn-delete-review").click(function() {
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'delete_review' %}",
+            data: {
+                slug_str: "{{product.slug_str}}",
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("Successfully deleted review");
+                location.reload();
+            }
+        });
+
+    });
+
+    // Handle editing your review
+
+    $("#btn-edit-review").click(function() {
+        $("#previous-review-card").hide();
+        $("#edit-review-card").show();
+    });
+
+    $("#btn-cancel-changes-review").click(function() {
+        $("#previous-review-card").show();
+        $("#edit-review-card").hide();
+    });
+
+    $("#edit-review-form").submit(function(e) {
+        e.preventDefault();
+
+        var reviewText = $(this).find('[name=text]').val();
+        var slug = $(this).find('[name=slug_str]').val();
+        var reviewRating = $(this).find('input[name=rating]:checked').val();
+
+        if (reviewText.length == 0)
+            return;
+        if (reviewText.length >= 1000)
+            return;
+        if (reviewRating == null)
+            return;
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'toggle_review_react' %}",
+            data: {
+                author: "{{request.user.customer}}",
+                slug_str: slug,
+                rating: reviewRating,
+                text: reviewText,
+
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("Successfully updated review");
+                location.reload();
+
+            }
+        });
+        
+    });
+
+    // Handle clicking on like or dislike on a review
+    $(".review-react").click(function() {
+        
+        var review = $(this).closest(".review");
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'toggle_review_react' %}",
+            data: {
+                review_id: review.data("review-id"),
+                is_like: $(this).hasClass("like"),
+
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                
+                var likeBtn = review.find(".like");
+                var dislikeBtn = review.find(".dislike");
+
+                // Change state of like and dislike buttons
+                if (response.state == 'liked') {
+                    likeBtn.addClass("react-active");
+                    dislikeBtn.removeClass("react-active");
+                } else if (response.state == 'disliked') {
+                    likeBtn.removeClass("react-active");
+                    dislikeBtn.addClass("react-active");
+                    
+                } else {
+                    likeBtn.removeClass("react-active");
+                    dislikeBtn.removeClass("react-active");
+                }
+                
+                // Update the review's score data and display
+                review.data("score", response.score);
+                review.find(".score-display").html(response.score);
+
+            }
+        })
+
+    });
+
+</script>
+
+
+<!-- Handle auctions -->
 <script type="text/javascript">
 	if (user == 'AnonymousUser'){
         document.getElementById('quantity').classList.add("hidden");

@@ -27,7 +27,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic, EditProductForm
+from .forms import OrderForm, CreateUserForm, UpdateUserForm, UpdateUserProfilePic, EditProductForm, NewReviewForm
 from .recommender import Recommender
 
 ### Constants ###
@@ -145,20 +145,51 @@ def product_page(request, slug=None):
     if request.user.is_authenticated:
         customer = request.user.customer
         cartItems = cart_items(customer)
-
+        is_owner = customer == product.seller
         ProductViewCount.log(customer, product)
+        try:
+            user_review = product.reviews.get(author=customer)
+        except ObjectDoesNotExist:
+            user_review = None
+        
+        # Get all of the user's reacts to reviews for this product
+        user_reacts = ReviewReact.objects.filter(customer=request.user.customer, review__product=product)
+        
     else:
         #Create empty cart for now for non-logged in user
         cartItems = 0
+        is_owner = False
+        user_review = None
 
     similar_items = product.tags.similar_objects()[:max_similar]
     similar_items = list(filter(lambda p: p.is_active, similar_items))
     
+    # Get initial state of like and dislike buttons for each review
+    reviews = []
+    for review in product.reviews.all():
+        liked = False
+        disliked = False
+        if request.user.is_authenticated:
+            try:
+                react = user_reacts.get(review=review)
+                liked = react.liked
+                disliked = not liked
+            except ObjectDoesNotExist:
+                pass
+        reviews.append({
+            "review": review,
+            "liked": liked,
+            "disliked": disliked,
+        })
+
     context = {
         "product": product,
         "tags": product.tags.names(),
         "cartItems": cartItems,
-        "similar_items": similar_items
+        "similar_items": similar_items,
+        "is_owner": is_owner,
+        "user_review": user_review,
+        "reviews": reviews
     }
     return render(request, 'store/product_description.html', context)
 
@@ -789,5 +820,114 @@ def check_auction_time():
 
 					email.fail_silently = False
 					email.send()
+
+def post_new_review(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(data={}, status=401)
+    if not request.method == 'POST':
+        return JsonResponse(data={}, status=400)
+    
+    form = NewReviewForm(request.POST)
+    if form.is_valid():
+
+        if ProductReview.objects.filter(product__slug_str=form.cleaned_data['slug_str'], author=request.user.customer).exists():
+            return JsonResponse(data={}, status=400)
+
+        review = ProductReview(
+            product=Product.objects.get(slug_str=form.cleaned_data['slug_str']),
+            author=request.user.customer,
+            rating=form.cleaned_data['rating'],
+            text=form.cleaned_data['text']
+        )
+        review.save()
+        # User automatically likes their own review
+        self_react = ReviewReact(liked=True,review=review, customer=request.user.customer)
+        self_react.save()
+
+        return JsonResponse(data={}, status=200)
+
+
+    return JsonResponse(data={}, status=400)
+
+def delete_review(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(data={}, status=401)
+    if not request.method == 'POST':
+        return JsonResponse(data={}, status=400)
+
+    try:
+        review = ProductReview.objects.get(
+            product__slug_str=request.POST.get('slug_str'),
+            author=request.user.customer)
+    except ObjectDoesNotExist:
+        return JsonResponse(data={}, status=400)
+    
+    review.delete()
+    return JsonResponse(data={}, status=200)
+
+def edit_review(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(data={}, status=401)
+    if not request.method == 'POST':
+        return JsonResponse(data={}, status=400)
+
+    form = NewReviewForm(request.POST)
+    print('made form')
+    if form.is_valid():
+        try:
+            review = ProductReview.objects.get(
+                product__slug_str=form.cleaned_data['slug_str'],
+                author=request.user.customer)
+        except ObjectDoesNotExist:
+            return JsonResponse(data={}, status=400)
+        
+        review.text = form.cleaned_data['text']
+        review.rating = form.cleaned_data['rating']
+        review.edited = True
+        review.save()
+
+        return JsonResponse(data={}, status=200)
+    
+    return JsonResponse(data={}, status=400)
+
+def toggle_review_react(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(data={}, status=401)
+    if not request.method == 'POST':
+        return JsonResponse(data={}, status=400)
+
+    try:
+        review = ProductReview.objects.get(id=int(request.POST.get('review_id')))
+    except ObjectDoesNotExist:
+        print('review not found')
+        return JsonResponse(data={}, status=400)
+    
+    try:
+        react = ReviewReact.objects.get(review=review, customer=request.user.customer)
+    except ObjectDoesNotExist:
+        react = None
+
+    is_like = request.POST.get('is_like') == 'true'
+    if (react is None):
+        react = ReviewReact(
+            review=review,
+            customer=request.user.customer,
+            liked=is_like
+        )
+        react.save()
+        state = 'liked' if is_like else 'disliked'
+
+    else:
+        # Case where cancelling reaction
+        if is_like == react.liked:
+            react.delete()
+            state = 'neither'
+        # Case where switching reaction
+        else:
+            react.liked = not react.liked
+            state = 'liked' if react.liked else 'disliked'
+            react.save()
+    
+    return JsonResponse(data={'score':review.score, 'state':state}, status=200)
 
 # check_auction_time()
