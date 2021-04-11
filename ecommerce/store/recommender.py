@@ -6,19 +6,21 @@ class Recommender():
     '''
     Profile a customer using their viewing and purchase history and find the
     products most suited to them
+    - Leave customer param as None if working with guest user
     '''
 
-    customer = None
-    profile_dict = None
-
-    def __init__(self, customer):
+    def __init__(self, customer=None):
         self.customer = customer
         self.profile_dict = self.get_customer_profile()
 
-    def get_customer_profile(self, purchase_weighting=2.0):
+    def get_customer_profile(self, purchase_weight=2.0):
         '''
         Generate the customers's profile using their viewing and purchase history
         '''
+
+        # Return empty profile dict for guest user
+        if not self.customer:
+            return dict()
 
         # Add to profile based on viewed items
         viewed = ProductViewCount.objects.filter(customer=self.customer)
@@ -32,9 +34,8 @@ class Recommender():
         purchases = OrderItem.objects.filter(order__in=orders)
         for order_item in purchases:
             for tag in order_item.product.tags.names():
-                profile[tag] = float(profile.get(tag, 0) + (1 * purchase_weighting))
+                profile[tag] = float(profile.get(tag, 0) + (1 * purchase_weight))
 
-        # print('User profile:', profile)
         return profile
 
     def calculate_similarity(self, product):
@@ -61,12 +62,26 @@ class Recommender():
         
         return float(numerator) / math.sqrt(denom_a*denom_b)
 
+    def calculate_score(self, product, rating_weight=0.1, default_score=2.5):
+        '''
+        Return the final score of the item
+        Score is the sum of its similarity and its review rating
+        '''
+        review_score = product.avg_rating
+        # Case where no reviews for product
+        if review_score == 0:
+            review_score = default_score
+        
+        print(product, self.calculate_similarity(product), rating_weight * review_score)
+        return self.calculate_similarity(product) + (rating_weight * review_score)
+
     
-    def get_recommended_products(self, max_results=100):
+    def get_recommended_products(self, max_results=1000):
         '''
         Return a list of the products most similar to the user's profile, that still have units left
         '''
 
         products = Product.objects.filter(remaining_unit__gt=0, is_active=True)
-        products = sorted(products, key=lambda p: self.calculate_similarity(p), reverse=True)
+        
+        products = sorted(products, key=lambda p: self.calculate_score(p), reverse=True)
         return products[:max_results]

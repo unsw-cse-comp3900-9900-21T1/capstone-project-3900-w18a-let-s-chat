@@ -49,20 +49,17 @@ def store(request):
         customer = request.user.customer
         cartItems = cart_items(customer)
 
-        rec = Recommender(request.user.customer)
-        products = rec.get_recommended_products()
-        # for p in products:
-        #     print(p.name, rec.calculate_similarity(p))
-
         # Get most recently viewed products - this displays even unlisted items
         view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
         recent_products = [view_count.product for view_count in view_counts][:max_recent]
 
     else:
         cartItems = 0
-        # Get all active products for now
-        products = Product.objects.filter(is_active=True)
         recent_products = []
+
+    # Get products from recommender
+    rec = Recommender(customer=request.user.customer if request.user.is_authenticated else None)
+    products = rec.get_recommended_products()
     
     # Paginate product list
     paginator = Paginator(products, paginated_size)
