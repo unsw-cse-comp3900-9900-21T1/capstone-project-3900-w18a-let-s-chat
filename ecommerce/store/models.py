@@ -13,6 +13,8 @@ SELLING_CHOICES = [
     ('auction', 'Auctions')
 ]
 
+no_image_url = '/images/no-image.jpg'
+
 class Customer(models.Model):
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=200, null=True)
@@ -67,7 +69,7 @@ class Product(models.Model):
         try:
             url = self.image.url
         except:
-            url = ''
+            url = no_image_url
         return url
 
     @property

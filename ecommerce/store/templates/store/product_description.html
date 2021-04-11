@@ -49,7 +49,7 @@
                             </h6>
 
                     <div class="row">
-                        <div style="min-width: 300px;" class="col-lg-6">
+                        <div style="width:50%" class="col-lg-6">
                             <h6><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></h6>
                             {% if product.selling_type == "auction" %}
                                 <strong>End time: </strong>
@@ -57,12 +57,12 @@
                                 <div>{{product.end_date}}</div>
                                 <div><strong>Auction time left:</strong></div>
                                 <div id="countdown-box">
-                                    <div class="spinner-border" role="status"></div>
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
                                 </div>
                             {% endif %}
                             <div style="padding: 10px; max-height:400px" class="card" id="desc-box">
                                 <h5>Description</h5>
-                                <p style="font-size:14px; overflow:none; white-space: pre-line;" id="desc-text">
+                                <p style="font-size:14px; overflow:scroll; white-space: pre-line;" id="desc-text">
                                     {{product.description}}
                                 </p>
                             </div>
@@ -71,39 +71,37 @@
                             <div style="padding: 10px; margin-bottom:10px;" class="card" id="buy-box">
                                 <form>
                                     <div class="row">
-                                        <div class="col" style="max-width:30%;">
+                                        <div class="col" style="max-width:60%;">
                                             {% if product.selling_type == "sale" %}
-                                                <p id="price-text"> ${{product.price|floatformat:2}} <strong>AUD</strong></p>
-                                                <p>per unit</p>
+                                                <p id="price-text"> <strong>${{product.price|floatformat:2}} AUD</strong> per unit</p>
                                             {% else %}
-                                                <p id="starting-bid-text"><strong>Current bid</strong>  ${{product.starting_bid|floatformat:2}} <strong>AUD</strong></p>
+                                                <p id="starting-bid-text"><strong>Current bid:</strong>  ${{product.starting_bid|floatformat:2}} <strong>AUD</strong></p>
                                             {% endif %}
                                         </div>
                                         <div class="col" style="max-width:30%;">
                                             <input type="number" id="quantity" min=1 value=1 style="max-width:100%;"/>
                                         </div>
-                                        <div class="col">
-                                            {% if product.selling_type == "sale" %}
-                                                <button data-product="{{product.id}}" 
-                                                class="btn btn-outline-primary" id="add-to-cart" style="font-size: 13px;">
-                                                    Add to Cart
-                                                </button>
-                                            {% else %}
-                                                <input id="starting_bid" placeholder="Bid">
-                                                <button href="#" id="place-bid" 
-                                                class="btn btn-primary" data-product="{{product.id}}">
-                                                Place Bid
-                                                </button>
-                                                {% for message in messages %}
-                                                <p id="messages">{{message}}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </div>
+                                    
                                     </div>
+                                    {% if product.selling_type == "sale" %}
+                                    <button data-product="{{product.id}}" 
+                                    class="btn btn-outline-primary btn" id="add-to-cart">
+                                        <i class="bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                {% else %}
+                                    <input id="starting_bid" placeholder="Bid" style="margin:5px;">
+                                    <button href="#" id="place-bid" style="margin:5px;"
+                                    class="btn btn-outline-primary" data-product="{{product.id}}">
+                                    <i class="bi-cash-stack"></i> Place Bid
+                                    </button>
+                                    {% for message in messages %}
+                                    <p id="messages">{{message}}</p>
+                                    {% endfor %}
+                                {% endif %}
                                 </form>
 
                             </div>
-                            <div style="padding: 10px; max-height:200px" class="card" id="tag-box">
+                            <div style="padding: 10px; max-height:200px; overflow-y:scroll;" class="card" id="tag-box">
                                 <h6> <i class="bi-tags"></i> Tags</h6>
                                 <ul class="list-group list-group-flush" style="overflow:scroll;">
 
