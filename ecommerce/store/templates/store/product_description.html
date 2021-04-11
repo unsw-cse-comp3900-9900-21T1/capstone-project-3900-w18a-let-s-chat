@@ -50,7 +50,7 @@
 
                     <div class="row">
                         <div style="min-width: 300px;" class="col-lg-6">
-                            <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
+                            <h6><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></h6>
                             {% if product.selling_type == "auction" %}
                                 <strong>End time: </strong>
                                 <div id='event-box'>{{product.end_date|date:"U"}}</div>
@@ -104,7 +104,7 @@
 
                             </div>
                             <div style="padding: 10px; max-height:200px" class="card" id="tag-box">
-                                <h6>Tags</h6>
+                                <h6> <i class="bi-tags"></i> Tags</h6>
                                 <ul class="list-group list-group-flush" style="overflow:scroll;">
 
                                     {% for tag in tags %}
@@ -125,12 +125,13 @@
         <div class="row horizontal-scroll-container">
 
             {% for product in similar_items %}
-                <div class="col-lg-4 horizontal-scroll-item">
+                <div class="col-lg-4 horizontal-scroll-item similar-item">
                     <a href = "{% url 'product_page' product.slug_str %}">
                         <img class="thumbnail" style="object-fit:cover; " src="{{product.imageURL}}">
                     </a>
                     <div class="box-element product">
                         <h6><strong>{{product.name}}</strong></h6>
+                        <div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
                         <hr>
 
                         <button data-product="{{product.id}}" data-action="add" 
@@ -264,10 +265,26 @@
 
     <div class="box-element" style="margin-top: 15px; margin-bottom:15px;">
         <h5>Reviews</h5>
-        <ul class="list-group" style="overflow:scroll;">
+
+        {% if reviews %}
+          <div class="dropdown">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="review-sort-dropdown" data-bs-toggle="dropdown" style="margin:10px; width:160px">
+            Sort reviews
+          </button>
+          <ul class="dropdown-menu">
+            <li><btn class="btn dropdown-item" id="btn-review-sort-score-desc"><i class="bi-award"></i> Top reviews</btn></li>
+            <li><btn class="btn dropdown-item" id="btn-review-sort-time-desc"><i class="bi-clock"></i> Most recent</btn></li>
+            <li><btn class="btn dropdown-item" id="btn-review-sort-rating-desc"><i class="bi-sort-up"></i> Highest rating</btn></li>
+            <li><btn class="btn dropdown-item" id="btn-review-sort-rating-asc"><i class="bi-sort-down-alt"></i> Lowest rating</btn></li>
+
+          </ul>
+        </div>
+        {% endif %}
+
+        <ul id="review-list" class="list-group" style="overflow:scroll; max-height:800px;">
             {% for review_item in reviews %}
 
-            <li class="list-group-item review" data-rating="{{review_item.review.rating}}" data-score="{{review_item.review.score}}" data-review-id="{{review_item.review.id}}">
+            <li class="list-group-item review" data-rating="{{review_item.review.rating}}" data-score="{{review_item.review.score}}" data-review-id="{{review_item.review.id}}" data-timestamp="{{review_item.review.timestamp}}">
                 <div class="review-star-div">
                 </div>
                 <h6>
@@ -329,6 +346,28 @@
         for (; i < maxRating; i++)
             starBar.append('<i class="bi-star"></i>');
     });
+
+    // Draw star rating on each similar product card
+	$(".similar-item .star-rating-div").each(function() {
+		console.log($(this));
+		var rating = $(this).data("rating");
+		var i;
+		for (i = 0; i < Math.floor(rating); i++)
+			$(this).append('<i class="bi-star-fill"></i>');
+		if (rating - i >= 0.5) {
+			$(this).append('<i class="bi-star-half"></i>');
+			i++;
+		}
+		for (; i < maxRating; i++)
+			$(this).append('<i class="bi-star"></i>');
+		
+		if ($(this).data("n-reviews") == 0)
+			$(this).append(" No reviews yet");
+		else if ($(this).data("n-reviews") == 1)
+			$(this).append(" from 1 review");
+		else
+			$(this).append(" from " + $(this).data("n-reviews") + " reviews");
+	});
 
     // Handle submission of new review
     $("#review-form").submit(function(e) {
@@ -483,7 +522,7 @@
                     likeBtn.removeClass("react-active");
                     dislikeBtn.addClass("react-active");
                     
-                } else {
+                } else if (response.state == 'neither') {
                     likeBtn.removeClass("react-active");
                     dislikeBtn.removeClass("react-active");
                 }
@@ -496,6 +535,33 @@
         })
 
     });
+
+    // Handle sorting reviews
+
+    function sortReviews(cmp) {
+        $("#review-list .review").sort(cmp).appendTo("#review-list");
+    }
+
+    $("#btn-review-sort-rating-desc").click(function() {
+        sortReviews((a,b) => ($(b).data("rating") - $(a).data("rating")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+    $("#btn-review-sort-rating-asc").click(function() {
+        sortReviews((a,b) => ($(a).data("rating") - $(b).data("rating")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+    $("#btn-review-sort-score-desc").click(function() {
+        sortReviews((a,b) => ($(b).data("score") - $(a).data("score")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+    $("#btn-review-sort-time-desc").click(function() {
+        sortReviews((a,b) => ($(b).data("timestamp") - $(a).data("timestamp")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+
+    function sortRatingDesc(a, b) {
+        return $(b).data("rating") - $(a).data("rating");
+    }
 
 </script>
 

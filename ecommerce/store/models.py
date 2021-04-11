@@ -100,6 +100,10 @@ class ProductReview(models.Model):
     def score(self):
         return self.reacts.filter(liked=True).count() - self.reacts.filter(liked=False).count()
     
+    @property
+    def timestamp(self):
+        return self.date_posted.timestamp()
+    
     def __str__(self):
         return f'{self.product} review by {self.author} ({self.rating} stars)'
     
