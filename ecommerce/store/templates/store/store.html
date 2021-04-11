@@ -15,6 +15,7 @@
 						</a>
 						<div class="box-element product">
 							<h6><strong>{{product.name}}</strong></h6>
+							<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
 							<hr>
 
 							{% if product.selling_type == "sale" %}
@@ -45,6 +46,7 @@
 			</a>
 			<div class="box-element product">
 				<h6><strong>{{product.name}}</strong></h6>
+				<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
 				<hr>
 
 				{% if product.selling_type == "sale" %}
@@ -86,5 +88,33 @@
 		{% endif%}
 	</ul>
 
+
+<script src="{% static 'javascript/jquery.js' %}"></script>
+<script>
+
+	// Draw star rating on each product card
+	const maxRating = 5;
+	$(".star-rating-div").each(function() {
+		console.log($(this));
+		var rating = $(this).data("rating");
+		var i;
+		for (i = 0; i < Math.floor(rating); i++)
+			$(this).append('<i class="bi-star-fill"></i>');
+		if (rating - i >= 0.5) {
+			$(this).append('<i class="bi-star-half"></i>');
+			i++;
+		}
+		for (; i < maxRating; i++)
+			$(this).append('<i class="bi-star"></i>');
+		
+		if ($(this).data("n-reviews") == 0)
+			$(this).append(" No reviews yet");
+		else if ($(this).data("n-reviews") == 1)
+			$(this).append(" from 1 review");
+		else
+			$(this).append(" from " + $(this).data("n-reviews") + " reviews");
+	});
+
+</script>
 
 {% endblock content %}

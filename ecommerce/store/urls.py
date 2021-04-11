@@ -26,6 +26,10 @@ urlpatterns = [
     path('view_orders/<slug:slug>/', views.view_orders, name="view_orders"),
     path('edit_listing/<slug:slug>/', views.edit_listing, name="edit_listing"),
     path('toggle_unlist/', views.toggle_unlist, name='toggle_unlist'),
+    path('new_review/', views.post_new_review, name='new_review'),
+    path('delete_review/', views.delete_review, name='delete_review'),
+    path('edit_review/', views.edit_review, name='edit_review'),
+    path('toggle_review_react/', views.toggle_review_react, name='toggle_review_react'),
 
     path('reset_password/',
         auth_views.PasswordResetView.as_view(template_name="store/password_reset.html"),

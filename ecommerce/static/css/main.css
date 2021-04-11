@@ -26,7 +26,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .thumbnail:hover {
-	transform: scale(1.1); 
+	transform: scale(1.05); 
 }
 
 .product {
@@ -303,6 +303,17 @@ h1, h2, h3, h4, h5, h6 {
 .list-box-item {
 	border:none;
 	height:fit-content
+}
+
+.review-react {
+	font-size:16px;
+}
+.review-react:hover {
+	color:#98d2eb;
+}
+
+.react-active {
+	color: #09f;
 }
 
 /********************** Layout and structure for User Profile page **********************/

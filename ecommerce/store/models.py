@@ -74,6 +74,47 @@ class Product(models.Model):
     def delivery_period_days_hours_str(self):
         secs = self.delivery_period.total_seconds()
         return f'{int(secs/86400)} days, {int((secs % 86400)/3600)} hours'
+    
+    @property
+    def avg_rating(self):
+        if self.reviews.count() == 0:
+            return 0.0
+        else:
+            return float(self.reviews.aggregate(models.Avg('rating'))['rating__avg'])
+
+class ProductReview(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    author = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    date_posted = models.DateTimeField(auto_now_add=True)
+    edited = models.BooleanField(default=False)
+
+    rating = models.PositiveIntegerField(blank=False)
+    text = models.TextField(max_length=1000, blank=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['product', 'author'], name='User can only leave one review per product')
+        ]
+
+    @property
+    def score(self):
+        return self.reacts.filter(liked=True).count() - self.reacts.filter(liked=False).count()
+    
+    @property
+    def timestamp(self):
+        return self.date_posted.timestamp()
+    
+    def __str__(self):
+        return f'{self.product} review by {self.author} ({self.rating} stars)'
+    
+class ReviewReact(models.Model):
+    review = models.ForeignKey(ProductReview, on_delete=models.CASCADE, related_name='reacts')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
+    liked = models.BooleanField(default=True, blank=False)
+
+    def __str__(self):
+        return f"{self.customer} {'liked' if self.liked else 'disliked'} {self.review.author}'s review of {self.review.product}"
 
 class Order(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
