@@ -80,7 +80,7 @@ class Product(models.Model):
     @property
     def avg_rating(self):
         if self.reviews.count() == 0:
-            return 0.0
+            return 2.5
         else:
             return float(self.reviews.aggregate(models.Avg('rating'))['rating__avg'])
 

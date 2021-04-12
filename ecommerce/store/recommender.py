@@ -62,18 +62,36 @@ class Recommender():
         
         return float(numerator) / math.sqrt(denom_a*denom_b)
 
-    def calculate_score(self, product, rating_weight=0.1, default_score=2.5):
+  
+
+
+    def calculate_score(self, product, max_rating_weight=0.3, max_reviews=5, max_rating=5):
         '''
-        Return the final score of the item
-        Score is the sum of its similarity and its review rating
-        '''
-        review_score = product.avg_rating
-        # Case where no reviews for product
-        if review_score == 0:
-            review_score = default_score
+        Calculate the final recommender score of a product
         
-        print(product, self.calculate_similarity(product), rating_weight * review_score)
-        return self.calculate_similarity(product) + (rating_weight * review_score)
+        Score is the weighted average of the product's similarity and its review score, with
+        the review score weighted more heavily if there are more reviews
+        
+        Eg. if a product has no reviews the score will be entirely based on the similarity score,
+        while if a product has 'max_reviews' reviews, the review score will make up 'max_rating_weight'
+        of the final score.
+        
+        If a user is a guest, and thus similarity cannot be found, only the product's review score will be used
+        '''
+
+
+        # Use only product rating if user is guest
+        if not self.customer:
+            return product.avg_rating / max_rating
+
+        # Calculate weighting of reviews versus similarity
+        n_reviews_clamped = max(0, min(product.reviews.count(), max_reviews))
+        max_reviews_fraction = n_reviews_clamped / float(max_reviews)
+        rating_weight = max_rating_weight * max_reviews_fraction
+        similarity_weight = 1 - rating_weight
+        print(product, n_reviews_clamped, rating_weight, similarity_weight)
+
+        return (self.calculate_similarity(product) * similarity_weight) + ((product.avg_rating / max_rating) * rating_weight)
 
     
     def get_recommended_products(self, max_results=1000):
