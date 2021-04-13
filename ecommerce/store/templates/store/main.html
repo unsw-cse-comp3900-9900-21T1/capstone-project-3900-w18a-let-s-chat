@@ -39,44 +39,49 @@
 </head>
 <body>
 
-	<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-	<!-- Brand name -->
-	  <a class="navbar-brand" href="{% url 'store' %}">Petiverse</a>
-	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-	    <span class="navbar-toggler-icon"></span>
-	  </button>
+	<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light" style="padding-top:5px;padding-bottom:5px;">
+		
+		<!-- Brand name -->
+		<a class="navbar-brand" href="{% url 'store' %}">Petiverse</a>
+		<div class="navbar-collapse collapse w-100 order-0 order-md-0 dual-collapse2">
+			<!-- Hello message -->
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+				  {% if request.user.is_authenticated %}
+					  <span class="hello-msg navbar-text">Hello, {{request.user.customer.nickname}}</span>
+				  {% endif %}
+				</li>
+		   
+			  </ul>
+		</div>
 
-	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-		<!-- Hello message -->
-	    <ul class="navbar-nav mr-auto">
-	      <li class="nav-item active">
-			{% if request.user.is_authenticated %}
-				<span class="hello-msg navbar-text">Hello, {{request.user.customer.nickname}}</span>
-			{% endif %}
-	      </li>
-	 
-	    </ul>
 
+		<div class="mx-auto order-1">
 			<!-- Search Bar -->
 	        <form action="{% url 'search_result' %}" method="get">
-	        	<input class="search_bar"  name = "q" type="text" placeholder="Search...", style="border-radius:3px !important; border:none; min-height:32px !important; padding-left:5px;">
+	        	<input class="search_bar"  name = "q" type="text" placeholder="Search...", style="border-radius:3px !important; border:none; min-height:38px !important; padding-left:5px;">
 	        	<!-- <input type="submit" value="Search"> -->
 	        </form>
+		</div>
+		<div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="btn" href="{% url 'cart' %}"><i class="bi-cart" style="font-size:22px;"></i> <span class="badge badge-pill badge-danger">{{cartItems}}</span></a>
+				</li>
 
-			<!-- Login / logout buttons -->
-			{% if not request.user.is_authenticated %}
-	     		<a href="/login" class="btn btn-secondary ">Login</a>
-				<a href="/signup" class="btn btn-secondary">Sign Up</a>
-			{% endif %}
+				{% if not request.user.is_authenticated%}
+				<!-- Login / logout buttons -->
+				<li class="nav-item" style="margin-left:5px; align-self:center;">
+					<a href="/login" class="btn btn-primary">Login</a>
+				</li>
+				<li class="nav-item"style="align-self:center;">
+					<a href="/signup" class="btn btn-success">Sign Up</a>
+				</li>
+				{% endif %}
 
-			<!-- Cart icon -->
-	     	<a href="{% url 'cart' %}">
-	    		<i id="cart-icon" class="bi-cart cart-icon"></i>
-	    	</a>
-	    	<p id="cart-total">{{cartItems}}</p>
-			
-			<!-- Dropdown menu -->
+			</ul>
+
 			{% if request.user.is_authenticated %}
 				<div class="dropdown">
 					<i class="bi-person-circle" id="user-icon" onclick="toggleDropdown()" ></i>
@@ -84,12 +89,14 @@
 						<a href="/new_product"><i class="bi-plus-square dropdown-icon"></i>New listing</a>
 						<a href="/my_listings"><i class="bi-card-checklist dropdown-icon"></i>Manage my listings</a>
 						<a href="/purchase_history"> <i class="bi-clock-history dropdown-icon"></i>Purchase history</a>
+						<hr class="dropdown-divider">
 						<a href="/user_profile"><i class="bi-person dropdown-icon"></i>User profile</a>
 						<a href="/logout"><i class="bi-power dropdown-icon"></i>Log out</a>
 					</div>
 				</div>
 			{% endif %}
-	  </div>
+
+		</div>
 	</nav>
 
      <div class="container">
