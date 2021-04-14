@@ -767,7 +767,9 @@ def add_bid(request):
 			else:
 				product.starting_bid = new_bid
 				product.highest_bidder = highest_bidder
+				product.bidder.create(name=highest_bidder.nickname, price=new_bid)
 				messages.success(request, f'You have successfully placed a bid!')
+				# product.bidder.save()
 				product.save()
 				return JsonResponse('You have successfully placed a bid!', safe=False)
 		else:

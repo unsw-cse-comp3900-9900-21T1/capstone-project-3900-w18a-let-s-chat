@@ -19,6 +19,46 @@
     #event-box{
         display:none;
     }
+    #bidder-count-button{
+        padding: 0;
+        border: none;
+        background: none;
+    }
+    #bidder-count{
+        color:#0000EE;
+    }
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        padding-top: 300px; /* Location of the box */
+        left: 1250px;
+        width: 13%; /* Full width */
+        height: 100%; /* Full height */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
 </style>
     <div class="row">
         <div style="max-width:40%" class="col-lg-6">
@@ -88,16 +128,35 @@
                                     class="btn btn-outline-primary btn" id="add-to-cart">
                                         <i class="bi-cart-plus"></i> Add to Cart
                                     </button>
-                                {% else %}
-                                    <input id="starting_bid" placeholder="Bid" style="margin:5px;">
-                                    <button href="#" id="place-bid" style="margin:5px;"
-                                    class="btn btn-outline-primary" data-product="{{product.id}}">
-                                    <i class="bi-cash-stack"></i> Place Bid
-                                    </button>
-                                    {% for message in messages %}
-                                    <p id="messages">{{message}}</p>
-                                    {% endfor %}
-                                {% endif %}
+                                    {% else %}
+                                        <div class="bidder-dropdown">
+                                            <button id="bidder-count-button" type="button">[ <a id="bidder-count">{{ product.bidder_count }} bids</a> ]</button>
+                                            <div id="myModal" class="modal">
+                                                <div class="modal-content">
+                                                    <span class="close">&times;</span>
+                                                    {% if product.bidder_count != 0%}
+                                                        <p><strong>5 Recent Bidders</strong></p>
+                                                        <hr style="width:100%;background-color:black;">
+                                                        {% for bidder in product.bidder.all|dictsortreversed:"id"|slice:"5" %}
+                                                            <p><strong>Bidder: </strong>{{bidder.name}}</p>
+                                                            <p><strong>Price: </strong>{{bidder.price}}</p>
+                                                            <hr style="width:100%;margin-left:0;background-color:black;">
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <p><strong>No one has placed a bid yet!</strong></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>                                        
+                                        <input id="starting_bid" placeholder="Bid" style="margin:5px;">
+                                        <button href="#" id="place-bid" style="margin:5px;"
+                                        class="btn btn-outline-primary" data-product="{{product.id}}">
+                                        <i class="bi-cash-stack"></i> Place Bid
+                                        </button>
+                                        {% for message in messages %}
+                                            <p id="messages">{{message}}</p>
+                                        {% endfor %}
+                                    {% endif %}
                                 </form>
 
                             </div>
@@ -307,7 +366,34 @@
             {% endfor %}
         </ul>
     </div>
+<!-- Bidder Count -->
+<script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
 
+    // Get the button that opens the modal
+    var btn = document.getElementById("bidder-count-button");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
 <!-- Handle reviews -->
 <script src="{% static 'javascript/jquery.js' %}"></script>
 <script type="text/javascript">
@@ -577,10 +663,11 @@
         var starting_bid = document.getElementById('starting_bid')
         var addBtn = document.getElementById('add-to-cart')
         var bidBtn = document.getElementById('place-bid')
-        var productId = addBtn.dataset.product
         if ("{{product.selling_type}}" == "auction") {
             var productId_bid = bidBtn.dataset.product
             
+        } else {
+            var productId = addBtn.dataset.product
         }
         var highest_bidder = "{{request.user.customer}}"
         window.console.log(bidBtn)
@@ -591,13 +678,13 @@
             console.log('Set Quantity')
         })
 
-        addBtn.addEventListener('click', function(){
-            submitData()
-        })
-
         if ("{{product.selling_type}}" == "auction") {
             bidBtn.addEventListener('click', function(){
                 addBid()
+            })
+        } else {
+            addBtn.addEventListener('click', function(){
+                submitData()
             })
         }
 

@@ -44,7 +44,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=30, decimal_places=2)
     starting_bid = models.DecimalField(max_digits=30, decimal_places=2, default=0)
     end_date = models.DateTimeField(default=timezone.now(), blank=True, null=True)
-    highest_bidder = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='bidder')
+    highest_bidder = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='highest_bidder')
     remaining_unit = models.IntegerField()
     sold_unit = models.IntegerField(default=0)
     isAnimal = models.BooleanField(default=False,null=True, blank=True)
@@ -83,6 +83,23 @@ class Product(models.Model):
             return 2.5
         else:
             return float(self.reviews.aggregate(models.Avg('rating'))['rating__avg'])
+    
+    @property
+    def bidder_count(self):
+        return self.bidder.count()
+
+class Bidder(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=200)
+    price = models.DecimalField(max_digits=30, decimal_places=2)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='bidder')
+
+    class Meta:
+        # order_with_respect_to = 'product'
+        ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 class ProductReview(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')

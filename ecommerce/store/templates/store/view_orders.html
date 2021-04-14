@@ -38,12 +38,21 @@
         <div class="col">
             <div class="col-sm">
                 <div class="card text-center text-white  mb-3">
-                      <div class="card-header">
-                          <h5 class="card-title">Unit price</h5>
-                      </div>
-                      <div class="card-body">
-                        <h3 class="card-title">${{product.price | floatformat:2}}</h3>
-                      </div>
+                    {% if product.selling_type == "sale" %}
+                        <div class="card-header">
+                            <h5 class="card-title">Unit price</h5>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">${{product.price | floatformat:2}}</h3>
+                        </div>
+                    {% else %}
+                        <div class="card-header">
+                            <h5 class="card-title">Current bid price</h5>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">${{product.starting_bid | floatformat:2}}</h3>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
