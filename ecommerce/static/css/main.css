@@ -9,6 +9,19 @@ h1, h2, h3, h4, h5, h6 {
 	color: hsl(0, 0%, 30%);
 }
 
+footer {
+	padding: 20px;
+	margin-top: 10px;
+	justify-content: center;
+	position: absolute;
+	width: 100%;
+}
+
+.container {
+	min-height: 100vh;
+	position: relative;
+}
+
 .box-element {
 	box-shadow: hsl(0, 0%, 80%) 0 0 16px;
 	background-color: #fff;
