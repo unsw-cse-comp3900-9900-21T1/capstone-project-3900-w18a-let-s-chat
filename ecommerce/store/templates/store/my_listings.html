@@ -43,6 +43,15 @@
                     {% endfor %}
 
                 </ol>
+                <hr>
+                {% if item.product.selling_type == "auction" %}
+                    <h6><strong>The 5 recent bidders</strong></h6>
+                    {% for bidder in item.product.bidder.all|dictsortreversed:"id"|slice:"5" %}
+                        <p><strong>Bidder: </strong>{{bidder.name}}</p>
+                        <p><strong>Price: </strong>{{bidder.price}}</p>
+                        <hr>
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
         </div>
