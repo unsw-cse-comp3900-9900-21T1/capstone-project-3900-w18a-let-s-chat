@@ -107,6 +107,39 @@
             {% endblock content %}
          </div>
 
+	<footer class="card">
+		<div>
+			<h5 style="display:inline;">Petiverse</h5>
+			<a href="#" style="display:inline;"><i class="bi-arrow-up-short"></i>Back to top</a>
+		</div>
+		<div style="text-align:center;">
+			<a href="/">Home</a>
+			&middot
+			<a href="{% url 'cart' %}">Cart</a>
+			&middot
+			{% if request.user.is_authenticated %}
+				<a href="{% url 'new_product' %}">New listing</a>
+				&middot
+				<a href="{% url 'my_listings' %}">My listings</a>
+				&middot
+				<a href="{% url 'purchase_history' %}">Purchase history</a>
+				&middot
+				<a href="{% url 'user_profile' %}">Profile</a>
+				&middot
+				<a href="{% url 'logout' %}">Log out</a>
+			{% else %}
+				<a href="{% url 'login' %}">Log in</a>
+				&middot
+				<a href="{% url 'signup' %}">Sign up</a>
+			{% endif %}
+		</div>
+		<hr>
+		<div style="text-align:center;">
+			By COMP3900 Let's Chat - 2021
+			&middot
+			<a href="mailto:unswcomp3900@gmail.com">Contact us</a>
+		</div>
+	</footer>
 
     <!--Below 3 lines of code referece: https://getbootstrap.com/-->
 
