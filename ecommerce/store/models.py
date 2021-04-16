@@ -43,7 +43,7 @@ class Product(models.Model):
     selling_type = models.CharField(max_length=10, choices=SELLING_CHOICES, default='sale')
     price = models.DecimalField(max_digits=30, decimal_places=2)
     starting_bid = models.DecimalField(max_digits=30, decimal_places=2, default=0)
-    end_date = models.DateTimeField(default=timezone.now(), blank=True, null=True)
+    end_date = models.DateTimeField(default=timezone.now, blank=True, null=True)
     highest_bidder = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True, related_name='highest_bidder')
     remaining_unit = models.IntegerField()
     sold_unit = models.IntegerField(default=0)
