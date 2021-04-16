@@ -18,7 +18,7 @@
 							<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
 							<hr>
 
-							{% if product.selling_type == "sale" %}
+							{% if product.selling_type == "sale"%}
 								<button data-product="{{product.id}}" data-action="add" 
 								class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
 							{% endif %}
@@ -49,7 +49,7 @@
 				<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
 				<hr>
 
-				{% if product.selling_type == "sale" %}
+				{% if product.selling_type == "sale" and request.user.is_authenticated %}
 					<button data-product="{{product.id}}" data-action="add" 
 					class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
 				{% endif %}

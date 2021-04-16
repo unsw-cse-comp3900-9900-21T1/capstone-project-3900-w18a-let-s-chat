@@ -128,7 +128,7 @@
                                     class="btn btn-outline-primary btn" id="add-to-cart">
                                         <i class="bi-cart-plus"></i> Add to Cart
                                     </button>
-                                    {% else %}
+                                    {% elif request.user.authenticated %}
                                         <div class="bidder-dropdown">
                                             <button id="bidder-count-button" type="button">[ <a id="bidder-count">{{ product.bidder_count }} bids</a> ]</button>
                                             <div id="myModal" class="modal">
@@ -190,9 +190,10 @@
                         <h6><strong>{{product.name}}</strong></h6>
                         <div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
                         <hr>
-
+                        {% if request.user.is_authenticated %}
                         <button data-product="{{product.id}}" data-action="add" 
                         class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+                        {% endif %}
 
                         <a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
                         <h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
@@ -271,6 +272,7 @@
         <div class="box-element" style="margin-top: 15px; overflow:auto;">
             <h5>Leave a review</h5>
             <form id="review-form">
+                <div class="alert alert-warning review-alert" role="alert" id="review-anon-alert" style="display:none"><i class='bi-exclamation-circle'></i> You must be logged in to leave a review</div>
                 <div class="alert alert-warning review-alert" role="alert" id="review-empty-alert" style="display:none"><i class='bi-exclamation-circle'></i> Review cannot be left empty</div>
                 <div class="alert alert-warning review-alert" role="alert" id="review-long-alert" style="display:none"><i class='bi-exclamation-circle'></i> Review is too long! Try to be more concise</div>
                 <div class="alert alert-warning review-alert" role="alert" id="review-rating-alert" style="display:none"><i class='bi-exclamation-circle'></i> Please select a star rating</div>
@@ -464,6 +466,10 @@
         var reviewRating = $(this).find('input[name=rating]:checked').val();
         var invalid = false;
 
+        if (user == 'AnonymousUser') {
+            $("#review-anon-alert").show();
+            invalid = true;
+        }
         if (reviewText.length == 0) {
             $("#review-empty-alert").show();
             invalid = true;
