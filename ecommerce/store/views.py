@@ -177,6 +177,7 @@ def product_page(request, slug=None):
             "review": review,
             "liked": liked,
             "disliked": disliked,
+            "verified": OrderItem.objects.filter(product=product, order__customer=review.author, order__complete=True).exists()
         })
 
     context = {

@@ -347,6 +347,7 @@
                 <h6>
                     <b>
                         {% if review_item.review.author.trusted %}<span class="badge bg-dark text-light rounded-pill"><i class="bi-award-fill"></i> Trusted</span>{% endif %}
+                        {% if review_item.verified %}<span class="badge bg-primary text-light rounded-pill"><i class="bi-check-circle-fill"></i> Verified purchase</span>{% endif %}
                         {% if review_item.review.edited %}<span class="badge bg-info text-light rounded-pill"><i class="bi-exclamation-circle-fill"></i> Edited</span>{% endif %}
 
                         {{review_item.review.author.nickname}}
