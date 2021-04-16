@@ -928,4 +928,4 @@ def toggle_review_react(request):
     
     return JsonResponse(data={'score':review.score, 'state':state}, status=200)
 
-# check_auction_time()
+check_auction_time()
