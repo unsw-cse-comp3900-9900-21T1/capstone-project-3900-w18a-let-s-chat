@@ -376,7 +376,6 @@ def processOrder(request):
 
             seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
 
-            print(settings.EMAIL_HOST_USER)
             email = EmailMessage(
                 'Your product has been sold!',
                 seller_template,
@@ -389,7 +388,6 @@ def processOrder(request):
 
             seller_template = render_to_string('store/email_processOrder_to_buyer.html', {'name': customer.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
 
-            print(settings.EMAIL_HOST_USER)
             email = EmailMessage(
                 'Your have purchased a product successfully!',
                 seller_template,
@@ -488,7 +486,6 @@ def add_multiple(request):
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         productId = int(data['productId'])
         quantity = int(data['quantity'])
-        print(quantity)
         try:
             product = Product.objects.get(id=productId)
         except ObjectDoesNotExist:
@@ -505,7 +502,6 @@ def add_multiple(request):
 
         if orderItem.quantity <= 0:
             orderItem.delete()
-            print('delete')	
 
     return JsonResponse('added', safe=False)
 
@@ -599,7 +595,6 @@ def edit_listing(request, slug=None):
         form = EditProductForm(request.POST)
         if form.is_valid():
             # Update field in product that was not left blank on form
-            print(form.cleaned_data)
             if form.cleaned_data['name']:
                 product.name = form.cleaned_data['name']
             if form.cleaned_data['price']:
@@ -872,7 +867,6 @@ def edit_review(request):
         return JsonResponse(data={}, status=400)
 
     form = NewReviewForm(request.POST)
-    print('made form')
     if form.is_valid():
         try:
             review = ProductReview.objects.get(
@@ -899,7 +893,6 @@ def toggle_review_react(request):
     try:
         review = ProductReview.objects.get(id=int(request.POST.get('review_id')))
     except ObjectDoesNotExist:
-        print('review not found')
         return JsonResponse(data={}, status=400)
     
     try:
