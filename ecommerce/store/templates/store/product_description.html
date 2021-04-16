@@ -4,7 +4,8 @@
 
 {% if not product.is_active %}
 <div class="alert alert-danger" role="alert">
-    Note: This item has been unlisted by the seller and cannot be purchased
+    <i class="bi-exclamation-circle"></i>
+    This item has been unlisted by the seller and cannot be purchased
 </div>
 {% endif %}
 
@@ -17,6 +18,46 @@
     }
     #event-box{
         display:none;
+    }
+    #bidder-count-button{
+        padding: 0;
+        border: none;
+        background: none;
+    }
+    #bidder-count{
+        color:#0000EE;
+    }
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        padding-top: 300px; /* Location of the box */
+        left: 1250px;
+        width: 13%; /* Full width */
+        height: 100%; /* Full height */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
     }
 </style>
     <div class="row">
@@ -31,25 +72,37 @@
                     <h3 id="product-name"> {{product.name}} </h3>
                             <h5 id="seller-name"> 
                                 {% if product.seller.trusted %}
-                                    <span class="badge bg-dark text-light">Trusted</span>
+                                    <span class="badge bg-dark text-light"><i class="bi-award-fill"></i> Trusted</span>
                                 {% endif %}
                                 by {{product.seller.nickname}}
                             </h5>
+                            <h6 id="product-star-rating" data-rating="{{product.avg_rating}}">
+                                <span id="review-count-text"> 
+                                    {% if product.reviews.count == 0 %}
+                                    No reviews yet
+                                    {% elif product.reviews.count == 1 %}
+                                    ({{product.avg_rating | floatformat:1}}) from {{product.reviews.count}} review
+                                    {% else %}
+                                    ({{product.avg_rating | floatformat:1}}) from {{product.reviews.count}} reviews
+                                    {% endif %}
+                                </span>
+                            </h6>
+
                     <div class="row">
-                        <div style="min-width: 300px;" class="col-lg-6">
-                            <p style="color:#FA3207;"><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></p>
+                        <div style="width:50%" class="col-lg-6">
+                            <h6><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></h6>
                             {% if product.selling_type == "auction" %}
                                 <strong>End time: </strong>
                                 <div id='event-box'>{{product.end_date|date:"U"}}</div>
                                 <div>{{product.end_date}}</div>
                                 <div><strong>Auction time left:</strong></div>
                                 <div id="countdown-box">
-                                    <div class="spinner-border" role="status"></div>
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
                                 </div>
                             {% endif %}
                             <div style="padding: 10px; max-height:400px" class="card" id="desc-box">
                                 <h5>Description</h5>
-                                <p style="font-size:14px; overflow:none; white-space: pre-line;" id="desc-text">
+                                <p style="font-size:14px; overflow:scroll; white-space: pre-line;" id="desc-text">
                                     {{product.description}}
                                 </p>
                             </div>
@@ -58,41 +111,57 @@
                             <div style="padding: 10px; margin-bottom:10px;" class="card" id="buy-box">
                                 <form>
                                     <div class="row">
-                                        <div class="col" style="max-width:30%;">
+                                        <div class="col" style="max-width:60%;">
                                             {% if product.selling_type == "sale" %}
-                                                <p id="price-text"> ${{product.price|floatformat:2}} <strong>AUD</strong></p>
-                                                <p>per unit</p>
+                                                <p id="price-text"> <strong>${{product.price|floatformat:2}} AUD</strong> per unit</p>
                                             {% else %}
-                                                <p id="starting-bid-text"><strong>Current bid</strong>  ${{product.starting_bid|floatformat:2}} <strong>AUD</strong></p>
-                                                <p>per unit</p>
+                                                <p id="starting-bid-text"><strong>Current bid:</strong>  ${{product.starting_bid|floatformat:2}} <strong>AUD</strong></p>
                                             {% endif %}
                                         </div>
                                         <div class="col" style="max-width:30%;">
                                             <input type="number" id="quantity" min=1 value=1 style="max-width:100%;"/>
                                         </div>
-                                        <div class="col">
-                                            {% if product.selling_type == "sale" %}
-                                                <button data-product="{{product.id}}" 
-                                                class="btn btn-outline-primary" id="add-to-cart" style="font-size: 13px;">
-                                                    Add to Cart
-                                                </button>
-                                            {% else %}
-                                                <input id="starting_bid" placeholder="Bid">
-                                                <button href="#" id="place-bid" 
-                                                class="btn btn-primary" data-product="{{product.id}}">
-                                                Place Bid
-                                                </button>
-                                                {% for message in messages %}
-                                                <p id="messages">{{message}}</p>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </div>
+                                    
                                     </div>
+                                    {% if product.selling_type == "sale" %}
+                                    <button data-product="{{product.id}}" 
+                                    class="btn btn-outline-primary btn" id="add-to-cart">
+                                        <i class="bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                    {% elif request.user.authenticated %}
+                                        <div class="bidder-dropdown">
+                                            <button id="bidder-count-button" type="button">[ <a id="bidder-count">{{ product.bidder_count }} bids</a> ]</button>
+                                            <div id="myModal" class="modal">
+                                                <div class="modal-content">
+                                                    <span class="close">&times;</span>
+                                                    {% if product.bidder_count != 0%}
+                                                        <p><strong>5 Recent Bidders</strong></p>
+                                                        <hr style="width:100%;background-color:black;">
+                                                        {% for bidder in product.bidder.all|dictsortreversed:"id"|slice:"5" %}
+                                                            <p><strong>Bidder: </strong>{{bidder.name}}</p>
+                                                            <p><strong>Price: </strong>{{bidder.price}}</p>
+                                                            <hr style="width:100%;margin-left:0;background-color:black;">
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <p><strong>No one has placed a bid yet!</strong></p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>                                        
+                                        <input id="starting_bid" placeholder="Bid" style="margin:5px;">
+                                        <button href="#" id="place-bid" style="margin:5px;"
+                                        class="btn btn-outline-primary" data-product="{{product.id}}">
+                                        <i class="bi-cash-stack"></i> Place Bid
+                                        </button>
+                                        {% for message in messages %}
+                                            <p id="messages">{{message}}</p>
+                                        {% endfor %}
+                                    {% endif %}
                                 </form>
 
                             </div>
-                            <div style="padding: 10px; max-height:200px" class="card" id="tag-box">
-                                <h6>Tags</h6>
+                            <div style="padding: 10px; max-height:200px; overflow-y:scroll;" class="card" id="tag-box">
+                                <h6> <i class="bi-tags"></i> Tags</h6>
                                 <ul class="list-group list-group-flush" style="overflow:scroll;">
 
                                     {% for tag in tags %}
@@ -113,16 +182,18 @@
         <div class="row horizontal-scroll-container">
 
             {% for product in similar_items %}
-                <div class="col-lg-4 horizontal-scroll-item">
+                <div class="col-lg-4 horizontal-scroll-item similar-item">
                     <a href = "{% url 'product_page' product.slug_str %}">
                         <img class="thumbnail" style="object-fit:cover; " src="{{product.imageURL}}">
                     </a>
                     <div class="box-element product">
                         <h6><strong>{{product.name}}</strong></h6>
+                        <div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
                         <hr>
-
+                        {% if request.user.is_authenticated %}
                         <button data-product="{{product.id}}" data-action="add" 
                         class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+                        {% endif %}
 
                         <a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
                         <h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
@@ -135,75 +206,458 @@
         </div>
     </div>
 
-    <div class="box-element" style="margin-top: 15px; height:250px;">
-        <h5>Leave a review</h5>
-        <!--HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr -->
-        <form class="rating">
-            <label>
-              <input type="radio" name="stars" value="1" />
-              <span class="icon">★</span>
-            </label>
-            <label>
-              <input type="radio" name="stars" value="2" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-            </label>
-            <label>
-              <input type="radio" name="stars" value="3" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>   
-            </label>
-            <label>
-              <input type="radio" name="stars" value="4" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-            </label>
-            <label>
-              <input type="radio" name="stars" value="5" />
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-              <span class="icon">★</span>
-            </label>
-          </form>
-          <div>
-              <form>
-                <textarea id="review-box" name="review-box" style="width:100%; height:120px; resize:none; font-size:14px;" placeholder="Enter your review here..."></textarea>
-                <button class="btn btn-outline-secondary" id="add-to-cart" style="font-size: 13px;">
-                    Submit review
-                </button>
-            </form>
-          </div>
+    {% if not is_owner %}
+        {% if user_review %}
+            <div class="box-element" style="margin-top: 15px; overflow:auto;">
+                <h5>Your review</h5>
+                
+                <div class="card" id="previous-review-card" style="padding:10px;" data-rating="{{user_review.rating}}">
+                    <div class="review-star-div"></div>
+                    <p id="previous-review-text">{{user_review.text}}</p>
+                    <div>
+                        <btn class="btn btn-outline-secondary btn-sm" id="btn-edit-review">Edit</btn>
+                        <btn class="btn btn-outline-danger btn-sm" id="btn-delete-review">Delete</a>
+                    </div>
+                </div>
+                <div class="card" id="edit-review-card" style="padding:10px; display:none;">
+                    <form id="edit-review-form">
+                        <input type="hidden" name="slug_str" value="{{product.slug_str}}">
 
-    </div>
-    <div class="box-element" style="margin-top: 15px; height:300px;">
+                        <!--HTML and CSS only star rating. Source: Neil Pomerleau - https://codepen.io/neilpomerleau/pen/wzxzQr -->
+                        <!--Template if statements are used to set the reviews old star rating to 'checked'-->
+                        <div class="rating">
+                            <label>
+                                <input type="radio" name="rating" value="1" {%if user_review.rating == 1%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="2" {%if user_review.rating == 2%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="3"{%if user_review.rating == 3%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>   
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="4" {%if user_review.rating == 4%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="rating" value="5" {%if user_review.rating == 5%} checked="checked"{%endif%}/>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                                <span class="icon">★</span>
+                            </label>
+                        </div>
+                        <textarea id="edit-review-box" name="text" style="width:100%; height:200px;  font-size:14px; padding:5px;">{{user_review.text}}</textarea>
+                        <div>
+                            <input type="submit" class="btn btn-outline-primary btn-sm" id="btn-save-changes-review" value="Save"></btn>
+                            <btn class="btn btn-outline-secondary btn-sm" id="btn-cancel-changes-review">Cancel</a>
+                        </div>
+                    </form>
+                    
+                </div>
+
+            </div>
+        {% else %}
+
+        <div class="box-element" style="margin-top: 15px; overflow:auto;">
+            <h5>Leave a review</h5>
+            <form id="review-form">
+                <div class="alert alert-warning review-alert" role="alert" id="review-anon-alert" style="display:none"><i class='bi-exclamation-circle'></i> You must be logged in to leave a review</div>
+                <div class="alert alert-warning review-alert" role="alert" id="review-empty-alert" style="display:none"><i class='bi-exclamation-circle'></i> Review cannot be left empty</div>
+                <div class="alert alert-warning review-alert" role="alert" id="review-long-alert" style="display:none"><i class='bi-exclamation-circle'></i> Review is too long! Try to be more concise</div>
+                <div class="alert alert-warning review-alert" role="alert" id="review-rating-alert" style="display:none"><i class='bi-exclamation-circle'></i> Please select a star rating</div>
+                <input type="hidden" name="slug_str" value="{{product.slug_str}}">
+
+                <div class="rating">
+                    <label>
+                        <input type="radio" name="rating" value="1" />
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="2" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="3" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>   
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="4" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="rating" value="5" />
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                        <span class="icon">★</span>
+                    </label>
+                </div>
+                
+            <div>
+
+                <textarea id="review-box" name="text" style="width:100%; height:200px;  font-size:14px; padding:5px;" placeholder="Enter your review here..."></textarea>
+                <input type="submit" class="btn btn-outline-secondary" style="font-size: 13px;" value="Submit review"></input>
+                </form>
+            </div>
+
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="box-element" style="margin-top: 15px; margin-bottom:15px;">
         <h5>Reviews</h5>
-        <ul class="list-group" style="overflow:scroll; max-height:85%">
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            <li class="list-group-item">
-                <h6>Reviewer name - review date</h6>
-                <p>This is an example text review</p>
-            </li>
-            
 
+        {% if reviews %}
+          <div class="dropdown">
+          <button class="btn btn-outline-primary dropdown-toggle" type="button" id="review-sort-dropdown" data-bs-toggle="dropdown" style="margin:10px; width:160px">
+            Sort reviews
+          </button>
+          <ul class="dropdown-menu">
+            <li><btn class="btn dropdown-item" id="btn-review-sort-score-desc"><i class="bi-award"></i> Top reviews</btn></li>
+            <li><btn class="btn dropdown-item" id="btn-review-sort-time-desc"><i class="bi-clock"></i> Most recent</btn></li>
+            <li><btn class="btn dropdown-item" id="btn-review-sort-rating-desc"><i class="bi-sort-up"></i> Highest rating</btn></li>
+            <li><btn class="btn dropdown-item" id="btn-review-sort-rating-asc"><i class="bi-sort-down-alt"></i> Lowest rating</btn></li>
+
+          </ul>
+        </div>
+        {% endif %}
+
+        <ul id="review-list" class="list-group" style="overflow:scroll; max-height:800px;">
+            {% for review_item in reviews %}
+
+            <li class="list-group-item review" data-rating="{{review_item.review.rating}}" data-score="{{review_item.review.score}}" data-review-id="{{review_item.review.id}}" data-timestamp="{{review_item.review.timestamp}}">
+                <div class="review-star-div">
+                </div>
+                <h6>
+                    <b>
+                        {% if review_item.review.author.trusted %}<span class="badge bg-dark text-light rounded-pill"><i class="bi-award-fill"></i> Trusted</span>{% endif %}
+                        {% if review_item.verified %}<span class="badge bg-primary text-light rounded-pill"><i class="bi-check-circle-fill"></i> Verified purchase</span>{% endif %}
+                        {% if review_item.review.edited %}<span class="badge bg-info text-light rounded-pill"><i class="bi-exclamation-circle-fill"></i> Edited</span>{% endif %}
+
+                        {{review_item.review.author.nickname}}
+                    </b>
+                     | {{review_item.review.date_posted}}</h6>
+                <p class="review-text">{{review_item.review.text}}</p>
+                <div class="card" style="display:inline-block">
+                    <btn class="btn bi-hand-thumbs-up-fill review-react like {%if review_item.liked%}react-active{%endif%}"></btn>
+                    <span class="score-display">{{review_item.review.score}}</span>
+                    <btn class="btn bi-hand-thumbs-down-fill review-react dislike {%if review_item.disliked%}react-active{%endif%}"></btn>
+                </div>
+                
+            </li>
+
+            {% empty %}
+            <p>No reviews for this listing were found</p>
+            {% endfor %}
         </ul>
     </div>
+<!-- Bidder Count -->
+<script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
 
+    // Get the button that opens the modal
+    var btn = document.getElementById("bidder-count-button");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+<!-- Handle reviews -->
+<script src="{% static 'javascript/jquery.js' %}"></script>
+<script type="text/javascript">
+    
+    const maxRating = 5;
+
+    // Draw average rating stars
+    $("#product-star-rating").each(function() {
+
+        var text = $(this).find("#review-count-text");
+        text.remove();
+
+        var rating = $(this).data("rating");
+        var i;
+        for (i = 0; i < Math.floor(rating); i++)
+            $(this).append('<i class="bi-star-fill"></i>');
+        if (rating - i >= 0.5) {
+            $(this).append('<i class="bi-star-half"></i>');
+            i++;
+        }
+        for (; i < maxRating; i++)
+            $(this).append('<i class="bi-star"></i>');
+
+        $(this).append(text);
+    });
+
+    // Draw stars above each review
+    $(".review").each(function() {
+        var rating = $(this).data("rating");
+        var starBar = $(this).find(".review-star-div");
+        var i;
+        for (i = 0; i < rating; i++)
+            starBar.append('<i class="bi-star-fill" style="color:#09f"></i>');
+        for (; i < maxRating; i++)
+            starBar.append('<i class="bi-star"></i>');
+    });
+
+    // Draw star rating on each similar product card
+	$(".similar-item .star-rating-div").each(function() {
+		console.log($(this));
+		var rating = $(this).data("rating");
+		var i;
+		for (i = 0; i < Math.floor(rating); i++)
+			$(this).append('<i class="bi-star-fill"></i>');
+		if (rating - i >= 0.5) {
+			$(this).append('<i class="bi-star-half"></i>');
+			i++;
+		}
+		for (; i < maxRating; i++)
+			$(this).append('<i class="bi-star"></i>');
+		
+		if ($(this).data("n-reviews") == 0)
+			$(this).append(" No reviews yet");
+		else if ($(this).data("n-reviews") == 1)
+			$(this).append(" from 1 review");
+		else
+			$(this).append(" from " + $(this).data("n-reviews") + " reviews");
+	});
+
+    // Handle submission of new review
+    $("#review-form").submit(function(e) {
+        e.preventDefault();
+        $(".review-alert").hide();
+
+        var reviewText = $(this).find('[name=text]').val();
+        var slug = $(this).find('[name=slug_str]').val();
+        var reviewRating = $(this).find('input[name=rating]:checked').val();
+        var invalid = false;
+
+        if (user == 'AnonymousUser') {
+            $("#review-anon-alert").show();
+            invalid = true;
+        }
+        if (reviewText.length == 0) {
+            $("#review-empty-alert").show();
+            invalid = true;
+        }
+        if (reviewText.length >= 1000) {
+            $("#review-long-alert").show();
+            invalid = true;
+        }
+        if (reviewRating == null) {
+            $("#review-rating-alert").show();
+            invalid = true;
+        }
+
+        if (invalid) return;
+
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'new_review' %}",
+            data: {
+                slug_str: slug,
+                rating: reviewRating,
+                text: reviewText,
+
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("Successfully posted review");
+                location.reload();
+
+            }
+        });
+        
+    });
+
+    // Draw details on user's existing review
+    $("#previous-review-card").each(function() {
+        var rating = $(this).data("rating");
+        var starBar = $(this).find(".review-star-div");
+        var i;
+        for (i = 0; i < rating; i++)
+            starBar.append('<i class="bi-star-fill" style="color:#09f"></i>');
+        for (; i < maxRating; i++)
+            starBar.append('<i class="bi-star"></i>');
+        starBar.append("<span> | {{user_review.date_posted}}</span>");
+    });
+
+    // Handle deleting your review
+    $("#btn-delete-review").click(function() {
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'delete_review' %}",
+            data: {
+                slug_str: "{{product.slug_str}}",
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("Successfully deleted review");
+                location.reload();
+            }
+        });
+
+    });
+
+    // Handle editing your review
+
+    $("#btn-edit-review").click(function() {
+        $("#previous-review-card").hide();
+        $("#edit-review-card").show();
+    });
+
+    $("#btn-cancel-changes-review").click(function() {
+        $("#previous-review-card").show();
+        $("#edit-review-card").hide();
+    });
+
+    $("#edit-review-form").submit(function(e) {
+        e.preventDefault();
+
+        var reviewText = $(this).find('[name=text]').val();
+        var slug = $(this).find('[name=slug_str]').val();
+        var reviewRating = $(this).find('input[name=rating]:checked').val();
+
+        if (reviewText.length == 0)
+            return;
+        if (reviewText.length >= 1000)
+            return;
+        if (reviewRating == null)
+            return;
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'edit_review' %}",
+            data: {
+                author: "{{request.user.customer}}",
+                slug_str: slug,
+                rating: reviewRating,
+                text: reviewText,
+
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log("Successfully updated review");
+                location.reload();
+
+            }
+        });
+        
+    });
+
+    // Handle clicking on like or dislike on a review
+    $(".review-react").click(function() {
+        
+        var review = $(this).closest(".review");
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'toggle_review_react' %}",
+            data: {
+                review_id: review.data("review-id"),
+                is_like: $(this).hasClass("like"),
+
+                csrfmiddlewaretoken: "{{csrf_token}}"
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                
+                var likeBtn = review.find(".like");
+                var dislikeBtn = review.find(".dislike");
+
+                // Change state of like and dislike buttons
+                if (response.state == 'liked') {
+                    likeBtn.addClass("react-active");
+                    dislikeBtn.removeClass("react-active");
+                } else if (response.state == 'disliked') {
+                    likeBtn.removeClass("react-active");
+                    dislikeBtn.addClass("react-active");
+                    
+                } else if (response.state == 'neither') {
+                    likeBtn.removeClass("react-active");
+                    dislikeBtn.removeClass("react-active");
+                }
+                
+                // Update the review's score data and display
+                review.data("score", response.score);
+                review.find(".score-display").html(response.score);
+
+            }
+        })
+
+    });
+
+    // Handle sorting reviews
+
+    function sortReviews(cmp) {
+        $("#review-list .review").sort(cmp).appendTo("#review-list");
+    }
+
+    $("#btn-review-sort-rating-desc").click(function() {
+        sortReviews((a,b) => ($(b).data("rating") - $(a).data("rating")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+    $("#btn-review-sort-rating-asc").click(function() {
+        sortReviews((a,b) => ($(a).data("rating") - $(b).data("rating")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+    $("#btn-review-sort-score-desc").click(function() {
+        sortReviews((a,b) => ($(b).data("score") - $(a).data("score")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+    $("#btn-review-sort-time-desc").click(function() {
+        sortReviews((a,b) => ($(b).data("timestamp") - $(a).data("timestamp")));
+        $("#review-sort-dropdown").html($(this).html());
+    });
+
+    function sortRatingDesc(a, b) {
+        return $(b).data("rating") - $(a).data("rating");
+    }
+
+</script>
+
+
+<!-- Handle auctions -->
 <script type="text/javascript">
 	if (user == 'AnonymousUser'){
         document.getElementById('quantity').classList.add("hidden");
@@ -216,10 +670,11 @@
         var starting_bid = document.getElementById('starting_bid')
         var addBtn = document.getElementById('add-to-cart')
         var bidBtn = document.getElementById('place-bid')
-        var productId = addBtn.dataset.product
         if ("{{product.selling_type}}" == "auction") {
             var productId_bid = bidBtn.dataset.product
             
+        } else {
+            var productId = addBtn.dataset.product
         }
         var highest_bidder = "{{request.user.customer}}"
         window.console.log(bidBtn)
@@ -230,13 +685,13 @@
             console.log('Set Quantity')
         })
 
-        addBtn.addEventListener('click', function(){
-            submitData()
-        })
-
         if ("{{product.selling_type}}" == "auction") {
             bidBtn.addEventListener('click', function(){
                 addBid()
+            })
+        } else {
+            addBtn.addEventListener('click', function(){
+                submitData()
             })
         }
 

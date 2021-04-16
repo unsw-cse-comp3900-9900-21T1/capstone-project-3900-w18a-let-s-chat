@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django import forms
 from django.forms.widgets import DateTimeInput
 
-from .models import Order, Customer, Product
+from .models import Order, Customer, Product, ProductReview
 
 class OrderForm(ModelForm):
     class Meta:
@@ -63,3 +63,10 @@ class EditProductForm(ModelForm):
         super(EditProductForm, self).__init__(*args, **kwargs)
         for field_name in self.fields:
             self.fields[field_name].required = False
+
+class NewReviewForm(ModelForm):
+
+    slug_str = forms.CharField()
+    class Meta:
+        model = ProductReview
+        fields = ['rating', 'text']

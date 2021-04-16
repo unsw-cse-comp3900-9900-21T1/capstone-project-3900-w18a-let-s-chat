@@ -4,14 +4,14 @@
 {%  include 'store/status.html' %}
     <h3>Purchase History</h3>
 
-    <div class="container" >
+    <div class="box-element">
         <ul  class="list-group list-group-flush" id="history-list" style="overflow:auto; height:100%;">
 
             {% for item in purchases %}
-            <li class="list-group-item list-box-item">
-                <div class="box-element">
+            <li class="list-group-item">
+              
                     <div class="row">
-                        <div class="col"><img class="row-image img-fluid" style="height:100%; object-fit:contain;" src="{{item.image}}"/></div>
+                        <div class="col" align="center"><img class="row-image img-fluid" style="height:100%; object-fit:contain;" src="{{item.image}}"/></div>
                         <div class="col">
                             <p id="Product-name" style="font-size:14px;"><b>{{item.name}} (x{{item.quantity}})</b></p>
                             <p id="seller-name" style="font-size:14px;">From seller {{item.seller}}</p>
@@ -27,7 +27,7 @@
                             <a class="btn btn-outline-success" href="{% url 'product_page' item.product.slug_str %}">View</a>
                         </div>
                     </div>
-                </div>
+               
             </li>
             {% empty %}
             <p>No purchases found</p>

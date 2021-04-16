@@ -39,52 +39,65 @@
 </head>
 <body>
 
-	<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-	  <a class="navbar-brand" href="{% url 'store' %}">Petiverse</a>
-	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-	    <span class="navbar-toggler-icon"></span>
-	  </button>
+	<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light" style="padding-top:5px;padding-bottom:5px;">
+		
+		<!-- Brand name -->
+		<a class="navbar-brand" href="{% url 'store' %}">Petiverse</a>
+		<div class="navbar-collapse collapse w-100 order-0 order-md-0 dual-collapse2">
+			<!-- Hello message -->
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+				  {% if request.user.is_authenticated %}
+					  <span class="hello-msg navbar-text">Hello, {{request.user.customer.nickname}}</span>
+				  {% endif %}
+				</li>
+		   
+			  </ul>
+		</div>
 
-	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-	    <ul class="navbar-nav mr-auto">
-	      <li class="nav-item active">
-	        <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>	        
-	      </li>
-	 
-	    </ul>
 
-			<!-- Search Bar is Here-->
+
+		<div class="mx-auto order-1">
+			<!-- Search Bar -->
 	        <form action="{% url 'search_result' %}" method="get">
-	        	<input class="search_bar" name = "q" type="text" placeholder="Search...", style="border-radius:3px !important; border:none;">
+	        	<input class="search_bar"  name = "q" type="text" placeholder="Search...", style="border-radius:3px !important; border:none; min-height:38px !important; padding-left:5px;">
 	        	<!-- <input type="submit" value="Search"> -->
 	        </form>
+		</div>
+		<div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
+			<ul class="navbar-nav ml-auto">
+				{% if request.user.is_authenticated %}
+				<li class="nav-item">
+					<a class="btn" href="{% url 'cart' %}"><i class="bi-cart" style="font-size:22px;"></i> <span class="badge badge-pill badge-danger">{{cartItems}}</span></a>
+				</li>
 
+				{% else %}
+				<!-- Login / logout buttons -->
+				<li class="nav-item" style="margin-left:5px; align-self:center;">
+					<a href="/login" class="btn btn-primary">Login</a>
+				</li>
+				<li class="nav-item"style="align-self:center;">
+					<a href="/signup" class="btn btn-success">Sign Up</a>
+				</li>
+				{% endif %}
 
-			{% if request.user.is_authenticated %}
-				<span class="hello-msg navbar-text">Hello, {{request.user.customer.nickname}}</span>
-  				<span><a class="hello-msg navbar-text" href="{% url 'logout' %}">Logout</a></span> 
-			{% else %}
-	     		<a href="/login" class="btn btn-secondary ">Login</a>
-				<a href="/signup" class="btn btn-secondary">Sign Up</a>
-			{% endif %}
-	
-	     	<a href="{% url 'cart' %}">
-	    		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
-	    	</a>
-	    	<p id="cart-total">{{cartItems}}</p>
-			
+			</ul>
+
 			{% if request.user.is_authenticated %}
 				<div class="dropdown">
-					<img  id="user-icon" src="{% static 'images/user_icon.png' %}" onclick="myFunction()" >
+					<i class="bi-person-circle" id="user-icon" onclick="toggleDropdown()" ></i>
 					<div id="myDropdown" class="dropdown-content">
-						<a href="/purchase_history">Purchase history</a>
-						<a href="/user_profile">User profile</a>
-						<a href="/new_product">New listing</a>
-						<a href="/my_listings">Manage my listings</a>
+						<a href="/new_product"><i class="bi-plus-square dropdown-icon"></i>New listing</a>
+						<a href="/my_listings"><i class="bi-card-checklist dropdown-icon"></i>Manage my listings</a>
+						<a href="/purchase_history"> <i class="bi-clock-history dropdown-icon"></i>Purchase history</a>
+						<hr class="dropdown-divider">
+						<a href="/user_profile"><i class="bi-person dropdown-icon"></i>User profile</a>
+						<a href="/logout"><i class="bi-power dropdown-icon"></i>Log out</a>
 					</div>
 				</div>
 			{% endif %}
-	  </div>
+
+		</div>
 	</nav>
 
      <div class="container">
@@ -95,6 +108,39 @@
             {% endblock content %}
          </div>
 
+	<footer class="card">
+		<div>
+			<h5 style="display:inline;">Petiverse</h5>
+			<a href="#" style="display:inline;"><i class="bi-arrow-up-short"></i>Back to top</a>
+		</div>
+		<div style="text-align:center;">
+			<a href="/">Home</a>
+			&middot
+			{% if request.user.is_authenticated %}
+				<a href="{% url 'cart' %}">Cart</a>
+				&middot
+				<a href="{% url 'new_product' %}">New listing</a>
+				&middot
+				<a href="{% url 'my_listings' %}">My listings</a>
+				&middot
+				<a href="{% url 'purchase_history' %}">Purchase history</a>
+				&middot
+				<a href="{% url 'user_profile' %}">Profile</a>
+				&middot
+				<a href="{% url 'logout' %}">Log out</a>
+			{% else %}
+				<a href="{% url 'login' %}">Log in</a>
+				&middot
+				<a href="{% url 'signup' %}">Sign up</a>
+			{% endif %}
+		</div>
+		<hr>
+		<div style="text-align:center;">
+			By COMP3900 Let's Chat - 2021
+			&middot
+			<a href="mailto:unswcomp3900@gmail.com">Contact us</a>
+		</div>
+	</footer>
 
     <!--Below 3 lines of code referece: https://getbootstrap.com/-->
 
@@ -113,7 +159,7 @@
 	<script>
 	/* When the user clicks on the button, 
 	toggle between hiding and showing the dropdown content */
-	function myFunction() {
+	function toggleDropdown() {
 		document.getElementById("myDropdown").classList.toggle("show");
 	}
 
