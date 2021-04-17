@@ -32,6 +32,7 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+*.env
 
 # Installer logs
 pip-log.txt
@@ -157,7 +158,6 @@ dmypy.json
 # Ignore all local history of files
 .history
 .ionide
-
 
 ## Ecommerce 
 ecommerce/store/__pycache__/*

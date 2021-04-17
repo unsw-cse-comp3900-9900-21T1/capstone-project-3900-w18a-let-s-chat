@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from . import views
@@ -20,6 +22,14 @@ urlpatterns = [
     path('search_result/', views.searchResult, name="search_result"),
     path('process_order/', views.processOrder, name="process_order"),
     path('new_product/', views.new_product, name='new_product'),
+    path('my_listings/', views.my_listings, name='my_listings'),
+    path('view_orders/<slug:slug>/', views.view_orders, name="view_orders"),
+    path('edit_listing/<slug:slug>/', views.edit_listing, name="edit_listing"),
+    path('toggle_unlist/', views.toggle_unlist, name='toggle_unlist'),
+    path('new_review/', views.post_new_review, name='new_review'),
+    path('delete_review/', views.delete_review, name='delete_review'),
+    path('edit_review/', views.edit_review, name='edit_review'),
+    path('toggle_review_react/', views.toggle_review_react, name='toggle_review_react'),
 
     path('reset_password/',
         auth_views.PasswordResetView.as_view(template_name="store/password_reset.html"),
@@ -41,4 +51,8 @@ urlpatterns = [
     path('update_item/', views.updateItem, name="update_item"),
     path('add_multiple/', views.add_multiple, name="add_multiple"),
     path('restore/', views.restore, name="restore"),
+    # path('chat_index/', views.index_view, name='index'),
+    # path('chat/', views.chat_view, name="chat_view"),
+    path('webhook/', views.webhook, name="webhook"),
+    path('add_bid/', views.add_bid, name="add_bid"),
 ]

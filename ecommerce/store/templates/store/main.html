@@ -27,7 +27,7 @@
 
     <!--Referece: https://getbootstrap.com/-->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
 
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -39,53 +39,64 @@
 </head>
 <body>
 
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	  <a class="navbar-brand" href="{% url 'store' %}">Petiverse</a>
-	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-	    <span class="navbar-toggler-icon"></span>
-	  </button>
+	<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light" style="padding-top:5px;padding-bottom:5px;">
+		
+		<!-- Brand name -->
+		<a class="navbar-brand" href="{% url 'store' %}">Petiverse</a>
+		<div class="navbar-collapse collapse w-100 order-0 order-md-0 dual-collapse2">
+			<!-- Hello message -->
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+				  {% if request.user.is_authenticated %}
+					  <span class="hello-msg navbar-text">Hello, {{request.user.customer.nickname}}</span>
+				  {% endif %}
+				</li>
+		   
+			  </ul>
+		</div>
 
-	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-	    <ul class="navbar-nav mr-auto">
-	      <li class="nav-item active">
-	        <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>	        
-	      </li>
-	 
-	    </ul>
-	    <div class ="form-inline my-1 my-lg-0">
-			<!-- Search Bar is Here-->
+
+
+		<div class="mx-auto order-1">
+			<!-- Search Bar -->
 	        <form action="{% url 'search_result' %}" method="get">
-	        	<input class="search_bar" name = "q" type="text" placeholder="Search...">
+	        	<input class="search_bar"  name = "q" type="text" placeholder="Search...", style="border-radius:3px !important; border:none; min-height:38px !important; padding-left:5px;">
 	        	<!-- <input type="submit" value="Search"> -->
 	        </form>
-	    </div>
-	    <div class="form-inline my-2 my-lg-0">
+		</div>
+		<div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="btn" href="{% url 'cart' %}"><i class="bi-cart" style="font-size:22px;"></i> <span class="badge badge-pill badge-danger">{{cartItems}}</span></a>
+				</li>
+
+				{% if not request.user.is_authenticated%}
+				<!-- Login / logout buttons -->
+				<li class="nav-item" style="margin-left:5px; align-self:center;">
+					<a href="/login" class="btn btn-primary">Login</a>
+				</li>
+				<li class="nav-item"style="align-self:center;">
+					<a href="/signup" class="btn btn-success">Sign Up</a>
+				</li>
+				{% endif %}
+
+			</ul>
 
 			{% if request.user.is_authenticated %}
-				<span class="hello-msg">Hello, {{request.user.customer.nickname}}</span>
-  				<span><a class="hello-msg" href="{% url 'logout' %}">Logout</a></span> 
-			{% else %}
-	     		<a href="/login"class="btn btn-warning">Login</a>
-				<a href="/signup"class="btn btn-warning">Sign Up</a>
-			{% endif %}
-	
-	     	<a href="{% url 'cart' %}">
-	    		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
-	    	</a>
-	    	<p id="cart-total">{{cartItems}}</p>
-			
-			{% if request.user.is_authenticated %}
 				<div class="dropdown">
-					<img  id="user-icon" src="{% static 'images/user_icon.png' %}" onclick="myFunction()" >
+					<i class="bi-person-circle" id="user-icon" onclick="toggleDropdown()" ></i>
 					<div id="myDropdown" class="dropdown-content">
-						<a href="/purchase_history">Purchase History</a>
-						<a href="/user_profile">User Profile</a>
-						<a href="#">Link 3</a>
+						<a href="/new_product"><i class="bi-plus-square dropdown-icon"></i>New listing</a>
+						<a href="/my_listings"><i class="bi-card-checklist dropdown-icon"></i>Manage my listings</a>
+						<a href="/purchase_history"> <i class="bi-clock-history dropdown-icon"></i>Purchase history</a>
+						<hr class="dropdown-divider">
+						<a href="/user_profile"><i class="bi-person dropdown-icon"></i>User profile</a>
+						<a href="/logout"><i class="bi-power dropdown-icon"></i>Log out</a>
 					</div>
 				</div>
 			{% endif %}
-	    </div>
-	  </div>
+
+		</div>
 	</nav>
 
      <div class="container">
@@ -98,7 +109,10 @@
 
 
     <!--Below 3 lines of code referece: https://getbootstrap.com/-->
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+	<!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
+	<!-- The JQuery version above came from the bootstrap reference but does not contain ajax as it is the "slim" version. The version below is the full version containing ajax. -->
+	<script src="{% static 'javascript/jquery.js' %}"></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 
@@ -111,7 +125,7 @@
 	<script>
 	/* When the user clicks on the button, 
 	toggle between hiding and showing the dropdown content */
-	function myFunction() {
+	function toggleDropdown() {
 		document.getElementById("myDropdown").classList.toggle("show");
 	}
 
@@ -129,5 +143,17 @@
 		}
 	}
 	</script>
+    <script type="text/javascript">
+      (function(d, m){
+          var kommunicateSettings = 
+              {"appId":"232096f64f61d669fec1cc191fadff44e","popupWidget":true,"automaticChatOpenOnNavigation":true};
+          var s = document.createElement("script"); s.type = "text/javascript"; s.async = true;
+          s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
+          var h = document.getElementsByTagName("head")[0]; h.appendChild(s);
+          window.kommunicate = m; m._globals = kommunicateSettings;
+      })(document, window.kommunicate || {});
+  /* NOTE: Use webserver to view HTML files as the real-time update will not work if you directly open the HTML file in the browser. */
+  </script>
+
 </body>
 </html>

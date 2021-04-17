@@ -15,3 +15,13 @@ Added to and cleaned up the user story table. Came up for acceptance criterias f
 
 Week 4:
 Working on the search function. Simple product search by name works.
+
+Week 5:
+Presented Sprint 1 and we did our retrospective A in class after the presentation
+
+Week 7:
+Explored different APIs to integrate a chat system into our project. However, there was little resources available. Found pinax-messages and the functionalities work. 
+A little compromise from the supposed chat system because it is more of a messaging feature. However, html files provided broke. Moving the deadline for the chat system to sprint 3. 
+
+Week 8:
+Presenting Sprint 2

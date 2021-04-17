@@ -19,11 +19,11 @@
             <div class="profile-nav-info">
                 <h3 class="user-name">{{request.user.customer.nickname}}</h3>
                 <div class="address">
-                    {% if request.user.customer.shippingaddress.address == "" %}
-                        <p class="address-line">{{request.user.customer.shippingaddress.address}}, </p>
-                        <p class="city">{{request.user.customer.shippingaddress.city}}, </p>
-                        <p class="state">{{request.user.customer.shippingaddress.city}} </p>
-                        <p class="postcode">{{request.user.customer.shippingaddress.postcode}}.</p>
+                    {% if request.user.customer.order.shippingaddress == "" %}
+                        <p class="address-line">{{request.user.customer.order.shippingaddress.address}}, </p>
+                        <p class="city">{{request.user.customer.order.shippingaddress.city}}, </p>
+                        <p class="state">{{request.user.customer.order.shippingaddress.state}}, </p>
+                        <p class="postcode">{{request.user.customer.order.shippingaddress.postcode}}.</p>
                     {% else %}
                         <p class="empty-address">No address</p>
                     {% endif %}
@@ -77,15 +77,15 @@
             <div class="right-side">
                 <div class="nav">
                     <ul>
-                        <li onclick="tabs(0)" class="user-product active">Your Products</li>
-                        <li onclick="tabs(1)" class="user-review">Reviews</li>
+                        <!-- <li onclick="tabs(0)" class="user-product active">Your Products</li> -->
+                        <li onclick="tabs(1)" class="user-review active">Reviews</li>
                         <li onclick="tabs(2)" class="user-setting">Settings</li>
                     </ul>
                 </div>
                 <div class="profile-body">
-                    <div class="profile-product tab">
+                    <!-- <div class="profile-product tab">
                         <h1>Your Products</h1>
-                    </div>
+                    </div> -->
                     <div class="profile-reviews tab">
                         <h1>User Reviews</h1>
                     </div>

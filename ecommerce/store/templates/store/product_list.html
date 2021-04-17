@@ -1,54 +1,83 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h1>Search Results</h1>
-    <h2>
-    	<div class="btn-group" role="group">
-    		<div class="btn-group">
-		    	<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-		        Buying Format:
-		        </button>
-				    <div class="dropdown-menu">
-					    <a class="dropdown-item" href="#">All listings</a>
-					    <a class="dropdown-item" href="#">Auction only</a>
-					    <a class="dropdown-item" href="#">Fixed price only</a>
-				    </div>
-			</div>
+    <h3>Search Results for "{{query}}"</h3>
 
-			<div class="btn-group">
-				<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-			      Sort by:
-			    </button>
-			    <div class="dropdown-menu">
-				    <a class="dropdown-item" href="#">Sort by relevance</a>
-				    <a class="dropdown-item" href="#">Sort by price (Low To High))</a>
-				    <a class="dropdown-item" href="#">Sort by price (High To Low)</a>
-			    </div>
+	<div class="row">
+		<div class="col-lg-10">
+			<div class="card card-body">
+
+				<form method="get">
+					{{myFilter.form}}
+
+					
+				<button class="btn btn-primary" type="submit" name='cached_q' value='{{query}}'>Search</button>
+				</div>
+			  </form>
+
+			</div>
+			<div class="card card-body">
+
+				<div class="dropdown">
+					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="button" id="search-sort-dropdown" data-bs-toggle="dropdown">
+					Sort By:
+					</button>
+					<div class="dropdown-menu">
+					<a class="dropdown-item" id="btn-search-sort-name-asc">Alphabetical(A-Z)</a>
+					<a class="dropdown-item" id="btn-search-sort-price-asc">Price(Low to High)</a>
+					<a class="dropdown-item" id="btn-search-sort-price-desc">Price(High to Low)</a>
+						
+				</div>
 			</div>
 		</div>
-	</h2>
+	</div>
 
-		<u1>
-	    	<div class="row">
-	    	{%for product in product_list%}
-	    		<div class="col-lg-4">
+			
+		
+<style>
+	ul{list-style-type: none; padding:0 !important}
+</style>
+
+    <ul id="search-list"class="row">
+    	{%for product in product_list%}
+				<li class="list-group-item search col-lg-4" style="list-style-type: none; "data-name="{{product.name}}" data-price="{{product.price}}">
 					<a href = "{% url 'product_page' product.slug_str %}">
 						<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
 					</a>
 					<div class="box-element product">
-						<h6><strong>{{product.name}}</strong></h6>
+						<h6><div class="product-name-div" ><strong>{{product.name}}</strong></h6>
 						<hr>
 
 						<button data-product="{{product.id}}" data-action="add"
 						class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
 						<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-						<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+						<h4 style="display: inline-block; float: right"><p class="product-price-div"><strong>${{product.price|floatformat:2}}</strong></h4>
 
 					</div>
-			</div>
+				</li>
+    	{% empty %}
+    		<p5>Search not found</p5>
+    	{% endfor %}
+    </ul>
+<!-- Handle reviews -->
+<script src="{% static 'javascript/jquery.js' %}"></script>
+<script type="text/javascript">
 
-	    	{% empty %}
-	    		<p5>Search not found</p5>
-	    	{% endfor %}
-	    <u1>
+	 function sortReviews(cmp) {
+        $("#search-list .search").sort(cmp).appendTo("#search-list");
+    }
+
+    $("#btn-search-sort-name-asc").click(function() {
+        sortReviews((a,b) => ($(a).data("name").localeCompare($(b).data("name"))));
+        $("#search-sort-dropdown").html($(this).html());
+    });
+    $("#btn-search-sort-price-asc").click(function() {
+        sortReviews((a,b) => ($(a).data("price") - $(b).data("price")));
+        $("#search-sort-dropdown").html($(this).html());
+    });
+    $("#btn-search-sort-price-desc").click(function() {
+        sortReviews((a,b) => ($(b).data("price") - $(a).data("price")));
+        $("#search-sort-dropdown").html($(this).html());
+    });
+</script>
 {% endblock content %}

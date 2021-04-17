@@ -18,4 +18,24 @@ Created HTML templates for product pages, and purchase history page
 Implemented purchase history functionality
 Implemented url slugs for product pages
 Implemented basic functionality for product pages
+Implemented form page for listing new products
+Minor ui fixes
+
+Week 5
+Implemented counting product page views by each user
+Implemented basic recommendation system
+Implemented 'similar products' display on product pages
+Implemented 'recently viewed' panel on store page
+Added pagination to main store page
+
+Week 6
+Implemented 'my listings' page and product unlisting
+Implemented 'view orders' page for products
+
+Week 7
+Improved product unlisting functionality
+
+Week 8
+Improved navbar layout, added icons to some controls
+Implemented review system, with review editing and like/dislike system
 

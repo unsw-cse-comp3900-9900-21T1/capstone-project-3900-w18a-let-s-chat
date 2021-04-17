@@ -1,16 +1,45 @@
-Word Diary
+Work Diary
 Written by Yip Jeremy Chung Lum, z5098112
 
 Week 1
-Group formed. Matthew has created the Jira Project, named as COMP3900-W18A-let's chat. Daniel has created a google document, together with Matthew, Well and Daniel, I wrote the simple notes for our project in it. Initially we wanted to do only the chatbot project, however our tutor, Ali, suggested us to do an extra project as well because the chatbot project is not too difficult which will not have a high grade. At last, we have chosen the E-Commerce Recommender System with the chatbot. 
-I have discussed about the functions and features that will be included in the product with the team.  I have also talked about the types of the users with the team, which are admin, seller, and buyer.
+Group formed. Matthew has created the Jira Project, named as COMP3900-W18A-let's chat. Daniel has created a google document, together with Matthew, Well and Daniel, I wrote the simple notes for our project in it. 
+Initially we wanted to do only the chatbot project, however our tutor, Ali, suggested us to do an extra project as well because the chatbot project is not too difficult which will not have a high grade. 
+At last, we have chosen the E-Commerce Recommender System with the chatbot. 
+I have discussed about the functions and features that will be included in the product with the team.
+I have also talked about the types of the users with the team, which are admin, seller, and buyer.
 
 Week 2
-Together with Matthew, Well and Daniel, I wrote the user story and sprints section of the proposal in Jira. The epics were concluded from the discussed features of the product, and the epics are Registration, Login, Product Management, Delivery, Sales Tracking, Chat Bot, Purchase, Product Searching, Wishlist, Product Moderation, User Management, and Recommendation System. I have written the acceptance criteria for the issues which under the Login epic.
+Together with Matthew, Well and Daniel, I wrote the user story and sprints section of the proposal in Jira. 
+The epics were concluded from the discussed features of the product, and the epics are Registration, Login, Product Management, Delivery, Sales Tracking, Chat Bot, Purchase, Product Searching, Wishlist, Product Moderation, User Management, and Recommendation System. 
+I have written the acceptance criteria for the issues which under the Login epic.
 
 Week 3
-Daniel has created a google document for the Proposal, I have start listed the main topics of the proposal and wrote a problem, statement. Daniel, Matthew, and I have chosen an e-commerce platform and wrote some analysis of the websites in a table. I have concluded a problem summary from the websites. I have also added a table that represent the overall features of the websites. 
-Also, I have wrote the user types of the product into the proposal. I have created a Balsamiq Cloud for the storyboard, designed several pages of prototype of the Registration and Login feature for the product. Well said he will be in charge of the rest of the storyboard in Balsamiq because he is not good at writing for proposal.
+Daniel has created a google document for the Proposal, I have start listed the main topics of the proposal and wrote a problem, statement. Daniel, Matthew, and I have chosen an e-commerce platform and wrote some analysis of the websites in a table.
+I have concluded a problem summary from the websites.
+I have also added a table that represent the overall features of the websites. 
+Also, I have wrote the user types of the product into the proposal.
+I have created a Balsamiq Cloud for the storyboard, designed several pages of prototype of the Registration and Login feature for the product.
+Wells said he will be in charge of the rest of the storyboard in Balsamiq because he is not good at writing for proposal.
 
 Week4
-Created the basic coding for the product and uploaded to github, which includes all website templates of the website, the main html that will be extended by other html files, the navbar imported from bootstrap, etc. After well has finish the following data structure, I have created the registration and login authentication for the website, with formatted html pages by css.
+Created the basic coding for the product and uploaded to github, which includes all website templates of the website, the main html that will be extended by other html files, the navbar imported from bootstrap, etc. 
+After wells has finish the following data structure, I have created the registration and login authentication for the website, with formatted html pages by css.
+
+Week5
+Splitted the sprint 2 work into several parts, which I am responsible for the selling features, auction features and more email features.
+
+Week7
+Daniel has completed the new listing features and manage listings features, I then made some changes to his files so that it works well with my auctions features.
+I have added new fields for the product class in models.py for auction features, which are selling_type, starting_bid, end_date, and highest_bidder.
+I have finished implementing all of the auction and email features:
+  - Buyer can now place bid to the auctions.
+  - A timer has been made so it countdowns til the end of the auction.
+  - Emails will be sent to both buyers and sellers once a payment has been made.
+  - Emails will be sent to both highest bidder and sellers once an auction has ended.
+  - Once an auction has ended, the product will be added to the highest bidder's cart.
+
+Week8
+After the online meeting, some changes has been made:
+  - Seller now cannot place bid to their own product.
+  - Seller now cannot modify the end date and quantity of the auction product.
+  - User profile has deleted the "Your Products" tag.

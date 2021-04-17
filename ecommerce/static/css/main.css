@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Bree+Serif&display=swap');
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css");
 body {
 	background-color: hsl(0, 0%, 98%);
 }
@@ -25,7 +26,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .thumbnail:hover {
-	transform: scale(1.1); 
+	transform: scale(1.05); 
 }
 
 .product {
@@ -34,6 +35,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .bg-dark {
 	background-color: #4f868c!important;
+}
+
+.bg-light {
+	background-color: #e1f2fe!important;
+
 }
 
 .dropbtn {
@@ -62,12 +68,12 @@ h1, h2, h3, h4, h5, h6 {
 	display: none;
 	position: absolute;
 	background-color: #f9f9f9;
-	min-width: 160px;
+	min-width: 230px;
 	overflow: auto;
 	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 	z-index: 1;
 	right: -16px;
-	top: 42px;
+	top: 51px;
 }
 
 /* Links inside the dropdown */
@@ -94,10 +100,20 @@ h1, h2, h3, h4, h5, h6 {
 	margin-right: 35px;
 }
 
+.dropdown-icon {
+	padding-right: 8px;
+}
+
 #cart-icon {
 	width: 25px;
 	display: inline-block;
 	margin-left: 15px;
+	font-size:22px;
+	color:black;
+}
+
+#cart-icon:hover {
+	color: #09f;
 }
 
 #cart-total {
@@ -106,15 +122,21 @@ h1, h2, h3, h4, h5, h6 {
 	color: #fff;
 	background-color: red;
 	width: 20px;
-	height: 25px;
-	border-radius: 50%;
+	height: 22px;
+	border-radius: 80%;
 	font-size: 14px;
 }
 
 #user-icon {
-	width: 25px;
+	width: 30px;
 	display: inline-block;
-	margin-left: 15px;
+	margin-left:5px;
+	margin-right:10px;
+	font-size:30px;
+}
+
+#user-icon:hover {
+	color: #09f;
 }
 
 #paypal-icon {
@@ -284,9 +306,20 @@ h1, h2, h3, h4, h5, h6 {
 	height:fit-content
 }
 
+.review-react {
+	font-size:16px;
+}
+.review-react:hover {
+	color:#98d2eb;
+}
+
+.react-active {
+	color: #09f;
+}
+
 /********************** Layout and structure for User Profile page **********************/
 :root {
-	--color: #4f868c;
+	--color: #AA8F66;
 }
 
 .profile-header {
@@ -492,7 +525,7 @@ button.chatbtn i, button.createbtn i {
 
 .nav ul li {
 	padding: 10px;
-	width: 243px;
+	width: 365px;
 	cursor: pointer;
 	text-align: center;
 	transition: all .2s ease-in-out;
@@ -605,3 +638,25 @@ button.chatbtn i, button.createbtn i {
 	}
 }
 /********************** End **********************/
+
+
+/***** Horizontal scroll displays ******/
+
+.horizontal-scroll-box {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.horizontal-scroll-container {
+	display: flex;
+	flex-direction: row;
+	overflow-x: scroll;
+	flex-wrap: nowrap;
+	padding: 5px
+}
+
+.horizontal-scroll-item {
+	float: left
+}
