@@ -56,6 +56,7 @@ class Product(models.Model):
     estimated_date = models.DateTimeField(editable=False, blank=True, null=True)
     slug_str = models.SlugField(blank=True)
     is_active = models.BooleanField(default=True)
+    imageUri = models.TextField(blank=True)
     
     def save(self, **kwargs):
         unique_slugify(self, self.name, slug_field_name='slug_str')
