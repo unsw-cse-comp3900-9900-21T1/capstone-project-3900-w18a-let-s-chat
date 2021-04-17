@@ -10,22 +10,23 @@
 			<div class="row horizontal-scroll-container">
 
 				{% for product in recent %}
-					<div class="col-lg-4 horizontal-scroll-item">
+					<div class="col-lg-4">
 						<a href = "{% url 'product_page' product.slug_str %}">
-							<img class="thumbnail" style="object-fit:cover; " src="{{product.imageURL}}">
+							<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
 						</a>
 						<div class="box-element product">
 							<h6><strong>{{product.name}}</strong></h6>
 							<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
 							<hr>
+
 							{% if product.selling_type == "sale" and request.user.is_authenticated %}
 								{% check_exist_tag customer product as result %}
 								{% if result %}
 									<button data-product="{{product.id}}"
-									class="btn btn-outline-secondary add-to-wishlist"> Remove from Wishlist </button>
+									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
 								{% else %}
 									<button data-product="{{product.id}}"
-									class="btn btn-outline-secondary add-to-wishlist"> Add to Wishlist </button>
+									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
 								{% endif %}
 								<button data-product="{{product.id}}" data-action="add" 
 								class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
@@ -33,18 +34,18 @@
 								{% check_exist_tag customer product as result %}
 								{% if result %}
 									<button data-product="{{product.id}}"
-									class="btn btn-outline-secondary add-to-wishlist"> Remove from Watchlist </button>
+									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i><</button>
 								{% else %}
 									<button data-product="{{product.id}}"
-									class="btn btn-outline-secondary add-to-wishlist"> Add to Watchlist </button>
+									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i><</button>
 								{% endif %}
 							{% endif %}
 
 							<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
 							{% if product.selling_type == "sale" %}
-								<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+								<h5 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h5>
 							{% else %}
-								<h4 style="display: inline-block; float: right"><strong>Bid</strong> ${{product.starting_bid|floatformat:2}}</h4>
+								<h5 style="display: inline-block; float: right"><strong>Bid</strong> ${{product.starting_bid|floatformat:2}}</h5>
 							{% endif %}
 						</div>
 					</div>
@@ -70,10 +71,10 @@
 					{% check_exist_tag customer product as result %}
 					{% if result %}
 						<button data-product="{{product.id}}"
-						class="btn btn-outline-secondary add-to-wishlist"> Remove from Wishlist </button>
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
 					{% else %}
 						<button data-product="{{product.id}}"
-						class="btn btn-outline-secondary add-to-wishlist"> Add to Wishlist </button>
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
 					{% endif %}
 					<button data-product="{{product.id}}" data-action="add" 
 					class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
@@ -81,10 +82,10 @@
 					{% check_exist_tag customer product as result %}
 					{% if result %}
 						<button data-product="{{product.id}}"
-						class="btn btn-outline-secondary add-to-wishlist"> Remove from Watchlist </button>
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i><</button>
 					{% else %}
 						<button data-product="{{product.id}}"
-						class="btn btn-outline-secondary add-to-wishlist"> Add to Watchlist </button>
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i><</button>
 					{% endif %}
 				{% endif %}
 

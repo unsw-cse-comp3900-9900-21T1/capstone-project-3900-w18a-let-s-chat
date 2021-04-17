@@ -225,3 +225,6 @@ class Wishlist(models.Model):
                 break
         
         return result
+    
+    def __str__(self):
+        return f"{self.Customer}'s wishlist"

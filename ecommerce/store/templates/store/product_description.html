@@ -77,25 +77,7 @@
                                 {% endif %}
                                 by {{product.seller.nickname}}
                             </h5>
-                            {% if product.selling_type == "sale" and request.user.is_authenticated %}
-                                {% check_exist_tag customer product as result %}
-                                {% if result %}
-                                    <button data-product="{{product.id}}" id="add-to-wishlist"
-                                    class="btn btn-outline-secondary"> Remove from Wishlist </button>
-                                {% else %}
-                                    <button data-product="{{product.id}}" id="add-to-wishlist"
-                                    class="btn btn-outline-secondary"> Add to Wishlist </button>
-                                {% endif %}
-                            {% else %}
-                                {% check_exist_tag customer product as result %}
-                                {% if result %}
-                                    <button data-product="{{product.id}}" id="add-to-wishlist"
-                                    class="btn btn-outline-secondary"> Remove from Watchlist </button>
-                                {% else %}
-                                    <button data-product="{{product.id}}" id="add-to-wishlist"
-                                    class="btn btn-outline-secondary"> Add to Watchlist </button>
-                                {% endif %}
-                            {% endif %}
+                            
                             <h6 id="product-star-rating" data-rating="{{product.avg_rating}}">
                                 <span id="review-count-text"> 
                                     {% if product.reviews.count == 0 %}
@@ -107,7 +89,25 @@
                                     {% endif %}
                                 </span>
                             </h6>
-
+                            {% if product.selling_type == "sale" and request.user.is_authenticated %}
+                                {% check_exist_tag customer product as result %}
+                                {% if result %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"><i class="bi-bookmark-check-fill"></i> Remove from wishlist</button>
+                                {% else %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"><i class="bi-bookmark-plus"></i> Add to wishlist</button>
+                                {% endif %}
+                            {% else %}
+                                {% check_exist_tag customer product as result %}
+                                {% if result %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"><i class="bi-bookmark-check-fill"> Remove from wishlist</i></button>
+                                {% else %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"><i class="bi-bookmark-plus"></i> Add to wishlist</button>
+                                {% endif %}
+                            {% endif %}
                     <div class="row">
                         <div style="width:50%" class="col-lg-6">
                             <h6><strong>Estimated delivery: {{product.delivery_period_days_hours_str}}</strong></h6>
@@ -214,10 +214,10 @@
                             {% check_exist_tag customer product as result %}
                             {% if result %}
                                 <button data-product="{{product.id}}"
-                                class="btn btn-outline-secondary add-to-wishlist"> Remove from Wishlist </button>
+                                class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
                             {% else %}
                                 <button data-product="{{product.id}}" id="add-to-wishlist"
-                                class="btn btn-outline-secondary add-to-wishlist"> Add to Wishlist </button>
+                                class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
                             {% endif %}
                             <button data-product="{{product.id}}" data-action="add" 
                             class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
@@ -232,7 +232,7 @@
                             {% endif %}
                         {% endif %}
                         <a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-                        <h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+                        <h5 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h5>
                     </div>
                 </div>
             {% empty %}
