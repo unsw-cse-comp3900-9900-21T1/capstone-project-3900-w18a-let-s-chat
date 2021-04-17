@@ -34,10 +34,10 @@
 								{% check_exist_tag customer product as result %}
 								{% if result %}
 									<button data-product="{{product.id}}"
-									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i><</button>
+									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
 								{% else %}
 									<button data-product="{{product.id}}"
-									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i><</button>
+									class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
 								{% endif %}
 							{% endif %}
 
@@ -82,10 +82,10 @@
 					{% check_exist_tag customer product as result %}
 					{% if result %}
 						<button data-product="{{product.id}}"
-						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i><</button>
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
 					{% else %}
 						<button data-product="{{product.id}}"
-						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i><</button>
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
 					{% endif %}
 				{% endif %}
 
