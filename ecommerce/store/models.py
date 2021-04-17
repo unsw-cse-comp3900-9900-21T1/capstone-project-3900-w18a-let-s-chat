@@ -208,3 +208,20 @@ class ProductViewCount(models.Model):
     def __str__(self):
         return f'Customer: {self.customer}, Product: {self.product}, Count: {self.count}'
 
+class Wishlist(models.Model):
+    Customer = models.OneToOneField(Customer, on_delete=models.CASCADE, null=True, related_name='wishlist')
+    product = models.ManyToManyField(Product, blank=True, related_name='wishlist_product')
+
+    def save(self):
+        super().save()
+
+    @staticmethod
+    def check_exist(wishlist, product):
+        products = wishlist.product.all()
+        result = False
+        for item in products:
+            if product == item:
+                result = True
+                break
+        
+        return result

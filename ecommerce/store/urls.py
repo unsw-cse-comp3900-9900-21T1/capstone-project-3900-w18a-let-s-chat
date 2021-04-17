@@ -17,7 +17,6 @@ urlpatterns = [
 	path('checkout/', views.checkout, name="checkout"),
     path('purchase_history/', views.purchase_history, name="purchase_history"),
     path('wishlist/', views.wishlist, name="wishlist"),
-    path('watchList/', views.watchList, name="watchList"),
     path('user_profile/', views.userProfile, name="user_profile"),
     path('search_result/', views.searchResult, name="search_result"),
     path('process_order/', views.processOrder, name="process_order"),
@@ -55,4 +54,6 @@ urlpatterns = [
     # path('chat/', views.chat_view, name="chat_view"),
     path('webhook/', views.webhook, name="webhook"),
     path('add_bid/', views.add_bid, name="add_bid"),
+    path('add_wishlist/', views.add_wishlist, name="add_wishlist"),
+    path('remove_wishlist/', views.remove_wishlist, name="remove_wishlist"),
 ]

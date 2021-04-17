@@ -1,5 +1,6 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% load support_tags %}
 {% block content %}
 
 {% if not product.is_active %}
@@ -76,6 +77,25 @@
                                 {% endif %}
                                 by {{product.seller.nickname}}
                             </h5>
+                            {% if product.selling_type == "sale" and request.user.is_authenticated %}
+                                {% check_exist_tag customer product as result %}
+                                {% if result %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"> Remove from Wishlist </button>
+                                {% else %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"> Add to Wishlist </button>
+                                {% endif %}
+                            {% else %}
+                                {% check_exist_tag customer product as result %}
+                                {% if result %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"> Remove from Watchlist </button>
+                                {% else %}
+                                    <button data-product="{{product.id}}" id="add-to-wishlist"
+                                    class="btn btn-outline-secondary"> Add to Watchlist </button>
+                                {% endif %}
+                            {% endif %}
                             <h6 id="product-star-rating" data-rating="{{product.avg_rating}}">
                                 <span id="review-count-text"> 
                                     {% if product.reviews.count == 0 %}
@@ -190,11 +210,27 @@
                         <h6><strong>{{product.name}}</strong></h6>
                         <div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
                         <hr>
-                        {% if request.user.is_authenticated %}
-                        <button data-product="{{product.id}}" data-action="add" 
-                        class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+                        {% if product.selling_type == "sale" and request.user.is_authenticated %}
+                            {% check_exist_tag customer product as result %}
+                            {% if result %}
+                                <button data-product="{{product.id}}"
+                                class="btn btn-outline-secondary add-to-wishlist"> Remove from Wishlist </button>
+                            {% else %}
+                                <button data-product="{{product.id}}" id="add-to-wishlist"
+                                class="btn btn-outline-secondary add-to-wishlist"> Add to Wishlist </button>
+                            {% endif %}
+                            <button data-product="{{product.id}}" data-action="add" 
+                            class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+                        {% else %}
+                            {% check_exist_tag customer product as result %}
+                            {% if result %}
+                                <button data-product="{{product.id}}"
+                                class="btn btn-outline-secondary add-to-wishlist"> Remove from Watchlist </button>
+                            {% else %}
+                                <button data-product="{{product.id}}" id="add-to-wishlist"
+                                class="btn btn-outline-secondary add-to-wishlist"> Add to Watchlist </button>
+                            {% endif %}
                         {% endif %}
-
                         <a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
                         <h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
                     </div>
@@ -371,29 +407,31 @@
     </div>
 <!-- Bidder Count -->
 <script>
-    // Get the modal
-    var modal = document.getElementById("myModal");
+    if ("{{product.selling_type}}" == "auction") {
+        // Get the modal
+        var modal = document.getElementById("myModal");
 
-    // Get the button that opens the modal
-    var btn = document.getElementById("bidder-count-button");
+        // Get the button that opens the modal
+        var btn = document.getElementById("bidder-count-button");
 
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
 
-    // When the user clicks the button, open the modal 
-    btn.onclick = function() {
-        modal.style.display = "block";
-    }
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
 
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-        if (event.target == modal) {
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
             modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
         }
     }
 </script>
@@ -740,8 +778,66 @@
                 })
         }
     }
-
 </script>
+
+<script type="text/javascript">
+    console.log('add-to-wishlist function')
+	if (user == 'AnonymousUser'){
+		document.getElementById('add-to-wishlist').classList.add("hidden");
+	} else {
+		var addBtn = document.getElementById('add-to-wishlist')
+		var productId = addBtn.dataset.product
+        console.log('Product ID:', productId)
+		addBtn.addEventListener('click', function(){
+			addWishlist()
+		})
+		function addWishlist(){
+			console.log('Product ID:', productId)
+			var url = "/add_wishlist/"
+			fetch(url, {
+				method:'POST',
+				headers:{
+					'Content-Type':'applicaiton/json',
+					'X-CSRFToken':csrftoken,
+				}, 
+				body:JSON.stringify({'productId':productId}),
+				
+			})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log('Data sent:', data);
+				location.reload()
+				})
+		}
+	}
+</script>
+
+<script type="text/javascript">
+    if (user == 'AnonymousUser'){
+        $('.add-to-wishlist').hide();
+    }
+    document.querySelectorAll('.add-to-wishlist').forEach(item => {
+        item.addEventListener('click', event => {
+            var productId = item.dataset.product
+            var url = "/add_wishlist/"
+			fetch(url, {
+				method:'POST',
+				headers:{
+					'Content-Type':'applicaiton/json',
+					'X-CSRFToken':csrftoken,
+				}, 
+				body:JSON.stringify({'productId':productId}),
+				
+			})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log('Data sent:', data);
+				location.reload()
+				})
+        })
+    })
+</script>
+
 {% if product.selling_type == "auction" %}
     <script src="{% static 'javascript/timer.js' %}"></script>
 {% endif %}

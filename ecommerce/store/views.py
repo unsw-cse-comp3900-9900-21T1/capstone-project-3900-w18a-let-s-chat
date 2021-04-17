@@ -44,7 +44,7 @@ recent_orders_display_size = 5
 #################
 
 def store(request):
-
+    context = {}
     if request.user.is_authenticated:
         customer = request.user.customer
         cartItems = cart_items(customer)
@@ -53,6 +53,7 @@ def store(request):
         view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
         recent_products = [view_count.product for view_count in view_counts][:max_recent]
 
+        context['customer'] = customer
     else:
         cartItems = 0
         recent_products = []
@@ -66,7 +67,7 @@ def store(request):
     page_number = request.GET.get('page')
     paginated_products = paginator.get_page(page_number)
 
-    context = {'products':paginated_products, 'recent': recent_products, 'cartItems':cartItems}
+    context.update({'products':paginated_products, 'recent': recent_products, 'cartItems':cartItems})
     return render(request, 'store/store.html', context)
 
 def signup(request):
@@ -87,7 +88,11 @@ def signup(request):
                 customer.user = user
                 customer.nickname = user.username
                 customer.email = user.email
+                wishlist = Wishlist()
+                customer.wishlist = wishlist
+                wishlist.customer = customer
                 customer.save()
+                wishlist.save()
 
                 template = render_to_string('store/email_template.html', {'name': user.username, 'username': user.username})
 
@@ -133,7 +138,7 @@ def logoutUser(request):
     return redirect('login')
 
 def product_page(request, slug=None):
-    
+    context = {}
     try:
         product = Product.objects.get(slug_str=slug)
     except ObjectDoesNotExist:
@@ -151,6 +156,7 @@ def product_page(request, slug=None):
         
         # Get all of the user's reacts to reviews for this product
         user_reacts = ReviewReact.objects.filter(customer=request.user.customer, review__product=product)
+        context['customer'] = customer
         
     else:
         #Create empty cart for now for non-logged in user
@@ -180,7 +186,7 @@ def product_page(request, slug=None):
             "verified": OrderItem.objects.filter(product=product, order__customer=review.author, order__complete=True).exists()
         })
 
-    context = {
+    context.update({
         "product": product,
         "tags": product.tags.names(),
         "cartItems": cartItems,
@@ -188,7 +194,7 @@ def product_page(request, slug=None):
         "is_owner": is_owner,
         "user_review": user_review,
         "reviews": reviews
-    }
+    })
     return render(request, 'store/product_description.html', context)
 
 def cart(request):
@@ -262,14 +268,40 @@ def purchase_history(request):
     }
     return render(request, 'store/purchase_history.html', context)
     
+# Wishlist and Watchlist is now in the same page
 def wishlist(request):
-    context = {}
-    return render(request, 'store/wishlist.html', context)
+    if not request.user.is_authenticated:
+        return redirect('login')
 
-# watchlist is a list of auction items that user watch to see
-def watchList(request):
-    context = {}
-    return render(request, 'store/watchList.html', context)
+    customer = request.user.customer
+    # cartItems to update the total number of items in cart
+    cartItems = cart_items(customer)
+    
+    # To query the complete orders
+    wishlist = customer.wishlist.product.all()
+
+    items = []
+    for item in wishlist:
+        items.append({
+            "id":item.id,
+            "selling_type": item.selling_type,
+            "is_active": item.is_active,
+            "product":item,
+            "name": item.name,
+            "current_bid": item.starting_bid,
+            "seller": item.seller.nickname,
+            "remaining_unit": item.remaining_unit,
+            "image": item.imageURL,
+            "price": item.price
+        })
+
+    context = {
+        'items': items,
+        'cartItems': cartItems,
+        'pending': Order.objects.filter(customer=customer, complete=False).count,
+        'total_orders': Order.objects.filter(customer=customer).count
+    }
+    return render(request, 'store/wishlist.html', context)
 
 def userProfile(request):
     if request.method == 'POST':
@@ -803,11 +835,11 @@ def check_auction_time():
 					email.fail_silently = False
 					email.send()
 
-					seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'bidder': product.highest_bidder.nickname, 'product': product.name, 'price': product.starting_bid})
+					seller_template = render_to_string('store/email_auctionEnd_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'bidder': product.highest_bidder.nickname, 'price': product.starting_bid})
 
 					print(settings.EMAIL_HOST_USER)
 					email = EmailMessage(
-						'Your product has ended!',
+						'Your auction has ended!',
 						seller_template,
 						settings.EMAIL_HOST_USER,
 						[product.seller.email],
@@ -923,4 +955,69 @@ def toggle_review_react(request):
     
     return JsonResponse(data={'score':review.score, 'state':state}, status=200)
 
-check_auction_time()
+def add_wishlist(request):
+	data = json.loads(request.body)
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		all_customer = Customer.objects.all()
+		productId = int(data['productId'])
+		wishlist = customer.wishlist
+				
+		try:
+			product = Product.objects.get(id=productId)
+		except ObjectDoesNotExist:
+			return JsonResponse('Product not found', safe=False)
+		if not product.is_active:
+			return JsonResponse('Product is unlisted', safe=False)
+
+		for wish_item in wishlist.product.all():
+			if product == wish_item:
+				wishlist.product.remove(product)
+				wishlist.save()
+				print("Removing product_id: " + str(productId))
+				print("Removing product name:" + product.name)
+				if product.selling_type == "sale":
+					messages.success(request, f'You have remove a product in your wishlist!')
+					return JsonResponse('You have remove a product in your wishlist!', safe=False)
+				else:
+					messages.success(request, f'You have remove a product in your watchlist!')
+					return JsonResponse('You have remove a product in your watchlist!', safe=False)
+
+		print("Adding product_id: " + str(productId))
+		print("Adding product name:" + product.name)
+		customer.wishlist.product.add(product)
+		wishlist.save()
+		if product.selling_type == "sale":
+			messages.success(request, f'You have added a product in your wishlist!')
+			return JsonResponse('You have added a product in your wishlist!', safe=False)
+		else:
+			messages.success(request, f'You have added a product in your watchlist!')
+			return JsonResponse('You have added a product in your watchlist!', safe=False)
+
+def remove_wishlist(request):
+	data = json.loads(request.body)
+	print("In views.py remove_wishlist")
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+		all_customer = Customer.objects.all()
+		productId = int(data['productId'])
+		print("Removing product_id: " + str(productId))
+		wishlist = customer.wishlist
+
+		try:
+			product = Product.objects.get(id=productId)
+			print("Creating product")
+		except ObjectDoesNotExist:
+			print("ObjectDoesNotExist")
+			return JsonResponse('Product not found', safe=False)
+
+		print("Removing product name:" + product.name)
+		customer.wishlist.product.remove(product)
+		wishlist.save()
+		messages.success(request, f'You have removed a product in your wishlist!')
+
+		return JsonResponse('You have removed a product in your wishlist!', safe=False)
+
+# check_auction_time()

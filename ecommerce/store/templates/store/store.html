@@ -1,5 +1,6 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% load support_tags %}
 {% block content %}
 
 	{% if recent %}
@@ -17,10 +18,26 @@
 							<h6><strong>{{product.name}}</strong></h6>
 							<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
 							<hr>
-
-							{% if product.selling_type == "sale"%}
+							{% if product.selling_type == "sale" and request.user.is_authenticated %}
+								{% check_exist_tag customer product as result %}
+								{% if result %}
+									<button data-product="{{product.id}}"
+									class="btn btn-outline-secondary add-to-wishlist"> Remove from Wishlist </button>
+								{% else %}
+									<button data-product="{{product.id}}"
+									class="btn btn-outline-secondary add-to-wishlist"> Add to Wishlist </button>
+								{% endif %}
 								<button data-product="{{product.id}}" data-action="add" 
 								class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+							{% else %}
+								{% check_exist_tag customer product as result %}
+								{% if result %}
+									<button data-product="{{product.id}}"
+									class="btn btn-outline-secondary add-to-wishlist"> Remove from Watchlist </button>
+								{% else %}
+									<button data-product="{{product.id}}"
+									class="btn btn-outline-secondary add-to-wishlist"> Add to Watchlist </button>
+								{% endif %}
 							{% endif %}
 
 							<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
@@ -50,8 +67,25 @@
 				<hr>
 
 				{% if product.selling_type == "sale" and request.user.is_authenticated %}
+					{% check_exist_tag customer product as result %}
+					{% if result %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"> Remove from Wishlist </button>
+					{% else %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"> Add to Wishlist </button>
+					{% endif %}
 					<button data-product="{{product.id}}" data-action="add" 
 					class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+				{% else %}
+					{% check_exist_tag customer product as result %}
+					{% if result %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"> Remove from Watchlist </button>
+					{% else %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"> Add to Watchlist </button>
+					{% endif %}
 				{% endif %}
 
 				<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
@@ -115,6 +149,31 @@
 			$(this).append(" from " + $(this).data("n-reviews") + " reviews");
 	});
 
+</script>
+<script type="text/javascript">
+    if (user == 'AnonymousUser'){
+        $('.add-to-wishlist').hide();
+    }
+    document.querySelectorAll('.add-to-wishlist').forEach(item => {
+        item.addEventListener('click', event => {
+            var productId = item.dataset.product
+            var url = "/add_wishlist/"
+			fetch(url, {
+				method:'POST',
+				headers:{
+					'Content-Type':'applicaiton/json',
+					'X-CSRFToken':csrftoken,
+				}, 
+				body:JSON.stringify({'productId':productId}),
+				
+			})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log('Data sent:', data);
+				location.reload()
+				})
+        })
+    })
 </script>
 
 {% endblock content %}
