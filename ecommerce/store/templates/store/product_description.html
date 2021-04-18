@@ -225,14 +225,18 @@
                             {% check_exist_tag customer product as result %}
                             {% if result %}
                                 <button data-product="{{product.id}}"
-                                class="btn btn-outline-secondary add-to-wishlist"> Remove from Watchlist </button>
+                                class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
                             {% else %}
                                 <button data-product="{{product.id}}" id="add-to-wishlist"
-                                class="btn btn-outline-secondary add-to-wishlist"> Add to Watchlist </button>
+                                class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
                             {% endif %}
                         {% endif %}
                         <a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-                        <h5 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h5>
+                        {% if product.selling_type == "sale" %}
+                            <h5 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h5>
+                        {% else %}
+                            <h5 style="display: inline-block; float: right"><strong>${{product.starting_bid|floatformat:2}}</strong></h5>
+                        {% endif %}
                     </div>
                 </div>
             {% empty %}
