@@ -685,6 +685,39 @@ def webhook(request):
                     }]
                 }
                 print("success")
+
+        elif action == 'place_bid':
+            product_name = parameters.get('product_name')
+            bid_price = parameters.get('bid_price')
+            customer_name = parameters.get('customer_name')
+            product = Product.objects.get(name=product_name)
+
+            if not product.is_active:
+                message = "This auction is ended!"
+
+            elif bid_price > product.starting_bid:
+                if customer_name == product.seller.nickname:
+                    message = "You cannot place a bid to your own product!"
+
+                else:
+                    product.starting_bid = bid_price
+                    all_customer = Customer.objects.all()
+                    for customer in all_customer:
+                        if customer.nickname == customer_name:
+                            product.highest_bidder = customer
+                            product.bidder.create(name=customer_name, price=bid_price)
+                            break
+                    message = 'You have successfully placed a bid!'
+                    product.save()
+                    
+            else:
+                message = f"Your bid price is not greater than the current highest bid price: ${product.starting_bid}!"
+
+            responseObj = {
+                "fulfillmentText": message,
+                # "fulfillmentMessages": [{"text": {"text": [message]}}],
+                "source": ""
+            }   
             
         return JsonResponse(responseObj)
 
