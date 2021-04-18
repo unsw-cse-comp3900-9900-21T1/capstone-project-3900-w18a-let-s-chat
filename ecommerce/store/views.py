@@ -214,6 +214,7 @@ def product_page(request, slug=None):
         # Get all of the user's reacts to reviews for this product
         user_reacts = ReviewReact.objects.filter(customer=request.user.customer, review__product=product)
         context['customer'] = customer
+        context['seller'] = Customer.objects.get(slug_str=product.seller.slug_str)
         
     else:
         #Create empty cart for now for non-logged in user
@@ -391,7 +392,7 @@ def wishlist(request):
     }
     return render(request, 'store/wishlist.html', context)
 
-def userProfile(request):
+def userProfile(request, slug=None):
     '''
     Path: 'profile/', GET or POST request, requires login
 
@@ -406,8 +407,8 @@ def userProfile(request):
         if user_form.is_valid() and user_pic_form.is_valid():
             user_form.save()
             user_pic_form.save()
-            messages.success(request, f'Your account information has been updated!')
-            return redirect('user_profile')
+            # messages.success(request, f'Your account information has been updated!')
+            return redirect(f'/user_profile/{slug}')
     else:
         user_form = UpdateUserForm(instance=request.user.customer)
         user_pic_form = UpdateUserProfilePic(instance=request.user.customer)
@@ -416,11 +417,20 @@ def userProfile(request):
     # Please don't delete the next two lines 
     # order is for cart to update the total number of items in cart
     customer = request.user.customer
+    customer_match = Customer.objects.get(slug_str=slug)
     cartItems = cart_items(customer)
 
     orders = Order.objects.filter(customer=customer)
 
+    items = []
+    products = Product.objects.all()
+    for product in products:
+        if product.seller == customer_match:
+            items.append(product)
+
     context = {
+        'customer': customer_match,
+        'items': items,
         'user_form': user_form,
         'user_pic_form': user_pic_form,
         'orders': orders,
@@ -1215,10 +1225,10 @@ def add_wishlist(request):
                 print("Removing product_id: " + str(productId))
                 print("Removing product name:" + product.name)
                 if product.selling_type == "sale":
-                    messages.success(request, f'You have remove a product in your wishlist!')
+                    # messages.success(request, f'You have remove a product in your wishlist!')
                     return JsonResponse('You have remove a product in your wishlist!', safe=False)
                 else:
-                    messages.success(request, f'You have remove a product in your watchlist!')
+                    # messages.success(request, f'You have remove a product in your watchlist!')
                     return JsonResponse('You have remove a product in your watchlist!', safe=False)
 
         print("Adding product_id: " + str(productId))
@@ -1226,10 +1236,10 @@ def add_wishlist(request):
         customer.wishlist.product.add(product)
         wishlist.save()
         if product.selling_type == "sale":
-            messages.success(request, f'You have added a product in your wishlist!')
+            # messages.success(request, f'You have added a product in your wishlist!')
             return JsonResponse('You have added a product in your wishlist!', safe=False)
         else:
-            messages.success(request, f'You have added a product in your watchlist!')
+            # messages.success(request, f'You have added a product in your watchlist!')
             return JsonResponse('You have added a product in your watchlist!', safe=False)
 
 def remove_wishlist(request):
@@ -1261,7 +1271,7 @@ def remove_wishlist(request):
         print("Removing product name:" + product.name)
         customer.wishlist.product.remove(product)
         wishlist.save()
-        messages.success(request, f'You have removed a product in your wishlist!')
+        # messages.success(request, f'You have removed a product in your wishlist!')
 
         return JsonResponse('You have removed a product in your wishlist!', safe=False)
 

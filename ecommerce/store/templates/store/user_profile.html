@@ -1,5 +1,6 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% load support_tags %}
 {% load crispy_forms_tags %}
 {% block content %}
     <html lang="en">
@@ -14,34 +15,35 @@
     <div class="container">
         <div class="profile-header">
             <div class="profile-img">
-                <img src="{{request.user.customer.image.url}}" width="200" alt="">
+                <img src="{{customer.image.url}}" width="200" alt="">
             </div>
             <div class="profile-nav-info">
-                <h3 class="user-name">{{request.user.customer.nickname}}</h3>
+                <h3 class="user-name">{{customer.nickname}}</h3>
                 <div class="address">
-                    {% if request.user.customer.order.shippingaddress == "" %}
-                        <p class="address-line">{{request.user.customer.order.shippingaddress.address}}, </p>
-                        <p class="city">{{request.user.customer.order.shippingaddress.city}}, </p>
-                        <p class="state">{{request.user.customer.order.shippingaddress.state}}, </p>
-                        <p class="postcode">{{request.user.customer.order.shippingaddress.postcode}}.</p>
+                    {% if customer.shipping_address == "" %}
+                        <p class="address-line">{{customer.shipping_address.address}}, </p>
+                        <p class="city">{{customer.shipping_address.city}}, </p>
+                        <p class="state">{{customer.shipping_address.state}}, </p>
+                        <p class="postcode">{{customer.shipping_address.postcode}}.</p>
                     {% else %}
                         <p class="empty-address">No address</p>
                     {% endif %}
                     <!--<span class="country">USA.</span>-->
                 </div>
             </div>
-            <div class="profile-option">
+            <!-- Commented out the notification icon cuz notification feature is not implemented yet-->
+            <!-- <div class="profile-option">
                 <div class="notification">
                     <i class="fa fa-bell"></i>
                     <span class="alert-message">1</span>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="main-bd">
             <div class="left-side">
                 <div class="profile-side">
-                    <p class="mobile-no"><i class="fa fa-phone"></i>{{request.user.customer.contactNo}}</p>
-                    <p class="user-mail"><i class="fa fa-envelope"></i>{{request.user.customer.email}}</p>
+                    <p class="mobile-no"><i class="fa fa-phone"></i>{{customer.contactNo}}</p>
+                    <p class="user-mail"><i class="fa fa-envelope"></i>{{customer.email}}</p>
                     <!--
                     <div class="user-bio">
                         <h3>About Me</h3>
@@ -77,34 +79,80 @@
             <div class="right-side">
                 <div class="nav">
                     <ul>
-                        <!-- <li onclick="tabs(0)" class="user-product active">Your Products</li> -->
-                        <li onclick="tabs(1)" class="user-review active">Reviews</li>
-                        <li onclick="tabs(2)" class="user-setting">Settings</li>
+                        <li onclick="tabs(0)" class="user-product active">{{customer.nickname}}'s Products</li>
+                        <!-- <li onclick="tabs(1)" class="user-review">Reviews</li> -->
+                        <li onclick="tabs(1)" class="user-setting">Settings</li>
                     </ul>
                 </div>
                 <div class="profile-body">
-                    <!-- <div class="profile-product tab">
-                        <h1>Your Products</h1>
-                    </div> -->
-                    <div class="profile-reviews tab">
-                        <h1>User Reviews</h1>
-                    </div>
-                    <div class="profile-settings tab">
-                        <h1>Account Setting</h1>
-                        <div class="edit-profile-info">
-                            <form method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <fieldset class="form-group">
-                                    <legend class="border-bottom mb-4">Profile Info</legend>
-                                    {{ user_form|crispy }}
-                                    {{ user_pic_form|crispy }}
-                                </fieldset>
-                                <div class="form-group">
-                                    <button class="btn btn-outline-info" type="submit">Update</button>
+                    <div class="profile-product tab">
+                        <div class="box-element list-box">
+                            <ul class="list-group list-group-flush" style="overflow:scroll; height:100%;">
+                            {% for product in items %}
+                                <div class="list-group-item list-box-item">
+                                    <a href = "{% url 'product_page' product.slug_str %}">
+                                        <img class="thumbnail" style="object-fit:cover; " src="{{product.imageURL}}">
+                                    </a>
+                                    <div class="box-element product">
+                                        <h6><strong>{{product.name}}</strong></h6>
+                                        <div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
+                                        <hr>
+                                        {% if product.selling_type == "sale" and request.user.is_authenticated %}
+                                            {% check_exist_tag request.user.customer product as result %}
+                                            {% if result %}
+                                                <button data-product="{{product.id}}"
+                                                class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
+                                            {% else %}
+                                                <button data-product="{{product.id}}" id="add-to-wishlist"
+                                                class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
+                                            {% endif %}
+                                            <button data-product="{{product.id}}" data-action="add" 
+                                            class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+                                        {% else %}
+                                            {% check_exist_tag request.user.customer product as result %}
+                                            {% if result %}
+                                                <button data-product="{{product.id}}"
+                                                class="btn btn-outline-secondary add-to-wishlist"> Remove from Watchlist </button>
+                                            {% else %}
+                                                <button data-product="{{product.id}}" id="add-to-wishlist"
+                                                class="btn btn-outline-secondary add-to-wishlist"> Add to Watchlist </button>
+                                            {% endif %}
+                                        {% endif %}
+                                        <a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
+                                        {% if product.selling_type == "sale" %}
+                                            <h5 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h5>
+                                        {% else %}
+                                            <h5 style="display: inline-block; float: right"><strong>${{product.starting_bid|floatformat:2}}</strong></h5>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </form>
+                            {% empty %}
+                                <p style="margin-left: 15px;">No products were found</p>
+                            {% endfor %}
+                            </ul>
                         </div>
                     </div>
+                    <!-- <div class="profile-reviews tab">
+                        <h1>User Reviews</h1>
+                    </div> -->
+                    {% if request.user.customer == customer %}
+                        <div class="profile-settings tab">
+                            <h1>Account Setting</h1>
+                            <div class="edit-profile-info">
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <fieldset class="form-group">
+                                        <legend class="border-bottom mb-4">Profile Info</legend>
+                                        {{ user_form|crispy }}
+                                        {{ user_pic_form|crispy }}
+                                    </fieldset>
+                                    <div class="form-group">
+                                        <button class="btn btn-outline-info" type="submit">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -114,6 +162,57 @@
 
         <script src="{% static 'javascript/jquery.js' %}"></script>
         <script src="{% static 'javascript/main.js' %}"></script>
+        <script>
+
+            // Draw star rating on each product card
+            const maxRating = 5;
+            $(".star-rating-div").each(function() {
+                console.log($(this));
+                var rating = $(this).data("rating");
+                var i;
+                for (i = 0; i < Math.floor(rating); i++)
+                    $(this).append('<i class="bi-star-fill"></i>');
+                if (rating - i >= 0.5) {
+                    $(this).append('<i class="bi-star-half"></i>');
+                    i++;
+                }
+                for (; i < maxRating; i++)
+                    $(this).append('<i class="bi-star"></i>');
+                
+                if ($(this).data("n-reviews") == 0)
+                    $(this).append(" No reviews yet");
+                else if ($(this).data("n-reviews") == 1)
+                    $(this).append(" from 1 review");
+                else
+                    $(this).append(" from " + $(this).data("n-reviews") + " reviews");
+            });
+
+        </script>
+        <script type="text/javascript">
+            if (user == 'AnonymousUser'){
+                $('.add-to-wishlist').hide();
+            }
+            document.querySelectorAll('.add-to-wishlist').forEach(item => {
+                item.addEventListener('click', event => {
+                    var productId = item.dataset.product
+                    var url = "/add_wishlist/"
+                    fetch(url, {
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'applicaiton/json',
+                            'X-CSRFToken':csrftoken,
+                        }, 
+                        body:JSON.stringify({'productId':productId}),
+                        
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log('Data sent:', data);
+                        location.reload()
+                        })
+                })
+            })
+        </script>
     </body>
     </html>
 {% endblock content %}

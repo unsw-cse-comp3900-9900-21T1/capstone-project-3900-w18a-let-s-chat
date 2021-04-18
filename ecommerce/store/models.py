@@ -31,11 +31,13 @@ class Customer(models.Model):
     contactNo = models.CharField(max_length=200, null=True)
     image = models.ImageField(default='../images/user_icon.png', upload_to='../images')
     trusted = models.BooleanField(default=False)
+    slug_str = models.SlugField(blank=True)
 
     def __str__(self):
         return self.nickname
 
     def save(self):
+        unique_slugify(self, self.nickname, slug_field_name='slug_str')
         super().save()
 
         print(self.image.path)
@@ -214,7 +216,7 @@ class ShippingAddress(models.Model):
     Since we are using a dummy purchasing system, the shipping address is not currently utilized
     '''
 
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, related_name='shipping_address')
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     recipient = models.CharField(max_length=200)
     address = models.CharField(max_length=200, null=False)
@@ -260,7 +262,7 @@ class Wishlist(models.Model):
     Represents a customer's wishlist, which is composed of a set of products
     '''
 
-    Customer = models.OneToOneField(Customer, on_delete=models.CASCADE, null=True, related_name='wishlist')
+    customer = models.OneToOneField(Customer, on_delete=models.CASCADE, null=True, related_name='wishlist')
     product = models.ManyToManyField(Product, blank=True, related_name='wishlist_product')
 
     def save(self):
