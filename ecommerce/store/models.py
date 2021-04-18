@@ -1,3 +1,7 @@
+'''
+Petiverse's database model, constructed using Django's ORM system with SQLite3
+'''
+
 from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
@@ -16,6 +20,11 @@ SELLING_CHOICES = [
 no_image_url = '/images/no-image.jpg'
 
 class Customer(models.Model):
+    '''
+    Represents the details of a user.
+    The user class within a customer is only used for authentication
+    '''
+
     user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=200, null=True)
     email = models.EmailField(max_length=254)
@@ -39,6 +48,12 @@ class Customer(models.Model):
 
 
 class Product(models.Model):
+    '''
+    Represents a single store listing - either a simple product or an auction
+    - The is_active attribute decides whether the product listing is visible to others on the store page
+    - A product with no reviews will have an average review score of 2.5 (50%)
+    '''
+
     name = models.CharField(max_length=200)
     selling_type = models.CharField(max_length=10, choices=SELLING_CHOICES, default='sale')
     price = models.DecimalField(max_digits=30, decimal_places=2)
@@ -89,6 +104,10 @@ class Product(models.Model):
         return self.bidder.count()
 
 class Bidder(models.Model):
+    '''
+    Represents a bid on an auction item
+    '''
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=30, decimal_places=2)
@@ -102,6 +121,10 @@ class Bidder(models.Model):
         return self.name
 
 class ProductReview(models.Model):
+    '''
+    Represents a review on a product
+    '''
+
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     author = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     date_posted = models.DateTimeField(auto_now_add=True)
@@ -127,6 +150,10 @@ class ProductReview(models.Model):
         return f'{self.product} review by {self.author} ({self.rating} stars)'
     
 class ReviewReact(models.Model):
+    '''
+    Represents a like or dislike on a product review
+    '''
+
     review = models.ForeignKey(ProductReview, on_delete=models.CASCADE, related_name='reacts')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
@@ -136,42 +163,57 @@ class ReviewReact(models.Model):
         return f"{self.customer} {'liked' if self.liked else 'disliked'} {self.review.author}'s review of {self.review.product}"
 
 class Order(models.Model):
-	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
-	date_ordered = models.DateTimeField(auto_now_add=True)
-	complete = models.BooleanField(default=False)
-	transaction_id = models.CharField(max_length=100, null=True)
+    '''
+    Represents an order made by a customer. An Order contains order items, which in turn contain products
+    - The complete attribute determines whether the order has actually been purchased, or if it just the contents of a cart
+    '''
 
-	def __str__(self):
-		return str(self.id)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    date_ordered = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)
+    transaction_id = models.CharField(max_length=100, null=True)
 
-	@property
-	def get_cart_total(self):
-		orderitems = self.orderitem_set.all()
-		total = sum([item.get_total for item in orderitems])
-		return total 
+    def __str__(self):
+        return str(self.id)
 
-	@property
-	def get_cart_items(self):
-		orderitems = self.orderitem_set.all()
-		total = sum([item.quantity for item in orderitems])
-		return total 
+    @property
+    def get_cart_total(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.get_total for item in orderitems])
+        return total 
+
+    @property
+    def get_cart_items(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitems])
+        return total 
         
 
 class OrderItem(models.Model):
-	product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-	order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
-	quantity = models.IntegerField(default=0, null=True, blank=True)
-	date_added = models.DateTimeField(auto_now_add=True)
+    '''
+    Wrapper object for products in an order
+    - Quantity attribute describes number of the product added to the order
+    '''
 
-	@property
-	def get_total(self):
-		if self.product.selling_type == "sale":
-			total = self.product.price * self.quantity
-		else:
-			total = self.product.starting_bid
-		return total
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=0, null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def get_total(self):
+        if self.product.selling_type == "sale":
+            total = self.product.price * self.quantity
+        else:
+            total = self.product.starting_bid
+        return total
 
 class ShippingAddress(models.Model):
+    '''
+    Shipping address attached to purchases
+    Since we are using a dummy purchasing system, the shipping address is not currently utilized
+    '''
+
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
     recipient = models.CharField(max_length=200)
@@ -185,6 +227,11 @@ class ShippingAddress(models.Model):
         return self.address
 
 class ProductViewCount(models.Model):
+    '''
+    Tracks the number of times a customer has viewed a product, and the last viewing time
+    - View tracking should only be updated by calling the classmethod 'log'
+    '''
+
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
     count = models.PositiveIntegerField(default=0)
@@ -209,6 +256,10 @@ class ProductViewCount(models.Model):
         return f'Customer: {self.customer}, Product: {self.product}, Count: {self.count}'
 
 class Wishlist(models.Model):
+    '''
+    Represents a customer's wishlist, which is composed of a set of products
+    '''
+
     Customer = models.OneToOneField(Customer, on_delete=models.CASCADE, null=True, related_name='wishlist')
     product = models.ManyToManyField(Product, blank=True, related_name='wishlist_product')
 

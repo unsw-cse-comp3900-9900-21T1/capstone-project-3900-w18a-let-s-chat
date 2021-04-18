@@ -1,3 +1,7 @@
+'''
+View functions corresponding to site urls
+'''
+
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from .models import *
@@ -44,6 +48,15 @@ recent_orders_display_size = 5
 #################
 
 def store(request):
+    '''
+    Path: '/', GET request
+
+    Render the main store page with recommended products and recently viewed items.
+    Recommended products are retrieved using recommender system and are paginated
+
+    Returns a rendered HTML template as a HTTPResponse
+    '''
+
     context = {}
     if request.user.is_authenticated:
         customer = request.user.customer
@@ -71,6 +84,15 @@ def store(request):
     return render(request, 'store/store.html', context)
 
 def signup(request):
+    '''
+    Path: 'signup/', GET and POST request
+
+    - If GET request, render the signup page with signup form
+    - If POST request and form is valid, create new user, send confirmation email and redirect to signup success page
+
+    Returns a rendered HTML template as a HTTPResponse
+    '''
+
     if request.user.is_authenticated:
         return redirect('store')
     else:
@@ -113,10 +135,26 @@ def signup(request):
     return render(request, 'store/signup.html', context)
 
 def signup_success(request):
+    '''
+    Path: 'signup_success/', GET request
+
+    Returns a rendered HTML template as a HTTPResponse
+    '''
+
+
     return render(request, 'store/signup_success.html')
 
 
 def loginPage(request):
+    '''
+    Path: '/login', GET and POST request
+
+    - If GET request, render the login page with login form
+    - If POST request and form is valid, authenticate the user with session based auth, and redirect to store page
+
+    Returns a rendered HTML templase as a HTTPResponse
+    '''
+
     if request.user.is_authenticated:
         return redirect('store')
     else:
@@ -134,10 +172,29 @@ def loginPage(request):
     return render(request, 'store/login.html')
 
 def logoutUser(request):
+    '''
+    Path: 'logout/', POST request
+
+    Invalidate user's login session and redirect to login page
+
+    Returns a rendered HTML template as HTTPResponse
+    '''
+
     logout(request)
     return redirect('login')
 
 def product_page(request, slug=None):
+    '''
+    Path: 'product/<slug string>', GET request
+
+    Render a product listing's store page, which includes:
+    - Details of the product
+    - Similar listings, found using tag similarity
+    - Reviews for the product
+
+    Returns a rendered HTML template as HTTPResponse
+    '''
+
     context = {}
     try:
         product = Product.objects.get(slug_str=slug)
@@ -198,6 +255,13 @@ def product_page(request, slug=None):
     return render(request, 'store/product_description.html', context)
 
 def cart(request):
+    '''
+    Path: 'cart/', GET request, requires login
+
+    Render a user's current cart, with buttons to change item quantities and 
+
+    Returns a rendered HTML template as HTTPResponse
+    '''
 
     if request.user.is_authenticated:
         customer = request.user.customer
@@ -214,6 +278,14 @@ def cart(request):
     return render(request, 'store/cart.html', context)
 
 def checkout(request):
+    '''
+    Path: 'checkout/', GET request, requires login
+
+    Render the checkout form for an order.
+
+    Returns a rendered HTML template as HTTPResponse
+    '''
+
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
@@ -229,6 +301,14 @@ def checkout(request):
     return render(request, 'store/checkout.html', context)
 
 def purchase_history(request):
+    '''
+    Path: 'purchase_history/', GET request, requires login
+
+    Render a user's purchase history page, showing details of ordered items
+    
+    Returns a rendered HTML template as HTTPResponse
+    '''
+
     if not request.user.is_authenticated:
         return redirect('login')
 
@@ -270,6 +350,14 @@ def purchase_history(request):
     
 # Wishlist and Watchlist is now in the same page
 def wishlist(request):
+    '''
+    Path: 'wishlist/', GET request, requires login
+
+    Render the wishlist page for a user, which shows details on wishlisted items,
+    as well as auctions the user is watching
+
+    Returns a rendered HTML template as HTTPResponse
+    '''
     if not request.user.is_authenticated:
         return redirect('login')
 
@@ -304,6 +392,14 @@ def wishlist(request):
     return render(request, 'store/wishlist.html', context)
 
 def userProfile(request):
+    '''
+    Path: 'profile/', GET or POST request, requires login
+
+    - If GET request, render a user's profile page with form for changing details
+    - If POST request and form is valid, update the user's details and reload the page
+
+    Returns a rendered HTML template as HTTPResponse
+    '''
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=request.user.customer)
         user_pic_form = UpdateUserProfilePic(request.POST, request.FILES, instance=request.user.customer)
@@ -333,6 +429,13 @@ def userProfile(request):
     return render(request, 'store/user_profile.html', context)
 
 def updateItem(request):
+    '''
+    Path: 'update_item/', POST request, requires login
+
+    Update the state of an order item in an order
+
+    Returns a JsonResponse object
+    '''
     data = json.loads(request.body)
     productId = data['productId']
     action = data['action']
@@ -371,6 +474,15 @@ def updateItem(request):
 
 
 def processOrder(request):
+    '''
+    Path: 'process_order/', POST request, requires login
+
+    Complete the purchase of an order using dummy payment system, and send an
+    email notification to both the seller and buyer
+
+    Returns a JSONResponse object
+    '''
+
     transaction_id = datetime.datetime.now().timestamp()
     data = json.loads(request.body)
 
@@ -433,6 +545,14 @@ def processOrder(request):
     return JsonResponse('Payment success', safe=False)
 
 def new_product(request):
+    '''
+    Path: 'new_product/', GET and POST request, requires login
+
+    - If GET request, render the new product form
+    - If POST request and product form is valid, create the new product and redirect to its product page
+
+    Returns a rendered HTML template as a HTTPResponse
+    '''
     if not request.user.is_authenticated:
         return redirect('login')
     else:
@@ -458,6 +578,14 @@ def new_product(request):
         return render(request, 'store/new_product.html', context)
   
 def searchResult(request):
+    '''
+    Path: 'search_result/', GET request
+
+    Process a search query and render the search page with results
+
+    Return a rendered HTML template as a HTTPResponse
+    '''
+
     if request.user.is_authenticated:
         customer = request.user.customer
         cartItems = cart_items(customer)
@@ -511,6 +639,13 @@ def searchResult(request):
     # return product_list
 
 def add_multiple(request):
+    '''
+    Path: 'add_multiple/', POST request, requires login
+
+    Add a given quantity of a product to a user's cart
+
+    Returns a JSONResponse object
+    '''
     data = json.loads(request.body)
 
     if request.user.is_authenticated:
@@ -538,6 +673,13 @@ def add_multiple(request):
     return JsonResponse('added', safe=False)
 
 def restore(request):
+    '''
+    Path: 'restore/', POST request, requires login
+
+    Cancel an order, restoring the quantity of available units for products in the order
+
+    Returns a JSONResponse object 
+    '''
     data = json.loads(request.body)
 
     customer = request.user.customer
@@ -568,6 +710,14 @@ def restore(request):
     return JsonResponse('Cancelled', safe=False)
 
 def my_listings(request):
+    '''
+    Path: 'my_listings/', GET request, requires login
+
+    Render a user's 'my listings' page which allows viewing and modification of their listed products
+
+    Returns a rendered HTML template as a HTTPResponse
+    '''
+
     if not request.user.is_authenticated:
         return redirect('login')
 
@@ -591,6 +741,13 @@ def my_listings(request):
     return render(request, 'store/my_listings.html', context)
 
 def view_orders(request, slug=None):
+    '''
+    Path: 'view_orders/<slug string>', GET request, requires login
+
+    Render the orders page for a user's product, which displays all orders of the product in a table
+
+    Returns a rendered HTML template as a HTTPResponse
+    '''
     if not request.user.is_authenticated:
         return redirect('login')
     try:
@@ -613,6 +770,15 @@ def view_orders(request, slug=None):
     return render(request, 'store/view_orders.html', context)
 
 def edit_listing(request, slug=None):
+    '''
+    Path: 'edit_listing/', GET and POST request, requires login
+
+    - If GET request, render the edit listing form, populating field placeholders with the product's current field values
+    - If POST request and form is valid, update the product's fields with the values given. Empty form fields are left unmodified.
+     Finally, redirect to the my_listings page.
+
+    Returns a rendered HTML template as a HTTPResponse
+    '''
     if not request.user.is_authenticated:
         return redirect('login')
     try:
@@ -659,6 +825,14 @@ def edit_listing(request, slug=None):
     return render(request, 'store/edit_listing.html', context)
 
 def toggle_unlist(request):
+    '''
+    Path: 'toggle_unlist/', POST request, requires login
+
+    Toggle whether the given product is unlisted. Only succeeds if called by owner of product
+
+    Returns a JSONResponse object
+    '''
+
     if not request.user.is_authenticated:
         return JsonResponse(data={}, status=401)
     try:
@@ -678,6 +852,13 @@ def toggle_unlist(request):
 
 @csrf_exempt
 def webhook(request):
+    '''
+    Path: 'webhook/', POST request
+
+    Hook for generating the Dialogflow chatbot's responses to queries
+
+    Returns a JSONResponse object if POST request, else a HTTPResponse
+    '''
     
     if (request.method == 'POST'):
 
@@ -769,86 +950,109 @@ def cart_items (customer):
     items = order.get_cart_items
     
     return items
-def add_bid(request):
-	data = json.loads(request.body)
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		all_customer = Customer.objects.all()
-		productId = int(data['productId'])
-		new_bid = int(data['new_bid'])
-		for each_customer in all_customer:
-			if each_customer.nickname == data['highest_bidder']:
-				highest_bidder = each_customer
-				
-		try:
-			product = Product.objects.get(id=productId)
-		except ObjectDoesNotExist:
-			return JsonResponse('Product not found', safe=False)
-		if not product.is_active:
-			return JsonResponse('Product is unlisted', safe=False)
 
-		if new_bid > product.starting_bid:
-			if customer == product.seller:
-				messages.error(request, f'You cannot place a bid to your own product!')
-				return JsonResponse('The bid must be greater than the current bid!', safe=False)
-			else:
-				product.starting_bid = new_bid
-				product.highest_bidder = highest_bidder
-				product.bidder.create(name=highest_bidder.nickname, price=new_bid)
-				messages.success(request, f'You have successfully placed a bid!')
-				# product.bidder.save()
-				product.save()
-				return JsonResponse('You have successfully placed a bid!', safe=False)
-		else:
-			messages.error(request, f'The bid must be greater than the current bid!')
-			return JsonResponse('The bid must be greater than the current bid!', safe=False)
+def add_bid(request):
+    '''
+    Path: 'add_bid/', POST request, requires login
+
+    Add a bid to an auction
+
+    Returns a JSONResponse object
+    '''
+
+    data = json.loads(request.body)
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        all_customer = Customer.objects.all()
+        productId = int(data['productId'])
+        new_bid = int(data['new_bid'])
+        for each_customer in all_customer:
+            if each_customer.nickname == data['highest_bidder']:
+                highest_bidder = each_customer
+                
+        try:
+            product = Product.objects.get(id=productId)
+        except ObjectDoesNotExist:
+            return JsonResponse('Product not found', safe=False)
+        if not product.is_active:
+            return JsonResponse('Product is unlisted', safe=False)
+
+        if new_bid > product.starting_bid:
+            if customer == product.seller:
+                messages.error(request, f'You cannot place a bid to your own product!')
+                return JsonResponse('The bid must be greater than the current bid!', safe=False)
+            else:
+                product.starting_bid = new_bid
+                product.highest_bidder = highest_bidder
+                product.bidder.create(name=highest_bidder.nickname, price=new_bid)
+                messages.success(request, f'You have successfully placed a bid!')
+                # product.bidder.save()
+                product.save()
+                return JsonResponse('You have successfully placed a bid!', safe=False)
+        else:
+            messages.error(request, f'The bid must be greater than the current bid!')
+            return JsonResponse('The bid must be greater than the current bid!', safe=False)
 
 def check_auction_time():
-	threading.Timer(10.0, check_auction_time).start()
-	# print("checking auction time")
-	products = Product.objects.all()
-	for product in products:
-		if product.is_active == True:
-			if product.selling_type == "auction":
-				if datetime.datetime.utcnow() >= product.end_date.replace(tzinfo=None):
-					print("datetime_now: " + str(datetime.datetime.now()))
-					print("end_date: " + str(product.end_date.replace(tzinfo=None)))
-					bidder = product.highest_bidder
-					order, created = Order.objects.get_or_create(customer=bidder, complete=False)
+    '''
+    Periodically check whether any auctions have ended, and if so,
+    process the purchase by the highest bidder
+    '''
 
-					orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
-					orderItem.quantity += 1
-					orderItem.save()
+    threading.Timer(10.0, check_auction_time).start()
+    # print("checking auction time")
+    products = Product.objects.all()
+    for product in products:
+        if product.is_active == True:
+            if product.selling_type == "auction":
+                if datetime.datetime.utcnow() >= product.end_date.replace(tzinfo=None):
+                    print("datetime_now: " + str(datetime.datetime.now()))
+                    print("end_date: " + str(product.end_date.replace(tzinfo=None)))
+                    bidder = product.highest_bidder
+                    order, created = Order.objects.get_or_create(customer=bidder, complete=False)
 
-					product.is_active = False
-					product.save()
-					seller_template = render_to_string('store/email_auctionEnd_to_buyer.html', {'name': product.highest_bidder.nickname, 'product': product.name, 'price': product.starting_bid})
+                    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+                    orderItem.quantity += 1
+                    orderItem.save()
 
-					email = EmailMessage(
-						'You have win the Auction!',
-						seller_template,
-						settings.EMAIL_HOST_USER,
-						[product.highest_bidder.email],
-					)
+                    product.is_active = False
+                    product.save()
+                    seller_template = render_to_string('store/email_auctionEnd_to_buyer.html', {'name': product.highest_bidder.nickname, 'product': product.name, 'price': product.starting_bid})
 
-					email.fail_silently = False
-					email.send()
+                    email = EmailMessage(
+                        'You have win the Auction!',
+                        seller_template,
+                        settings.EMAIL_HOST_USER,
+                        [product.highest_bidder.email],
+                    )
 
-					seller_template = render_to_string('store/email_auctionEnd_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'bidder': product.highest_bidder.nickname, 'price': product.starting_bid})
+                    email.fail_silently = False
+                    email.send()
 
-					print(settings.EMAIL_HOST_USER)
-					email = EmailMessage(
-						'Your auction has ended!',
-						seller_template,
-						settings.EMAIL_HOST_USER,
-						[product.seller.email],
-					)
+                    seller_template = render_to_string('store/email_auctionEnd_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'bidder': product.highest_bidder.nickname, 'price': product.starting_bid})
 
-					email.fail_silently = False
-					email.send()
+                    print(settings.EMAIL_HOST_USER)
+                    email = EmailMessage(
+                        'Your auction has ended!',
+                        seller_template,
+                        settings.EMAIL_HOST_USER,
+                        [product.seller.email],
+                    )
+
+                    email.fail_silently = False
+                    email.send()
 
 def post_new_review(request):
+    '''
+    Path: 'new_review/', POST request, requires login
+
+    If the given values are valid, submit a new review for a product, composed
+    of a text review and a numerical rating
+
+    Returns a JSONResponse object
+    '''
+
     if not request.user.is_authenticated:
         return JsonResponse(data={}, status=401)
     if not request.method == 'POST':
@@ -877,6 +1081,14 @@ def post_new_review(request):
     return JsonResponse(data={}, status=400)
 
 def delete_review(request):
+    '''
+    Path: 'delete_review/', POST request, requires login
+
+    Remove a product review.
+
+    Returns a JSONResponse object
+    '''
+
     if not request.user.is_authenticated:
         return JsonResponse(data={}, status=401)
     if not request.method == 'POST':
@@ -893,6 +1105,13 @@ def delete_review(request):
     return JsonResponse(data={}, status=200)
 
 def edit_review(request):
+    '''
+    Path: 'edit_review/', POST request, requires login
+
+    If the given values are valid, update the text and rating of a porduct review
+
+    Returns a JSONResponse object
+    '''
     if not request.user.is_authenticated:
         return JsonResponse(data={}, status=401)
     if not request.method == 'POST':
@@ -917,6 +1136,16 @@ def edit_review(request):
     return JsonResponse(data={}, status=400)
 
 def toggle_review_react(request):
+    '''
+    Path: 'toggle_review_react/', POST request, requires login
+
+    Update whether a user is liking or disliking a product review (or neither). The is_like parameter
+    determines whether the like or dislike button was pressed.
+    The returned json response contains the review's updated score and react state
+
+    Returns a JSONResponse object
+    '''
+
     if not request.user.is_authenticated:
         return JsonResponse(data={}, status=401)
     if not request.method == 'POST':
@@ -956,68 +1185,84 @@ def toggle_review_react(request):
     return JsonResponse(data={'score':review.score, 'state':state}, status=200)
 
 def add_wishlist(request):
-	data = json.loads(request.body)
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		all_customer = Customer.objects.all()
-		productId = int(data['productId'])
-		wishlist = customer.wishlist
-				
-		try:
-			product = Product.objects.get(id=productId)
-		except ObjectDoesNotExist:
-			return JsonResponse('Product not found', safe=False)
-		if not product.is_active:
-			return JsonResponse('Product is unlisted', safe=False)
+    '''
+    Path: 'add_wishlist/', POST request, requires login
 
-		for wish_item in wishlist.product.all():
-			if product == wish_item:
-				wishlist.product.remove(product)
-				wishlist.save()
-				print("Removing product_id: " + str(productId))
-				print("Removing product name:" + product.name)
-				if product.selling_type == "sale":
-					messages.success(request, f'You have remove a product in your wishlist!')
-					return JsonResponse('You have remove a product in your wishlist!', safe=False)
-				else:
-					messages.success(request, f'You have remove a product in your watchlist!')
-					return JsonResponse('You have remove a product in your watchlist!', safe=False)
+    Add the given item to the user's wishlist
 
-		print("Adding product_id: " + str(productId))
-		print("Adding product name:" + product.name)
-		customer.wishlist.product.add(product)
-		wishlist.save()
-		if product.selling_type == "sale":
-			messages.success(request, f'You have added a product in your wishlist!')
-			return JsonResponse('You have added a product in your wishlist!', safe=False)
-		else:
-			messages.success(request, f'You have added a product in your watchlist!')
-			return JsonResponse('You have added a product in your watchlist!', safe=False)
+    Returns a JSONResponse object
+    '''
+
+    data = json.loads(request.body)
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        all_customer = Customer.objects.all()
+        productId = int(data['productId'])
+        wishlist = customer.wishlist
+                
+        try:
+            product = Product.objects.get(id=productId)
+        except ObjectDoesNotExist:
+            return JsonResponse('Product not found', safe=False)
+        if not product.is_active:
+            return JsonResponse('Product is unlisted', safe=False)
+
+        for wish_item in wishlist.product.all():
+            if product == wish_item:
+                wishlist.product.remove(product)
+                wishlist.save()
+                print("Removing product_id: " + str(productId))
+                print("Removing product name:" + product.name)
+                if product.selling_type == "sale":
+                    messages.success(request, f'You have remove a product in your wishlist!')
+                    return JsonResponse('You have remove a product in your wishlist!', safe=False)
+                else:
+                    messages.success(request, f'You have remove a product in your watchlist!')
+                    return JsonResponse('You have remove a product in your watchlist!', safe=False)
+
+        print("Adding product_id: " + str(productId))
+        print("Adding product name:" + product.name)
+        customer.wishlist.product.add(product)
+        wishlist.save()
+        if product.selling_type == "sale":
+            messages.success(request, f'You have added a product in your wishlist!')
+            return JsonResponse('You have added a product in your wishlist!', safe=False)
+        else:
+            messages.success(request, f'You have added a product in your watchlist!')
+            return JsonResponse('You have added a product in your watchlist!', safe=False)
 
 def remove_wishlist(request):
-	data = json.loads(request.body)
-	print("In views.py remove_wishlist")
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		all_customer = Customer.objects.all()
-		productId = int(data['productId'])
-		print("Removing product_id: " + str(productId))
-		wishlist = customer.wishlist
+    '''
+    Path: 'remove_wishlist/', POST request, requires login
 
-		try:
-			product = Product.objects.get(id=productId)
-			print("Creating product")
-		except ObjectDoesNotExist:
-			print("ObjectDoesNotExist")
-			return JsonResponse('Product not found', safe=False)
+    Remove the given item from the user's wishlist
 
-		print("Removing product name:" + product.name)
-		customer.wishlist.product.remove(product)
-		wishlist.save()
-		messages.success(request, f'You have removed a product in your wishlist!')
+    Returns a JSONResponse object
+    '''
 
-		return JsonResponse('You have removed a product in your wishlist!', safe=False)
+    data = json.loads(request.body)
+    print("In views.py remove_wishlist")
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        all_customer = Customer.objects.all()
+        productId = int(data['productId'])
+        print("Removing product_id: " + str(productId))
+        wishlist = customer.wishlist
+
+        try:
+            product = Product.objects.get(id=productId)
+            print("Creating product")
+        except ObjectDoesNotExist:
+            print("ObjectDoesNotExist")
+            return JsonResponse('Product not found', safe=False)
+
+        print("Removing product name:" + product.name)
+        customer.wishlist.product.remove(product)
+        wishlist.save()
+        messages.success(request, f'You have removed a product in your wishlist!')
+
+        return JsonResponse('You have removed a product in your wishlist!', safe=False)
 
 # check_auction_time()
