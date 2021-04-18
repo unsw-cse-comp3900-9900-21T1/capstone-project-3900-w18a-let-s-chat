@@ -960,39 +960,39 @@ def add_bid(request):
     Returns a JSONResponse object
     '''
 
-	data = json.loads(request.body)
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		all_customer = Customer.objects.all()
-		productId = int(data['productId'])
-		new_bid = int(data['new_bid'])
-		for each_customer in all_customer:
-			if each_customer.nickname == data['highest_bidder']:
-				highest_bidder = each_customer
-				
-		try:
-			product = Product.objects.get(id=productId)
-		except ObjectDoesNotExist:
-			return JsonResponse('Product not found', safe=False)
-		if not product.is_active:
-			return JsonResponse('Product is unlisted', safe=False)
+    data = json.loads(request.body)
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        all_customer = Customer.objects.all()
+        productId = int(data['productId'])
+        new_bid = int(data['new_bid'])
+        for each_customer in all_customer:
+            if each_customer.nickname == data['highest_bidder']:
+                highest_bidder = each_customer
+                
+        try:
+            product = Product.objects.get(id=productId)
+        except ObjectDoesNotExist:
+            return JsonResponse('Product not found', safe=False)
+        if not product.is_active:
+            return JsonResponse('Product is unlisted', safe=False)
 
-		if new_bid > product.starting_bid:
-			if customer == product.seller:
-				messages.error(request, f'You cannot place a bid to your own product!')
-				return JsonResponse('The bid must be greater than the current bid!', safe=False)
-			else:
-				product.starting_bid = new_bid
-				product.highest_bidder = highest_bidder
-				product.bidder.create(name=highest_bidder.nickname, price=new_bid)
-				messages.success(request, f'You have successfully placed a bid!')
-				# product.bidder.save()
-				product.save()
-				return JsonResponse('You have successfully placed a bid!', safe=False)
-		else:
-			messages.error(request, f'The bid must be greater than the current bid!')
-			return JsonResponse('The bid must be greater than the current bid!', safe=False)
+        if new_bid > product.starting_bid:
+            if customer == product.seller:
+                messages.error(request, f'You cannot place a bid to your own product!')
+                return JsonResponse('The bid must be greater than the current bid!', safe=False)
+            else:
+                product.starting_bid = new_bid
+                product.highest_bidder = highest_bidder
+                product.bidder.create(name=highest_bidder.nickname, price=new_bid)
+                messages.success(request, f'You have successfully placed a bid!')
+                # product.bidder.save()
+                product.save()
+                return JsonResponse('You have successfully placed a bid!', safe=False)
+        else:
+            messages.error(request, f'The bid must be greater than the current bid!')
+            return JsonResponse('The bid must be greater than the current bid!', safe=False)
 
 def check_auction_time():
     '''
@@ -1000,48 +1000,48 @@ def check_auction_time():
     process the purchase by the highest bidder
     '''
 
-	threading.Timer(10.0, check_auction_time).start()
-	# print("checking auction time")
-	products = Product.objects.all()
-	for product in products:
-		if product.is_active == True:
-			if product.selling_type == "auction":
-				if datetime.datetime.utcnow() >= product.end_date.replace(tzinfo=None):
-					print("datetime_now: " + str(datetime.datetime.now()))
-					print("end_date: " + str(product.end_date.replace(tzinfo=None)))
-					bidder = product.highest_bidder
-					order, created = Order.objects.get_or_create(customer=bidder, complete=False)
+    threading.Timer(10.0, check_auction_time).start()
+    # print("checking auction time")
+    products = Product.objects.all()
+    for product in products:
+        if product.is_active == True:
+            if product.selling_type == "auction":
+                if datetime.datetime.utcnow() >= product.end_date.replace(tzinfo=None):
+                    print("datetime_now: " + str(datetime.datetime.now()))
+                    print("end_date: " + str(product.end_date.replace(tzinfo=None)))
+                    bidder = product.highest_bidder
+                    order, created = Order.objects.get_or_create(customer=bidder, complete=False)
 
-					orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
-					orderItem.quantity += 1
-					orderItem.save()
+                    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+                    orderItem.quantity += 1
+                    orderItem.save()
 
-					product.is_active = False
-					product.save()
-					seller_template = render_to_string('store/email_auctionEnd_to_buyer.html', {'name': product.highest_bidder.nickname, 'product': product.name, 'price': product.starting_bid})
+                    product.is_active = False
+                    product.save()
+                    seller_template = render_to_string('store/email_auctionEnd_to_buyer.html', {'name': product.highest_bidder.nickname, 'product': product.name, 'price': product.starting_bid})
 
-					email = EmailMessage(
-						'You have win the Auction!',
-						seller_template,
-						settings.EMAIL_HOST_USER,
-						[product.highest_bidder.email],
-					)
+                    email = EmailMessage(
+                        'You have win the Auction!',
+                        seller_template,
+                        settings.EMAIL_HOST_USER,
+                        [product.highest_bidder.email],
+                    )
 
-					email.fail_silently = False
-					email.send()
+                    email.fail_silently = False
+                    email.send()
 
-					seller_template = render_to_string('store/email_auctionEnd_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'bidder': product.highest_bidder.nickname, 'price': product.starting_bid})
+                    seller_template = render_to_string('store/email_auctionEnd_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'bidder': product.highest_bidder.nickname, 'price': product.starting_bid})
 
-					print(settings.EMAIL_HOST_USER)
-					email = EmailMessage(
-						'Your auction has ended!',
-						seller_template,
-						settings.EMAIL_HOST_USER,
-						[product.seller.email],
-					)
+                    print(settings.EMAIL_HOST_USER)
+                    email = EmailMessage(
+                        'Your auction has ended!',
+                        seller_template,
+                        settings.EMAIL_HOST_USER,
+                        [product.seller.email],
+                    )
 
-					email.fail_silently = False
-					email.send()
+                    email.fail_silently = False
+                    email.send()
 
 def post_new_review(request):
     '''
@@ -1193,44 +1193,44 @@ def add_wishlist(request):
     Returns a JSONResponse object
     '''
 
-	data = json.loads(request.body)
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		all_customer = Customer.objects.all()
-		productId = int(data['productId'])
-		wishlist = customer.wishlist
-				
-		try:
-			product = Product.objects.get(id=productId)
-		except ObjectDoesNotExist:
-			return JsonResponse('Product not found', safe=False)
-		if not product.is_active:
-			return JsonResponse('Product is unlisted', safe=False)
+    data = json.loads(request.body)
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        all_customer = Customer.objects.all()
+        productId = int(data['productId'])
+        wishlist = customer.wishlist
+                
+        try:
+            product = Product.objects.get(id=productId)
+        except ObjectDoesNotExist:
+            return JsonResponse('Product not found', safe=False)
+        if not product.is_active:
+            return JsonResponse('Product is unlisted', safe=False)
 
-		for wish_item in wishlist.product.all():
-			if product == wish_item:
-				wishlist.product.remove(product)
-				wishlist.save()
-				print("Removing product_id: " + str(productId))
-				print("Removing product name:" + product.name)
-				if product.selling_type == "sale":
-					messages.success(request, f'You have remove a product in your wishlist!')
-					return JsonResponse('You have remove a product in your wishlist!', safe=False)
-				else:
-					messages.success(request, f'You have remove a product in your watchlist!')
-					return JsonResponse('You have remove a product in your watchlist!', safe=False)
+        for wish_item in wishlist.product.all():
+            if product == wish_item:
+                wishlist.product.remove(product)
+                wishlist.save()
+                print("Removing product_id: " + str(productId))
+                print("Removing product name:" + product.name)
+                if product.selling_type == "sale":
+                    messages.success(request, f'You have remove a product in your wishlist!')
+                    return JsonResponse('You have remove a product in your wishlist!', safe=False)
+                else:
+                    messages.success(request, f'You have remove a product in your watchlist!')
+                    return JsonResponse('You have remove a product in your watchlist!', safe=False)
 
-		print("Adding product_id: " + str(productId))
-		print("Adding product name:" + product.name)
-		customer.wishlist.product.add(product)
-		wishlist.save()
-		if product.selling_type == "sale":
-			messages.success(request, f'You have added a product in your wishlist!')
-			return JsonResponse('You have added a product in your wishlist!', safe=False)
-		else:
-			messages.success(request, f'You have added a product in your watchlist!')
-			return JsonResponse('You have added a product in your watchlist!', safe=False)
+        print("Adding product_id: " + str(productId))
+        print("Adding product name:" + product.name)
+        customer.wishlist.product.add(product)
+        wishlist.save()
+        if product.selling_type == "sale":
+            messages.success(request, f'You have added a product in your wishlist!')
+            return JsonResponse('You have added a product in your wishlist!', safe=False)
+        else:
+            messages.success(request, f'You have added a product in your watchlist!')
+            return JsonResponse('You have added a product in your watchlist!', safe=False)
 
 def remove_wishlist(request):
     '''
@@ -1241,28 +1241,28 @@ def remove_wishlist(request):
     Returns a JSONResponse object
     '''
 
-	data = json.loads(request.body)
-	print("In views.py remove_wishlist")
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-		all_customer = Customer.objects.all()
-		productId = int(data['productId'])
-		print("Removing product_id: " + str(productId))
-		wishlist = customer.wishlist
+    data = json.loads(request.body)
+    print("In views.py remove_wishlist")
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        all_customer = Customer.objects.all()
+        productId = int(data['productId'])
+        print("Removing product_id: " + str(productId))
+        wishlist = customer.wishlist
 
-		try:
-			product = Product.objects.get(id=productId)
-			print("Creating product")
-		except ObjectDoesNotExist:
-			print("ObjectDoesNotExist")
-			return JsonResponse('Product not found', safe=False)
+        try:
+            product = Product.objects.get(id=productId)
+            print("Creating product")
+        except ObjectDoesNotExist:
+            print("ObjectDoesNotExist")
+            return JsonResponse('Product not found', safe=False)
 
-		print("Removing product name:" + product.name)
-		customer.wishlist.product.remove(product)
-		wishlist.save()
-		messages.success(request, f'You have removed a product in your wishlist!')
+        print("Removing product name:" + product.name)
+        customer.wishlist.product.remove(product)
+        wishlist.save()
+        messages.success(request, f'You have removed a product in your wishlist!')
 
-		return JsonResponse('You have removed a product in your wishlist!', safe=False)
+        return JsonResponse('You have removed a product in your wishlist!', safe=False)
 
 # check_auction_time()
