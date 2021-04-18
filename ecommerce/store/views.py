@@ -214,6 +214,7 @@ def product_page(request, slug=None):
         # Get all of the user's reacts to reviews for this product
         user_reacts = ReviewReact.objects.filter(customer=request.user.customer, review__product=product)
         context['customer'] = customer
+        context['seller'] = Customer.objects.get(slug_str=product.seller.slug_str)
         
     else:
         #Create empty cart for now for non-logged in user
@@ -391,7 +392,7 @@ def wishlist(request):
     }
     return render(request, 'store/wishlist.html', context)
 
-def userProfile(request):
+def userProfile(request, slug=None):
     '''
     Path: 'profile/', GET or POST request, requires login
 
@@ -416,11 +417,13 @@ def userProfile(request):
     # Please don't delete the next two lines 
     # order is for cart to update the total number of items in cart
     customer = request.user.customer
+    customer_match = Customer.objects.get(slug_str=slug)
     cartItems = cart_items(customer)
 
     orders = Order.objects.filter(customer=customer)
 
     context = {
+        'customer': customer_match,
         'user_form': user_form,
         'user_pic_form': user_pic_form,
         'orders': orders,

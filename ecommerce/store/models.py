@@ -31,11 +31,13 @@ class Customer(models.Model):
     contactNo = models.CharField(max_length=200, null=True)
     image = models.ImageField(default='../images/user_icon.png', upload_to='../images')
     trusted = models.BooleanField(default=False)
+    slug_str = models.SlugField(blank=True)
 
     def __str__(self):
         return self.nickname
 
     def save(self):
+        unique_slugify(self, self.nickname, slug_field_name='slug_str')
         super().save()
 
         print(self.image.path)

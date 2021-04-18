@@ -17,31 +17,32 @@
                 <img src="{{request.user.customer.image.url}}" width="200" alt="">
             </div>
             <div class="profile-nav-info">
-                <h3 class="user-name">{{request.user.customer.nickname}}</h3>
+                <h3 class="user-name">{{customer.nickname}}</h3>
                 <div class="address">
-                    {% if request.user.customer.order.shippingaddress == "" %}
-                        <p class="address-line">{{request.user.customer.order.shippingaddress.address}}, </p>
-                        <p class="city">{{request.user.customer.order.shippingaddress.city}}, </p>
-                        <p class="state">{{request.user.customer.order.shippingaddress.state}}, </p>
-                        <p class="postcode">{{request.user.customer.order.shippingaddress.postcode}}.</p>
+                    {% if customer.order.shippingaddress == "" %}
+                        <p class="address-line">{{customer.order.shippingaddress.address}}, </p>
+                        <p class="city">{{customer.order.shippingaddress.city}}, </p>
+                        <p class="state">{{customer.order.shippingaddress.state}}, </p>
+                        <p class="postcode">{{customer.order.shippingaddress.postcode}}.</p>
                     {% else %}
                         <p class="empty-address">No address</p>
                     {% endif %}
                     <!--<span class="country">USA.</span>-->
                 </div>
             </div>
-            <div class="profile-option">
+            <!-- Commented out the notification icon cuz notification feature is not implemented yet-->
+            <!-- <div class="profile-option">
                 <div class="notification">
                     <i class="fa fa-bell"></i>
                     <span class="alert-message">1</span>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="main-bd">
             <div class="left-side">
                 <div class="profile-side">
-                    <p class="mobile-no"><i class="fa fa-phone"></i>{{request.user.customer.contactNo}}</p>
-                    <p class="user-mail"><i class="fa fa-envelope"></i>{{request.user.customer.email}}</p>
+                    <p class="mobile-no"><i class="fa fa-phone"></i>{{customer.contactNo}}</p>
+                    <p class="user-mail"><i class="fa fa-envelope"></i>{{customer.email}}</p>
                     <!--
                     <div class="user-bio">
                         <h3>About Me</h3>
@@ -77,15 +78,17 @@
             <div class="right-side">
                 <div class="nav">
                     <ul>
-                        <!-- <li onclick="tabs(0)" class="user-product active">Your Products</li> -->
-                        <li onclick="tabs(1)" class="user-review active">Reviews</li>
-                        <li onclick="tabs(2)" class="user-setting">Settings</li>
+                        <li onclick="tabs(0)" class="user-product active">Your Products</li>
+                        <li onclick="tabs(1)" class="user-review">Reviews</li>
+                        {% if request.user.customer == customer %}
+                            <li onclick="tabs(2)" class="user-setting">Settings</li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="profile-body">
-                    <!-- <div class="profile-product tab">
+                    <div class="profile-product tab">
                         <h1>Your Products</h1>
-                    </div> -->
+                    </div>
                     <div class="profile-reviews tab">
                         <h1>User Reviews</h1>
                     </div>

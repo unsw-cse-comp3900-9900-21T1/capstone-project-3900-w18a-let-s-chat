@@ -74,8 +74,8 @@
                             <h5 id="seller-name"> 
                                 {% if product.seller.trusted %}
                                     <span class="badge bg-dark text-light"><i class="bi-award-fill"></i> Trusted</span>
-                                {% endif %}
-                                by {{product.seller.nickname}}
+                                {% endif %} 
+                                by <a href = "{% url 'user_profile' seller.slug_str %}">{{product.seller.nickname}}</a>
                             </h5>
                             
                             <h6 id="product-star-rating" data-rating="{{product.avg_rating}}">

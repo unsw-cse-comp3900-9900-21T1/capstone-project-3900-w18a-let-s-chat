@@ -92,7 +92,7 @@
 						<a href="/wishlist"><i class="bi-bookmark-heart dropdown-icon"></i>Wishlist</a>
 						<a href="/purchase_history"> <i class="bi-clock-history dropdown-icon"></i>Purchase history</a>
 						<hr class="dropdown-divider">
-						<a href="/user_profile"><i class="bi-person dropdown-icon"></i>User profile</a>
+						<a href="{% url 'user_profile' request.user.customer.slug_str %}"><i class="bi-person dropdown-icon"></i>User profile</a>
 						<a href="/logout"><i class="bi-power dropdown-icon"></i>Log out</a>
 					</div>
 				</div>
@@ -126,7 +126,7 @@
 				&middot
 				<a href="{% url 'purchase_history' %}">Purchase history</a>
 				&middot
-				<a href="{% url 'user_profile' %}">Profile</a>
+				<a href="{% url 'user_profile' request.user.customer.slug_str %}">Profile</a>
 				&middot
 				<a href="{% url 'logout' %}">Log out</a>
 			{% else %}
