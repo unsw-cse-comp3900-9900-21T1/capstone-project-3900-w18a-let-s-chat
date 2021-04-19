@@ -148,7 +148,7 @@
                                     class="btn btn-outline-primary btn" id="add-to-cart">
                                         <i class="bi-cart-plus"></i> Add to Cart
                                     </button>
-                                    {% elif request.user.authenticated %}
+                                    {% elif request.user.is_authenticated %}
                                         <div class="bidder-dropdown">
                                             <button id="bidder-count-button" type="button">[ <a id="bidder-count">{{ product.bidder_count }} bids</a> ]</button>
                                             <div id="myModal" class="modal">

@@ -81,7 +81,9 @@
                     <ul>
                         <li onclick="tabs(0)" class="user-product active">{{customer.nickname}}'s Products</li>
                         <!-- <li onclick="tabs(1)" class="user-review">Reviews</li> -->
-                        <li onclick="tabs(1)" class="user-setting">Settings</li>
+                        {% if customer == request.user.customer%}
+                            <li onclick="tabs(1)" class="user-setting">Settings</li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="profile-body">
