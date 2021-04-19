@@ -879,6 +879,7 @@ def webhook(request):
             inquiry = parameters.get('product')
             print(inquiry)
             keyword = inquiry_product(parameters)
+
             if keyword == '':
                 responseObj = {
                     "fulfillmentText": "Sorry, I can't found the thing you want. Please ask for something else.",
@@ -889,25 +890,31 @@ def webhook(request):
                 
                 product_list = find_by_tag(keyword)
                 print(product_list)
-
-                elements = create_element(product_list) 
-                responseObj = {
-                    "fulfillmentMessages": [{
-                        "payload": {
-                            "message": "Here you go",
-                            "platform": "kommunicate",
-                            "metadata": {
-                                "contentType": "300",
-                                "templateId": "7",
-                                "payload": {
-                                    "elements": elements,
-                                    "headerText": "Here is the searched results"
+                if not product_list:
+                    responseObj = {
+                        "fulfillmentText": "Sorry, currently the product that you're searching for is out of stock.",
+                        # "fulfillmentMessages": [{"text": {"text": [message]}}],
+                        "source": ""
+                    }   
+                else:
+                    elements = create_element(product_list) 
+                    responseObj = {
+                        "fulfillmentMessages": [{
+                            "payload": {
+                                "message": "Here you go",
+                                "platform": "kommunicate",
+                                "metadata": {
+                                    "contentType": "300",
+                                    "templateId": "7",
+                                    "payload": {
+                                        "elements": elements,
+                                        "headerText": "Here is the searched results"
+                                    }
                                 }
-                            }
-                        }             
-                    }]
-                }
-                print("success")
+                            }             
+                        }]
+                    }
+                    print("success")
 
         elif action == 'place_bid':
             product_name = parameters.get('product_name')
@@ -917,6 +924,9 @@ def webhook(request):
 
             if not product.is_active:
                 message = "This auction is ended!"
+            
+            elif product.selling_type == 'sale':
+                message = "This product isn't an auction product! You can't place a bid for this."
 
             elif bid_price > product.starting_bid:
                 if customer_name == product.seller.nickname:
@@ -948,6 +958,11 @@ def webhook(request):
 
 
 def inquiry_product (parameters):
+    '''
+    Helper Function to retrieve the correct value from the parsed in parameter dict of Dialogflow
+    
+    Returns a string
+    '''
     product = ''
     if parameters.get('collar') != '':
         product =parameters.get('collar')
@@ -960,10 +975,21 @@ def inquiry_product (parameters):
         
     elif parameters.get('pet_food') != '':
         product =parameters.get('pet_food')
+
+    elif parameters.get('bowl') != '':
+        product =parameters.get('bowl')
+
+    elif parameters.get('aquarium') != '':
+        product =parameters.get('aquarium')
     
     return product
 
 def cart_items (customer):
+    '''
+    Helper Function to retrieve number of items in cart so that the cart icon number get to update
+    
+    Returns a dict
+    '''
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
     items = order.orderitem_set.all()
     items = order.get_cart_items
@@ -1285,6 +1311,12 @@ def remove_wishlist(request):
         return JsonResponse('You have removed a product in your wishlist!', safe=False)
 
 def query_result (query):
+    '''
+    Helper Function for searchResult 
+    This will query the matched results based on product name, tag and seller
+    
+    Returns a list
+    '''
     if query == "":
         product_list = Product.objects.none()
     else:
@@ -1330,6 +1362,11 @@ def query_result (query):
         return product_list
 
 def create_element (product_list):
+    '''
+    Helper Function to create a displayable list in chatbot
+    
+    Returns a dict
+    '''
     elements = []
     for product in product_list:
         # print(image)
@@ -1349,12 +1386,20 @@ def create_element (product_list):
     return elements
 
 def find_by_tag (keyword):
+    '''
+    Helper Function to search all products that has the desired tag
+    
+    Returns a list
+    '''
     product_list = Product.objects.filter(Q(tags__name__iexact=keyword))
     product_list = product_list.filter(remaining_unit__gt=0, is_active=True).distinct()
     return product_list
     
 
 def update_cart (action, productId, customer):
+    '''
+    Helper Function to update the cart item like add to cart and remove from cart
+    '''
     product = Product.objects.get(id=productId)
     
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
