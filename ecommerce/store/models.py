@@ -280,4 +280,4 @@ class Wishlist(models.Model):
         return result
     
     def __str__(self):
-        return f"{self.Customer}'s wishlist"
+        return f"{self.customer}'s wishlist"
