@@ -1275,4 +1275,4 @@ def remove_wishlist(request):
 
         return JsonResponse('You have removed a product in your wishlist!', safe=False)
 
-# check_auction_time()
+check_auction_time()
