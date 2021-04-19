@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
@@ -55,4 +55,5 @@ urlpatterns = [
     # path('chat/', views.chat_view, name="chat_view"),
     path('webhook/', views.webhook, name="webhook"),
     path('add_bid/', views.add_bid, name="add_bid"),
+    path(r"^messages/", include("pinax.messages.urls", namespace="pinax_messages")),
 ]

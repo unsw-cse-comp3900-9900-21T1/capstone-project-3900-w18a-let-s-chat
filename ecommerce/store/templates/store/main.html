@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 {% load static %}
+
+{% load i18n %}
+{% load pinax_messages_tags %}
 <html>
 <head>
 	<title>Petiverse</title>
@@ -91,6 +94,7 @@
 						<a href="/purchase_history"> <i class="bi-clock-history dropdown-icon"></i>Purchase history</a>
 						<hr class="dropdown-divider">
 						<a href="/user_profile"><i class="bi-person dropdown-icon"></i>User profile</a>
+						<a href="{% url 'pinax_messages:inbox' %}"><i class="bi bi-envelope"></i></i> {% trans "Message Inbox" %}</a>
 						<a href="/logout"><i class="bi-power dropdown-icon"></i>Log out</a>
 					</div>
 				</div>

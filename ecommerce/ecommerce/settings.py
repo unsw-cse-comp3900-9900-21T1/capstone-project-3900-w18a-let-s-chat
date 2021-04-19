@@ -42,6 +42,10 @@ INSTALLED_APPS = [
 
     'store.apps.StoreConfig',
     'django_filters',
+
+    'pinax.messages',
+    'bootstrapform',
+    'pinax.templates',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pinax.messages.context_processors.user_messages',
             ],
         },
     },

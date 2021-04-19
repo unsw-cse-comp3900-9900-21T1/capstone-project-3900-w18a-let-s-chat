@@ -660,3 +660,205 @@ button.chatbtn i, button.createbtn i {
 .horizontal-scroll-item {
 	float: left
 }
+
+/** Pinax Messages Stuff **/
+button {
+    border-radius: 0
+}
+
+button:focus {
+    outline: 1px dotted;
+    outline: 5px auto -webkit-focus-ring-color
+}
+
+button,input,optgroup,select,textarea {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
+}
+
+button,input {
+    overflow: visible
+}
+
+button,select {
+    text-transform: none
+}
+
+[type=reset],[type=submit],button,html [type=button] {
+    -webkit-appearance: button
+}
+
+[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner {
+    padding: 0;
+    border-style: none
+}
+
+.pinax-messages-inbox-container h2 a {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff
+}
+
+.pinax-messages-inbox-container h2 a:hover {
+    color: #fff;
+    background-color: #0069d9;
+    border-color: #0062cc
+}
+
+.pinax-messages-inbox-container h2 a.focus,.pinax-messages-inbox-container h2 a:focus {
+    box-shadow: 0 0 0 .2rem rgba(0,123,255,.5)
+}
+
+.pinax-messages-inbox-container h2 a.disabled,.pinax-messages-inbox-container h2 a:disabled {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff
+}
+
+.pinax-messages-inbox-container h2 a:not(:disabled):not(.disabled).active,.pinax-messages-inbox-container h2 a:not(:disabled):not(.disabled):active,.show>.pinax-messages-inbox-container h2 a.dropdown-toggle {
+    color: #fff;
+    background-color: #0062cc;
+    border-color: #005cbf
+}
+
+.pinax-messages-inbox-container h2 a:not(:disabled):not(.disabled).active:focus,.pinax-messages-inbox-container h2 a:not(:disabled):not(.disabled):active:focus,.show>.pinax-messages-inbox-container h2 a.dropdown-toggle:focus {
+    box-shadow: 0 0 0 .2rem rgba(0,123,255,.5)
+}
+
+.pinax-messages-inbox-container .no-messages {
+    font-size: 1.2rem;
+    padding: .5rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #868e96;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 20px
+}
+
+.pinax-messages-inbox-container section.mailbox .thread a {
+    border: 1px solid #e9ecef;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-decoration: none;
+    display: flex;
+    padding: .5rem;
+    color: #212529;
+    transition: box-shadow .15s ease
+}
+
+.pinax-messages-inbox-container section.mailbox .thread a:hover {
+    background: #f5faff;
+    border-color: #cce5ff;
+    color: #007bff;
+    box-shadow: 0 7px 14px 0 rgba(0,123,255,.1),0 3px 6px 0 rgba(0,0,0,.07)
+}
+
+.pinax-messages-inbox-container section.mailbox .thread a:hover .latest-message .content {
+    color: #66b0ff
+}
+
+.pinax-messages-inbox-container section.mailbox .thread a .participants {
+    flex: 1
+}
+
+.pinax-messages-inbox-container section.mailbox .thread a .latest-message {
+    flex: 4
+}
+
+.pinax-messages-inbox-container section.mailbox .thread a .latest-message .subject {
+    font-size: 1.2rem
+}
+
+.pinax-messages-inbox-container section.mailbox .thread a .latest-message .content {
+    color: #868e96;
+    margin-bottom: 0
+}
+
+.pinax-messages-thread-detail-container h2 {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 5px
+}
+
+.pinax-messages-thread-detail-container h2 a {
+    color: #dc3545;
+    background-color: transparent;
+    background-image: none;
+    border-color: #dc3545
+}
+
+.pinax-messages-thread-detail-container h2 a:hover {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545
+}
+
+.pinax-messages-thread-detail-container h2 a.focus,.pinax-messages-thread-detail-container h2 a:focus {
+    box-shadow: 0 0 0 .2rem rgba(220,53,69,.5)
+}
+
+.pinax-messages-thread-detail-container h2 a.disabled,.pinax-messages-thread-detail-container h2 a:disabled {
+    color: #dc3545;
+    background-color: transparent
+}
+
+.pinax-messages-thread-detail-container h2 a:not(:disabled):not(.disabled).active,.pinax-messages-thread-detail-container h2 a:not(:disabled):not(.disabled):active,.show>.pinax-messages-thread-detail-container h2 a.dropdown-toggle {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545
+}
+
+.pinax-messages-thread-detail-container h2 a:not(:disabled):not(.disabled).active:focus,.pinax-messages-thread-detail-container h2 a:not(:disabled):not(.disabled):active:focus,.show>.pinax-messages-thread-detail-container h2 a.dropdown-toggle:focus {
+    box-shadow: 0 0 0 .2rem rgba(220,53,69,.5)
+}
+
+.pinax-messages-thread-detail-container .message-byline {
+    font-weight: 600
+}
+
+.pinax-messages-thread-detail-container .message-content {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-top: 20px
+}
+
+.pinax-messages-delete-container .delete-warning {
+    font-size: 1.2rem;
+    padding: 1rem;
+    text-align: center
+}
+
+.pinax-messages-delete-container form button {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545
+}
+
+.pinax-messages-delete-container form button:hover {
+    color: #fff;
+    background-color: #c82333;
+    border-color: #bd2130
+}
+
+.pinax-messages-delete-container form button.focus,.pinax-messages-delete-container form button:focus {
+    box-shadow: 0 0 0 .2rem rgba(220,53,69,.5)
+}
+
+.pinax-messages-delete-container form button.disabled,.pinax-messages-delete-container form button:disabled {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545
+}
+
+.pinax-messages-delete-container form button:not(:disabled):not(.disabled).active,.pinax-messages-delete-container form button:not(:disabled):not(.disabled):active,.show>.pinax-messages-delete-container form button.dropdown-toggle {
+    color: #fff;
+    background-color: #bd2130;
+    border-color: #b21f2d
+}
+
+.pinax-messages-delete-container form button:not(:disabled):not(.disabled).active:focus,.pinax-messages-delete-container form button:not(:disabled):not(.disabled):active:focus,.show>.pinax-messages-delete-container form button.dropdown-toggle:focus {
+    box-shadow: 0 0 0 .2rem rgba(220,53,69,.5)
+}
