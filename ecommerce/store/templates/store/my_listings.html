@@ -33,9 +33,9 @@
 
                     {% for order_item in item.recent_orders %}
                     <li class="list-group-item">
-                        <h6 style="margin-bottom:15px;"><strong>{{order_item.order.customer.nickname}}</strong></h6>
+                        <h6 style="margin-bottom:15px;"><strong><a href="{% url 'user_profile' order_item.order.customer.slug_str %}">{{order_item.order.customer.nickname}}</a></strong></h6>
                         <p>Quantity: {{order_item.quantity}}</p>
-                        <p>Contact Details: {{order_item.order.customer.email}}{%if order_item.order.customer.contactNo%}, {{order_item.order.customer.contactNo}}{%endif%}</p>
+                        <p>Contact Details: <a href="mailto:{{order_item.order.customer.email}}">{{order_item.order.customer.email}}</a>{%if order_item.order.customer.contactNo%}, {{order_item.order.customer.contactNo}}{%endif%}</p>
                         <p>Date ordered: {{order_item.order.date_ordered}}</p>
                     </li>
                     {% empty %}

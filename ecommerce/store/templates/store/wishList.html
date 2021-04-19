@@ -8,7 +8,7 @@
             <input type="radio" name="account" id="account1" checked>
             <label for="account1" class="showWishList" target="1">Wishlist</label>
             <input type="radio" name="account" id="account2">
-            <label for="account2" class="showWatchList" target="2">WatchList</label>
+            <label for="account2" class="showWatchList" target="2">Watchlist</label>
             <a class="slide" aria-hidden="true"></a>
         </div>
     </fieldset>
@@ -17,15 +17,14 @@
         <ul class="list-group list-group-flush" style="overflow:scroll; height:100%;">
 
             {% for item in items %}
-            <!-- Placeholder for wishlist item-->
                 <li class="list-group-item list-box-item wishlist">
                     {% if item.selling_type == "sale" %}
                         <div class="box-element">
                             <div class="row">
                                 <div class="col"><img class="row-image img-fluid" style="height:100%; object-fit:contain;" src="{{item.image}}"/></div>
                                 <div class="col">
-                                    <p id="Product-name" style="font-size:14px;"><b>{{item.name}}</b></p>
-                                    <p id="seller-name" style="font-size:14px;">Seller: {{item.seller}}</p>
+                                    <a id="Product-name" style="font-size:14px;" href="{% url 'product_page' item.product.slug_str %}"><b>{{item.name}}</b></a>
+                                    <p id="seller-name" style="font-size:14px;">Seller: <a href="{% url 'user_profile' item.product.seller.slug_str %}">{{item.seller}}</a></p>
                                     {% if item.remaining_unit > 0%}
                                         <p id="delivery-time" style="font-size:14px;">Stock Status: In Stock</p>
                                     {% else %}
@@ -36,7 +35,7 @@
                                 <div class="col" style="display:flex; align-items:center;">
                                     <button data-id={{item.id}} class="btn btn-outline-warning remove" 
                                     data-product="{{item.id}}">Remove</button>
-                                    <button class="btn btn-outline-secondary" id="contact-button">Contact</button>
+                                    <a class="btn btn-outline-secondary" id="contact-button" href="mailto:{{item.product.seller.email}}">Contact</a>
                                     <a class="btn btn-outline-success" href="{% url 'product_page' item.product.slug_str %}">View</a>
                                 </div>
                             </div>
@@ -49,8 +48,8 @@
                             <div class="row">
                                 <div class="col"><img class="row-image img-fluid" style="height:100%; object-fit:contain;" src="{{item.image}}"/></div>
                                 <div class="col">
-                                    <p id="Product-name" style="font-size:14px;"><b>{{item.name}}</b></p>
-                                    <p id="seller-name" style="font-size:14px;">Seller: {{item.seller}}</p>
+                                    <a id="Product-name" style="font-size:14px;" href="{% url 'product_page' item.product.slug_str %}"><b>{{item.name}}</b></a>
+                                    <p id="seller-name" style="font-size:14px;">Seller: <a href="{% url 'user_profile' item.product.seller.slug_str %}">{{item.seller}}</a></p>
                                     {% if item.is_active%}
                                         <p id="delivery-time" style="font-size:14px;">Stock Status: Active</p>
                                     {% else %}
@@ -61,7 +60,7 @@
                                 <div class="col" style="display:flex; align-items:center;">
                                     <button data-id={{item.id}} class="btn btn-outline-warning remove" 
                                     data-product="{{item.id}}">Remove</button>
-                                    <button class="btn btn-outline-secondary" id="contact-button">Contact</button>
+                                    <a class="btn btn-outline-secondary" id="contact-button" href="mailto:{{item.product.seller.email}}">Contact</a>
                                     <a class="btn btn-outline-success" href="{% url 'product_page' item.product.slug_str %}">View</a>
                                 </div>
                             </div>
