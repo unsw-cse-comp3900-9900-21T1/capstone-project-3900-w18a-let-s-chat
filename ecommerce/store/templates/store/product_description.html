@@ -392,7 +392,7 @@
                         {% if review_item.verified %}<span class="badge bg-primary text-light rounded-pill"><i class="bi-check-circle-fill"></i> Verified purchase</span>{% endif %}
                         {% if review_item.review.edited %}<span class="badge bg-info text-light rounded-pill"><i class="bi-exclamation-circle-fill"></i> Edited</span>{% endif %}
 
-                        {{review_item.review.author.nickname}}
+                        <a href="{% url 'user_profile' review_item.review.author.slug_str%}">{{review_item.review.author.nickname}}</a>
                     </b>
                      | {{review_item.review.date_posted}}</h6>
                 <p class="review-text">{{review_item.review.text}}</p>

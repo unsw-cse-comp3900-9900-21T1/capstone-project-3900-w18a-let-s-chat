@@ -76,10 +76,10 @@
             {% for item in order_items %}
             <tr>
                 <th scope="row">{{forloop.counter}}</th>
-                <td>{{item.order.customer.nickname}}</td>
+                <td><a href="{% url 'user_profile' item.order.customer.slug_str %}">{{item.order.customer.nickname}}</a></td>
                 <td>{{item.quantity}}</td>
                 <td>{{item.order.date_ordered}}</td>
-                <td>{{item.order.customer.email}}</td>
+                <td><a href="mailto:{{item.order.customer.email}}">{{item.order.customer.email}}</a></td>
                 <td>{{item.order.customer.contactNo}}</td>
             </tr>
             {% endfor %}

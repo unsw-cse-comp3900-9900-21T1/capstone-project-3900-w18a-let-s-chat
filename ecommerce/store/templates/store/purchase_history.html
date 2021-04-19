@@ -13,8 +13,8 @@
                     <div class="row">
                         <div class="col" align="center"><img class="row-image img-fluid" style="height:100%; object-fit:contain;" src="{{item.image}}"/></div>
                         <div class="col">
-                            <p id="Product-name" style="font-size:14px;"><b>{{item.name}} (x{{item.quantity}})</b></p>
-                            <p id="seller-name" style="font-size:14px;">From seller {{item.seller}}</p>
+                            <p id="Product-name" style="font-size:14px;"><b><a href="{% url 'product_page' item.product.slug_str %}">{{item.name}}</a> (x{{item.quantity}})</b></p>
+                            <p id="seller-name" style="font-size:14px;">From seller <a href="{% url 'user_profile' item.product.seller.slug_str %}">{{item.seller}}</a></p>
                             <p id="delivery-time" style="font-size:14px;">Estimated date: {{item.estimated}}</p>
                             <p id="added-time" style="font-size:14px;">Added on {{item.date_added}}</p>
                             <p id="transaction" style="font-size:14px;">Transaction ID: {{item.transaction}}</p>
@@ -23,7 +23,7 @@
                         <div class="col" style="display:flex; align-items:center;">
                             <button data-id={{item.id}} data-iid={{item.iid}}
                             class="btn btn-outline-warning cancel" id="cancel-button">Cancel order</button>
-                            <button class="btn btn-outline-secondary" id="contact-button">Contact</button>
+                            <a class="btn btn-outline-secondary" href="{% url 'user_profile' item.product.seller.slug_str %}" id="contact-button">Contact</a>
                             <a class="btn btn-outline-success" href="{% url 'product_page' item.product.slug_str %}">View</a>
                         </div>
                     </div>
