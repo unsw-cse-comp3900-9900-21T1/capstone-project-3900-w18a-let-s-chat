@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
     'pinax.messages',
     'bootstrapform',
-    'pinax.templates',
+    #'pinax.templates',
 ]
 
 MIDDLEWARE = [
