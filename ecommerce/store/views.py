@@ -1341,7 +1341,7 @@ def query_result (query):
                     tag_checked = tag
                     if tag_checked[0] == " ":
                         tag_checked = tag[1:]
-                    print("Tag is: " + tag_checked)
+
                     if counter == 0:
                         tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
                         counter = 1
@@ -1422,11 +1422,8 @@ def update_cart (action, productId, customer):
             orderItem.quantity -= 1
 
     orderItem.save()
-    print('Action:', action)
-    print('Product:', productId)
 
     if orderItem.quantity <= 0:
         orderItem.delete()
-        print('delete')
 
 check_auction_time()
