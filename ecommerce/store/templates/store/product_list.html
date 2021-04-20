@@ -1,5 +1,6 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% load support_tags %}
 {% block content %}
     <h3>Search Results for "{{query}}"</h3>
 
@@ -13,6 +14,7 @@
 				<a class="dropdown-item" id="btn-search-sort-name-asc">Alphabetical(A-Z)</a>
 				<a class="dropdown-item" id="btn-search-sort-price-asc">Price(Low to High)</a>
 				<a class="dropdown-item" id="btn-search-sort-price-desc">Price(High to Low)</a>
+				<a class="dropdown-item" id="btn-search-sort-rating-desc">Highest rated</a>
 				</div>
 		</div>
 		<button class="btn btn-link" data-toggle="collapse" data-target="#filter">Advanced Filter</button>
@@ -34,19 +36,42 @@
     	{%for product in product_list%}
 				<li class="list-group-item search col-lg-4" style="list-style-type: none; " data-name="{{product.name}}" data-price="{{product.price}}" data-rating="{{product.avg_rating}}">
 					<a href = "{% url 'product_page' product.slug_str %}">
-						<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
-					</a>
-					<div class="box-element product">
-						<h6><div class="product-name-div" ><strong>{{product.name}}</strong></h6>
-						<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
-						<hr>
+				<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
+			</a>
+			<div class="box-element product">
+				<h6><strong>{{product.name}}</strong></h6>
+				<div class="star-rating-div" data-rating="{{product.avg_rating}}" data-n-reviews="{{product.reviews.count}}"></div>
+				<hr>
 
-						<button data-product="{{product.id}}" data-action="add"
-						class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-						<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-						<h4 style="display: inline-block; float: right"><p class="product-price-div"><strong>${{product.price|floatformat:2}}</strong></h4>
+				{% if product.selling_type == "sale" and request.user.is_authenticated %}
+					{% check_exist_tag customer product as result %}
+					{% if result %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
+					{% else %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
+					{% endif %}
+					<button data-product="{{product.id}}" data-action="add" 
+					class="btn btn-outline-secondary add-btn update-cart"> Add to Cart </button>
+				{% else %}
+					{% check_exist_tag customer product as result %}
+					{% if result %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-check-fill"></i></button>
+					{% else %}
+						<button data-product="{{product.id}}"
+						class="btn btn-outline-secondary add-to-wishlist"><i class="bi-bookmark-plus"></i></button>
+					{% endif %}
+				{% endif %}
 
-					</div>
+				<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
+				{% if product.selling_type == "sale" %}
+					<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+				{% else %}
+					<h4 style="display: inline-block; float: right"><strong>Bid</strong> ${{product.starting_bid|floatformat:2}}</h4>
+				{% endif %}
+			</div>
 				</li>
     	{% empty %}
     		<p5>Search not found</p5>
@@ -78,7 +103,7 @@
     });
 
 // Draw star rating on each product card
-const maxRating = 5;
+	const maxRating = 5;
 	$(".star-rating-div").each(function() {
 		console.log($(this));
 		var rating = $(this).data("rating");
@@ -91,7 +116,6 @@ const maxRating = 5;
 		}
 		for (; i < maxRating; i++)
 			$(this).append('<i class="bi-star"></i>');
-		
 		if ($(this).data("n-reviews") == 0)
 			$(this).append(" No reviews yet");
 		else if ($(this).data("n-reviews") == 1)
@@ -99,7 +123,6 @@ const maxRating = 5;
 		else
 			$(this).append(" from " + $(this).data("n-reviews") + " reviews");
 	});
-
 
 </script>
 {% endblock content %}

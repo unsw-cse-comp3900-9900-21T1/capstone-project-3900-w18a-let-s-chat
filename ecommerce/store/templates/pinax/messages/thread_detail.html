@@ -7,11 +7,11 @@
 {% load bootstrap %}
 
 {% block content %}
-<link rel="stylesheet" href="/env/Lib/site-packagespinax/templates/templates/pinax_messages.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/pinax_messages.css' %}">
 <div class="pinax-messages-thread-detail-container">
     <h2 class="with-actions">
         {{ thread.subject }}
-        <a role="button" class="btn btn-primary"href="{% url "pinax_messages:thread_delete" thread.pk %}" style="float: right;">Delete Thread</a>
+        <a role="button" class="btn btn-danger"href="{% url "pinax_messages:thread_delete" thread.pk %}" style="float: right;">Delete Thread</a>
     </h2>
 
     <section class="thread-messages">

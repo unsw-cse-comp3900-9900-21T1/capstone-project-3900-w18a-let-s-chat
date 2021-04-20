@@ -8,7 +8,7 @@
 {% block head_title %}Confirm Delete: {{ thread.subject }}{% endblock %}
 
 {% block content %}
-<!--<link rel="stylesheet" href="/env/Lib/site-packagespinax/templates/templates/pinax_messages.css">-->
+<link rel="stylesheet" type="text/css" href="{% static 'css/pinax_messages.css' %}">
 <div class="pinax-messages-delete-container">
     <h2>{{ thread.subject }}</h2>
 
@@ -22,7 +22,7 @@
         {% csrf_token %}
         <div class="form-actions">
             <a href="{% url "pinax_messages:inbox" %}" class="cancel">{% trans "Cancel" %}</a>
-            <button class="btn btn-primary">{% trans "Delete" %}</button>
+            <button class="btn btn-danger">{% trans "Delete" %}</button>
         </div>
     </form>
 {% endblock content%}

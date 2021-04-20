@@ -585,12 +585,14 @@ def searchResult(request):
         cartItems = 0
 
     query = request.GET.get('q')
+    if query is None:
+        query = request.GET.get('cached_q')
     product_list = query_result(query)
 
-    myFilter = ProductFilter(request.GET, queryset=product_list)
-    product_list = myFilter.qs
+    advancedFilter = ProductFilter(request.GET, queryset=product_list)
+    product_list = advancedFilter.qs
 
-    context = {'product_list':product_list, 'cartItems':cartItems,'myFilter':myFilter, 'query':query}
+    context = {'product_list':product_list, 'cartItems':cartItems,'myFilter':advancedFilter, 'query':query}
     return render(request, 'store/product_list.html', context)
     # return product_list
 
@@ -1353,15 +1355,23 @@ def query_result (query):
 
         else:
             
-            byName = Product.objects.filter(Q(name__icontains=query))
-            byName = byName.filter(remaining_unit__gt=0, is_active=True).distinct()
-            byTag = Product.objects.filter(Q(tags__name__icontains=query))
-            byTag = byTag.filter(remaining_unit__gt=0, is_active=True).distinct()
-            bySeller = Product.objects.filter(Q(seller__nickname__icontains=query))
-            bySeller = bySeller.filter(remaining_unit__gt=0, is_active=True).distinct()
+            #byName = Product.objects.filter(Q(name__icontains=query))
+            #byName = byName.filter(remaining_unit__gt=0, is_active=True).distinct()
+            #advancedFilter = ProductFilter(request.GET, queryset=byName)
+            #byName = advancedFilter_byName.qs
+            #byTag = Product.objects.filter(Q(tags__name__icontains=query))
+            #byTag = byTag.filter(remaining_unit__gt=0, is_active=True).distinct()
+            #advancedFilter_byTag = ProductFilter(request.GET, queryset=byTag)
+            #byTag = advancedFilter_byTag.qs
+            #bySeller = Product.objects.filter(Q(seller__nickname__icontains=query))
+            #bySeller = bySeller.filter(remaining_unit__gt=0, is_active=True).distinct()
+            #advancedFilter_bySeller = ProductFilter(request.GET, queryset=bySeller)
+            #bySeller = advancedFilter_bySeller.qs
             # Filter cannot be worked after union
-            combine_query1 = byName.union(byTag)
-            product_list = combine_query1.union(bySeller)
+            #combine_query1 = byName.union(byTag)
+            #product_list = combine_query1.union(bySeller)
+
+            product_list = Product.objects.filter(Q(name__icontains=query)|Q(tags__name__icontains=query)|Q(seller__nickname__icontains=query)|Q(remaining_unit__gt=0,is_active=True)).distinct()
         # Only show products that still have units left and aren't unlisted
         return product_list
 

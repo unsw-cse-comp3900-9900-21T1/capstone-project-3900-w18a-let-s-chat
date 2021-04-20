@@ -3,8 +3,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
-from .filters import ProductFilter 
-
 from . import views
 
 urlpatterns = [
