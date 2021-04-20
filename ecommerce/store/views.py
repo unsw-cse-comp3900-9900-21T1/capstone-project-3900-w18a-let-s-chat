@@ -414,8 +414,11 @@ def userProfile(request, slug=None):
         if user_form.is_valid() and user_pic_form.is_valid():
             user_form.save()
             user_pic_form.save()
+            new_username = user_form['nickname'].value()
+            new_customer = Customer.objects.get(nickname=new_username)
+            new_customer.save()
             # messages.success(request, f'Your account information has been updated!')
-            return redirect(f'/user_profile/{slug}')
+            return redirect(f'/user_profile/{new_customer.slug_str}')
     else:
         user_form = UpdateUserForm(instance=request.user.customer)
         user_pic_form = UpdateUserProfilePic(instance=request.user.customer)
