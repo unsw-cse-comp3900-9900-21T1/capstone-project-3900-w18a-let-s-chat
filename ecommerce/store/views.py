@@ -27,6 +27,7 @@ from uuid import uuid4
 
 from django.views.decorators.csrf import csrf_exempt
 
+from .filters import ProductFilter 
 from .forms import CreateProductForm
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
@@ -585,6 +586,9 @@ def searchResult(request):
 
     query = request.GET.get('q')
     product_list = query_result(query)
+
+    myFilter = ProductFilter(request.GET, queryset=product_list)
+    product_list = myFilter.qs
 
     context = {'product_list':product_list, 'cartItems':cartItems}
     return render(request, 'store/product_list.html', context)
@@ -1430,4 +1434,4 @@ def update_cart (action, productId, customer):
         orderItem.delete()
         print('delete')
 
-check_auction_time()
+#check_auction_time()

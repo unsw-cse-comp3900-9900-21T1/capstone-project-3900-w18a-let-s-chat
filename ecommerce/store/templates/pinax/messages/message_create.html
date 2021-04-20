@@ -1,0 +1,22 @@
+{% extends "store/main.html" %}
+{% load static %}
+{% load i18n %}
+{% block body_class %}{{ block.super }} pinax-messages-create{% endblock %}
+
+{% load bootstrap %}
+
+{% block content %}
+<link rel="stylesheet" href="/env/Lib/site-packagespinax/templates/templates/pinax_messages.css">
+<div class="pinax-messages-create-container">
+    <h2>New Message</h2>
+
+    <form class="comment-form" action="{% url "pinax_messages:message_create" %}" method="post">
+        {% csrf_token %}
+        {{ form|bootstrap }}
+        <div class="form-actions">
+            <a href="{% url "pinax_messages:inbox" %}" class="cancel">Cancel</a>
+            <button class="btn btn-primary">Send</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

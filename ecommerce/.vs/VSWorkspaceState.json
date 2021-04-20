@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\ecommerce",
+    "\\static",
+    "\\static\\css",
+    "\\store",
+    "\\store\\templates",
+    "\\store\\templates\\store"
+  ],
+  "SelectedNode": "\\store\\views.py",
+  "PreviewInSolutionExplorer": false
+}
