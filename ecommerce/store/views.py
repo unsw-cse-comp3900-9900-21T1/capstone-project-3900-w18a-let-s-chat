@@ -1434,4 +1434,3 @@ def update_cart (action, productId, customer):
         print('delete')
 
 check_auction_time()
-check_auction_time()
