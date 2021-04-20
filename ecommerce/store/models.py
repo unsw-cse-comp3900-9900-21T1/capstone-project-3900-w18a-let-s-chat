@@ -10,7 +10,8 @@ from taggit.managers import TaggableManager
 from .util.generate_url_slugs import unique_slugify
 from PIL import Image
 
-import datetime 
+import datetime
+
 SELLING_CHOICES = [
     ('sale', 'Sales'),
     ('auction', 'Auctions')
@@ -70,10 +71,8 @@ class Product(models.Model):
     delivery_period = models.DurationField()
     seller = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     tags = TaggableManager()
-    estimated_date = models.DateTimeField(editable=False, blank=True, null=True)
     slug_str = models.SlugField(blank=True)
     is_active = models.BooleanField(default=True)
-    imageUri = models.TextField(blank=True)
     
     def save(self, **kwargs):
         unique_slugify(self, self.name, slug_field_name='slug_str')
@@ -166,25 +165,30 @@ class ReviewReact(models.Model):
         return f"{self.customer} {'liked' if self.liked else 'disliked'} {self.review.author}'s review of {self.review.product}"
 
 class Order(models.Model):
-	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
-	date_ordered = models.DateTimeField(editable=False, blank=True, null=True)
-	complete = models.BooleanField(default=False)
-	transaction_id = models.CharField(max_length=100, null=True)
+    '''
+    Represents an order made by a customer. An Order contains order items, which in turn contain products
+    - The complete attribute determines whether the order has actually been purchased, or if it just the contents of a cart
+    '''
 
-	def __str__(self):
-		return str(self.id)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    date_ordered = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)
+    transaction_id = models.CharField(max_length=100, null=True)
 
-	@property
-	def get_cart_total(self):
-		orderitems = self.orderitem_set.all()
-		total = sum([item.get_total for item in orderitems])
-		return total 
+    def __str__(self):
+        return str(self.id)
 
-	@property
-	def get_cart_items(self):
-		orderitems = self.orderitem_set.all()
-		total = sum([item.quantity for item in orderitems])
-		return total 
+    @property
+    def get_cart_total(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.get_total for item in orderitems])
+        return total 
+
+    @property
+    def get_cart_items(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitems])
+        return total 
         
 
 class OrderItem(models.Model):

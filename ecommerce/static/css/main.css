@@ -10,29 +10,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 footer {
-	padding: 15px;
+	padding: 20px;
 	margin-top: 10px;
 	justify-content: center;
 	position: absolute;
 	width: 100%;
-}
-
-.brand-img {
-	object-fit: contain;
-	height: 45px;
-}
-
-.navbar {
-	padding-top: 3px;
-	padding-bottom: 3px;
-}
-
-.footer-logo-link:hover {
-	text-decoration: none;
-}
-
-.footer-logo-link:active {
-	text-decoration: none;
 }
 
 .container {

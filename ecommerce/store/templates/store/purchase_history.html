@@ -16,7 +16,7 @@
                             <p id="Product-name" style="font-size:14px;"><b><a href="{% url 'product_page' item.product.slug_str %}">{{item.name}}</a> (x{{item.quantity}})</b></p>
                             <p id="seller-name" style="font-size:14px;">From seller <a href="{% url 'user_profile' item.product.seller.slug_str %}">{{item.seller}}</a></p>
                             <p id="delivery-time" style="font-size:14px;">Estimated date: {{item.estimated}}</p>
-                            <p id="ordered-time" style="font-size:14px;">Ordered on {{item.date_ordered}}</p>
+                            <p id="added-time" style="font-size:14px;">Added on {{item.date_added}}</p>
                             <p id="transaction" style="font-size:14px;">Transaction ID: {{item.transaction}}</p>
                             <p id="price" style="font-size:14px;"><b>${{item.price|floatformat:2}}</b></p>
                         </div>

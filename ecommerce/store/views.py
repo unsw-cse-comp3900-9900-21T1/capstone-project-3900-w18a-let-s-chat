@@ -5,7 +5,6 @@ View functions corresponding to site urls
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
 from .models import *
-from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -20,7 +19,6 @@ import os
 import sys
 import json
 import datetime
-import base64
 import re
 import threading
 from uuid import uuid4
@@ -46,8 +44,6 @@ max_recent = 10
 paginated_size = 9
 # Number of recent orders to display under each product on manage listings page
 recent_orders_display_size = 5
-# Customer
-ca = None
 
 #################
 
@@ -64,9 +60,7 @@ def store(request):
     context = {}
     if request.user.is_authenticated:
         customer = request.user.customer
-        ca = customer
         cartItems = cart_items(customer)
-        
 
         # Get most recently viewed products - this displays even unlisted items
         view_counts = ProductViewCount.objects.filter(customer=request.user.customer).order_by('-last_viewing')
@@ -330,7 +324,7 @@ def purchase_history(request):
     purchases = []
     for o in orders:
         order_items = OrderItem.objects.filter(order=o).order_by('-date_added')
-        # print(order_items.estimated_date)
+
         for item in order_items:
             purchases.append({
                 "iid":item.id,
@@ -339,9 +333,9 @@ def purchase_history(request):
                 "name": item.product.name,
                 "seller": item.product.seller.nickname,
                 "quantity": item.quantity,
-                "date_ordered": o.date_ordered,
+                "date_added": item.date_added,
                 "transaction": o.transaction_id,
-                "estimated": item.product.estimated_date,
+                "estimated": item.product.delivery_period_days_hours_str,
                 "image": item.product.imageURL,
                 "price": item.get_total
             })
@@ -457,7 +451,34 @@ def updateItem(request):
     action = data['action']
 
     customer = request.user.customer
-    update_cart(action, productId, customer)
+    product = Product.objects.get(id=productId)
+    order, created = Order.objects.get_or_create(customer=customer, complete=False)
+
+    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
+
+    # run out of stock
+    if product.remaining_unit == 0 or product.remaining_unit == orderItem.quantity:
+        if action == 'remove':
+            orderItem.quantity -= 1
+
+    # Still have enough stock available
+    elif product.remaining_unit != 0 and product.remaining_unit > orderItem.quantity:
+        if action == 'add':
+            orderItem.quantity += 1
+        
+        elif action == 'remove':
+            orderItem.quantity -= 1
+    else:
+        if action == 'remove':
+            orderItem.quantity -= 1
+
+    orderItem.save()
+    print('Action:', action)
+    print('Product:', productId)
+
+    if orderItem.quantity <= 0:
+        orderItem.delete()
+        print('delete')
     
     return JsonResponse('Item was updated', safe=False)
 
@@ -484,7 +505,6 @@ def processOrder(request):
         # To prevent user change the value through javascript to bypass the checkout checking
         if total == order.get_cart_total:
             order.complete = True
-            order.date_ordered = timezone.now()
         order.save()
 
         ShippingAddress.objects.create(
@@ -502,36 +522,35 @@ def processOrder(request):
             product = Product.objects.get(id=item.product.id)
             product.remaining_unit -= item.quantity
             product.sold_unit += item.quantity
-            product.estimated_date = timezone.now() + product.delivery_period
             product.save()			
             if product.selling_type == "sale":
                 total_price = product.price * item.quantity
             else:
                 total_price = product.starting_bid
 
-            # seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
+            seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
 
-            # email = EmailMessage(
-            #     'Your product has been sold!',
-            #     seller_template,
-            #     settings.EMAIL_HOST_USER,
-            #     [product.seller.email],
-            # )
+            email = EmailMessage(
+                'Your product has been sold!',
+                seller_template,
+                settings.EMAIL_HOST_USER,
+                [product.seller.email],
+            )
 
-            # email.fail_silently = False
-            # email.send()
+            email.fail_silently = False
+            email.send()
 
-            # seller_template = render_to_string('store/email_processOrder_to_buyer.html', {'name': customer.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
+            seller_template = render_to_string('store/email_processOrder_to_buyer.html', {'name': customer.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
 
-            # email = EmailMessage(
-            #     'Your have purchased a product successfully!',
-            #     seller_template,
-            #     settings.EMAIL_HOST_USER,
-            #     [customer.email],
-            # )
+            email = EmailMessage(
+                'Your have purchased a product successfully!',
+                seller_template,
+                settings.EMAIL_HOST_USER,
+                [customer.email],
+            )
 
-            # email.fail_silently = False
-            # email.send()
+            email.fail_silently = False
+            email.send()
 
     return JsonResponse('Payment success', safe=False)
 
@@ -584,8 +603,47 @@ def searchResult(request):
         cartItems = 0
 
     query = request.GET.get('q')
-    product_list = query_result(query)
 
+    if query == "":
+        product_list = Product.objects.none()
+    else:
+        
+        if query.find(",") != -1:
+            taglist = query.split(',')
+
+            if len(taglist) == 1:
+                product_list = Product.objects.filter(Q(tags__name__icontains=taglist[0]))
+            else:
+
+                tmp1 = Product.objects.none()
+                tmp2 = Product.objects.none()
+                counter = 0
+                for tag in taglist:
+                    tag_checked = tag
+                    if tag_checked[0] == " ":
+                        tag_checked = tag[1:]
+                    print("Tag is: " + tag_checked)
+                    if counter == 0:
+                        tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
+                        counter = 1
+
+                    else:
+                        tmp1 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
+
+                        product_list = tmp1 & tmp2
+
+                        tmp2 = product_list
+
+        else:
+            product_list = Product.objects.filter(Q(name__icontains=query))
+            if not product_list:
+                product_list = Product.objects.filter(Q(seller__nickname__icontains=query))
+
+                if not product_list:
+                    product_list = Product.objects.filter(Q(tags__name__icontains=query))
+
+    # Only show products that still have units left and aren't unlisted
+    product_list = product_list.filter(remaining_unit__gt=0, is_active=True).distinct()
     context = {'product_list':product_list, 'cartItems':cartItems}
     return render(request, 'store/product_list.html', context)
     # return product_list
@@ -825,7 +883,6 @@ def webhook(request):
         print(parameters)
         print(action)
         message = "ok"
-
         if action == 'product_enquiry':
             inquiry = parameters.get('product_details')
             product = inquiry_product(parameters)
@@ -868,101 +925,20 @@ def webhook(request):
                         message = "{}:\n{}".format(product, description)
                 else:
                     message = 'Sorry I cannot understand your questions. Please ask me again.'
-
-            responseObj = {
-                "fulfillmentText": message,
-                # "fulfillmentMessages": [{"text": {"text": [message]}}],
-                "source": ""
-            }          
-
-        elif action == 'product_searching':
-            inquiry = parameters.get('product')
-            print(inquiry)
-            keyword = inquiry_product(parameters)
-
-            if keyword == '':
-                responseObj = {
-                    "fulfillmentText": "Sorry, I can't found the thing you want. Please ask for something else.",
-                    # "fulfillmentMessages": [{"text": {"text": [message]}}],
-                    "source": ""
-                }   
-            else: 
                 
-                product_list = find_by_tag(keyword)
-                print(product_list)
-                if not product_list:
-                    responseObj = {
-                        "fulfillmentText": "Sorry, currently the product that you're searching for is out of stock.",
-                        # "fulfillmentMessages": [{"text": {"text": [message]}}],
-                        "source": ""
-                    }   
-                else:
-                    elements = create_element(product_list) 
-                    responseObj = {
-                        "fulfillmentMessages": [{
-                            "payload": {
-                                "message": "Here you go",
-                                "platform": "kommunicate",
-                                "metadata": {
-                                    "contentType": "300",
-                                    "templateId": "7",
-                                    "payload": {
-                                        "elements": elements,
-                                        "headerText": "Here is the searched results"
-                                    }
-                                }
-                            }             
-                        }]
-                    }
-                    print("success")
 
-        elif action == 'place_bid':
-            product_name = parameters.get('product_name')
-            bid_price = parameters.get('bid_price')
-            customer_name = parameters.get('customer_name')
-            product = Product.objects.get(name=product_name)
 
-            if not product.is_active:
-                message = "This auction is ended!"
-            
-            elif product.selling_type == 'sale':
-                message = "This product isn't an auction product! You can't place a bid for this."
-
-            elif bid_price > product.starting_bid:
-                if customer_name == product.seller.nickname:
-                    message = "You cannot place a bid to your own product!"
-
-                else:
-                    product.starting_bid = bid_price
-                    all_customer = Customer.objects.all()
-                    for customer in all_customer:
-                        if customer.nickname == customer_name:
-                            product.highest_bidder = customer
-                            product.bidder.create(name=customer_name, price=bid_price)
-                            break
-                    message = 'You have successfully placed a bid!'
-                    product.save()
-                    
-            else:
-                message = f"Your bid price is not greater than the current highest bid price: ${product.starting_bid}!"
-
-            responseObj = {
-                "fulfillmentText": message,
-                # "fulfillmentMessages": [{"text": {"text": [message]}}],
-                "source": ""
-            }   
-            
+        responseObj = {
+            "fulfillmentText":  message,
+            # "fulfillmentMessages": [{"text": {"text": [message]}}],
+             "source": ""
+        }
         return JsonResponse(responseObj)
 
     return HttpResponse('OK')
 
 
 def inquiry_product (parameters):
-    '''
-    Helper Function to retrieve the correct value from the parsed in parameter dict of Dialogflow
-    
-    Returns a string
-    '''
     product = ''
     if parameters.get('collar') != '':
         product =parameters.get('collar')
@@ -975,21 +951,10 @@ def inquiry_product (parameters):
         
     elif parameters.get('pet_food') != '':
         product =parameters.get('pet_food')
-
-    elif parameters.get('bowl') != '':
-        product =parameters.get('bowl')
-
-    elif parameters.get('aquarium') != '':
-        product =parameters.get('aquarium')
     
     return product
 
 def cart_items (customer):
-    '''
-    Helper Function to retrieve number of items in cart so that the cart icon number get to update
-    
-    Returns a dict
-    '''
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
     items = order.orderitem_set.all()
     items = order.get_cart_items
@@ -1310,124 +1275,4 @@ def remove_wishlist(request):
 
         return JsonResponse('You have removed a product in your wishlist!', safe=False)
 
-def query_result (query):
-    '''
-    Helper Function for searchResult 
-    This will query the matched results based on product name, tag and seller
-    
-    Returns a list
-    '''
-    if query == "":
-        product_list = Product.objects.none()
-    else:
-        
-        if query.find(",") != -1:
-            taglist = query.split(',')
-
-            if len(taglist) == 1:
-                product_list = Product.objects.filter(Q(tags__name__icontains=taglist[0]))
-            else:
-
-                tmp1 = Product.objects.none()
-                tmp2 = Product.objects.none()
-                counter = 0
-                for tag in taglist:
-                    tag_checked = tag
-                    if tag_checked[0] == " ":
-                        tag_checked = tag[1:]
-                    print("Tag is: " + tag_checked)
-                    if counter == 0:
-                        tmp2 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
-                        counter = 1
-
-                    else:
-                        tmp1 = Product.objects.filter(Q(tags__name__icontains=tag_checked))
-
-                        product_list = tmp1 & tmp2
-
-                        tmp2 = product_list
-
-        else:
-            
-            byName = Product.objects.filter(Q(name__icontains=query))
-            byName = byName.filter(remaining_unit__gt=0, is_active=True).distinct()
-            byTag = Product.objects.filter(Q(tags__name__icontains=query))
-            byTag = byTag.filter(remaining_unit__gt=0, is_active=True).distinct()
-            bySeller = Product.objects.filter(Q(seller__nickname__icontains=query))
-            bySeller = bySeller.filter(remaining_unit__gt=0, is_active=True).distinct()
-            # Filter cannot be worked after union
-            combine_query1 = byName.union(byTag)
-            product_list = combine_query1.union(bySeller)
-        # Only show products that still have units left and aren't unlisted
-        return product_list
-
-def create_element (product_list):
-    '''
-    Helper Function to create a displayable list in chatbot
-    
-    Returns a dict
-    '''
-    elements = []
-    for product in product_list:
-        # print(image)
-        elements.append({
-        "title": product.name,
-        "description": product.description,
-        # "imgSrc": json.dumps(str(product.image)),
-        "imgSrc": product.imageUri,
-        "action": 
-            {
-                "type": "link",
-                "url": f"http://127.0.0.1:8000/product/{product.slug_str}/"
-            }
-        })
-    
-
-    return elements
-
-def find_by_tag (keyword):
-    '''
-    Helper Function to search all products that has the desired tag
-    
-    Returns a list
-    '''
-    product_list = Product.objects.filter(Q(tags__name__iexact=keyword))
-    product_list = product_list.filter(remaining_unit__gt=0, is_active=True).distinct()
-    return product_list
-    
-
-def update_cart (action, productId, customer):
-    '''
-    Helper Function to update the cart item like add to cart and remove from cart
-    '''
-    product = Product.objects.get(id=productId)
-    
-    order, created = Order.objects.get_or_create(customer=customer, complete=False)
-
-    orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
-
-    # run out of stock
-    if product.remaining_unit == 0 or product.remaining_unit == orderItem.quantity:
-        if action == 'remove':
-            orderItem.quantity -= 1
-
-    # Still have enough stock available
-    elif product.remaining_unit != 0 and product.remaining_unit > orderItem.quantity:
-        if action == 'add':
-            orderItem.quantity += 1
-        
-        elif action == 'remove':
-            orderItem.quantity -= 1
-    else:
-        if action == 'remove':
-            orderItem.quantity -= 1
-
-    orderItem.save()
-    print('Action:', action)
-    print('Product:', productId)
-
-    if orderItem.quantity <= 0:
-        orderItem.delete()
-        print('delete')
-
-check_auction_time()
+# check_auction_time()
