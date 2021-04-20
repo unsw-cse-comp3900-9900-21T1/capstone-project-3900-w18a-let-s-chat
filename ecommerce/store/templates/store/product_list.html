@@ -1,75 +1,29 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-    <h3>Search Results for "{{query}}"</h3>
+    <h3>Search Results</h3>
 
-	<div class="row">
-		<div class="dropdown">
-				<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="button" id="search-sort-dropdown" data-bs-toggle="dropdown">
-				Sort By:
-				</button>
-				<div class="dropdown-menu">
-				<a class="dropdown-item" id="btn-search-sort-name-asc">Alphabetical(A-Z)</a>
-				<a class="dropdown-item" id="btn-search-sort-price-asc">Price(Low to High)</a>
-				<a class="dropdown-item" id="btn-search-sort-price-desc">Price(High to Low)</a>
+    <u1>
+    	<div class="row">
+    	{%for product in product_list%}
+    		<div class="col-lg-4">
+				<a href = "{% url 'product_page' product.slug_str %}">
+					<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
+				</a>
+				<div class="box-element product">
+					<h6><strong>{{product.name}}</strong></h6>
+					<hr>
+
+					<button data-product="{{product.id}}" data-action="add"
+					class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+					<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
+					<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+
 				</div>
 		</div>
-		<button class="btn btn-link" data-toggle="collapse" data-target="#filter">Advanced Filter</button>
-		<div id="filter" class="collapse">
-			<form method="get">
-				{{myFilter.form}}
 
-					
-			<button class="btn btn-primary" type="submit" name='cached_q' value='{{query}}'>Search</button>
-			
-			</form>
-		</div>
-	</div>
-		
-<style>
-	ul{list-style-type: none; padding:0 !important}
-</style>
-
-    <ul id="search-list"class="row">
-    	{%for product in product_list%}
-				<li class="list-group-item search col-lg-4" style="list-style-type: none; "data-name="{{product.name}}" data-price="{{product.price}}">
-					<a href = "{% url 'product_page' product.slug_str %}">
-						<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
-					</a>
-					<div class="box-element product">
-						<h6><div class="product-name-div" ><strong>{{product.name}}</strong></h6>
-						<hr>
-
-						<button data-product="{{product.id}}" data-action="add"
-						class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-						<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
-						<h4 style="display: inline-block; float:right"><p class="product-price-div"><strong>${{product.price|floatformat:2}}</strong></h4>
-
-					</div>
-				</li>
     	{% empty %}
     		<p5>Search not found</p5>
     	{% endfor %}
-    </ul>
-<!-- Handle reviews -->
-<script src="{% static 'javascript/jquery.js' %}"></script>
-<script type="text/javascript">
-
-	 function sortReviews(cmp) {
-        $("#search-list .search").sort(cmp).appendTo("#search-list");
-    }
-
-    $("#btn-search-sort-name-asc").click(function() {
-        sortReviews((a,b) => ($(a).data("name").localeCompare($(b).data("name"))));
-        $("#search-sort-dropdown").html($(this).html());
-    });
-    $("#btn-search-sort-price-asc").click(function() {
-        sortReviews((a,b) => ($(a).data("price") - $(b).data("price")));
-        $("#search-sort-dropdown").html($(this).html());
-    });
-    $("#btn-search-sort-price-desc").click(function() {
-        sortReviews((a,b) => ($(b).data("price") - $(a).data("price")));
-        $("#search-sort-dropdown").html($(this).html());
-    });
-</script>
+    <u1>
 {% endblock content %}

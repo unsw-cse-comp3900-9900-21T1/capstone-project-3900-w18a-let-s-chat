@@ -89,6 +89,7 @@ class Recommender():
         max_reviews_fraction = n_reviews_clamped / float(max_reviews)
         rating_weight = max_rating_weight * max_reviews_fraction
         similarity_weight = 1 - rating_weight
+
         return (self.calculate_similarity(product) * similarity_weight) + ((product.avg_rating / max_rating) * rating_weight)
 
     
