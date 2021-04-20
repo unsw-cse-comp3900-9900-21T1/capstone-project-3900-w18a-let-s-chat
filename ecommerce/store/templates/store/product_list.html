@@ -139,8 +139,6 @@
 			$(this).append(" from " + $(this).data("n-reviews") + " reviews");
 	});
 
-</script>
-<script type="text/javascript">
     if (user == 'AnonymousUser'){
         $('.add-to-wishlist').hide();
     }
@@ -151,7 +149,7 @@
 			fetch(url, {
 				method:'POST',
 				headers:{
-					'Content-Type':'applicaiton/json',
+					'Content-Type':'application/json',
 					'X-CSRFToken':csrftoken,
 				}, 
 				body:JSON.stringify({'productId':productId}),
