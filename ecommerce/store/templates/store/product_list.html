@@ -14,7 +14,6 @@
 				<a class="dropdown-item" id="btn-search-sort-name-asc">Alphabetical(A-Z)</a>
 				<a class="dropdown-item" id="btn-search-sort-price-asc">Price(Low to High)</a>
 				<a class="dropdown-item" id="btn-search-sort-price-desc">Price(High to Low)</a>
-				<a class="dropdown-item" id="btn-search-sort-rating-desc">Highest rated</a>
 				</div>
 		</div>
 		<button class="btn btn-link" data-toggle="collapse" data-target="#filter">Advanced Filter</button>
@@ -50,7 +49,7 @@
 
     <ul id="search-list"class="row">
     	{%for product in product_list%}
-				<li class="list-group-item search col-lg-4" style="list-style-type: none; " data-name="{{product.name}}" data-price="{{product.price}}" data-rating="{{product.avg_rating}}">
+				<li class="search col-lg-4" style="list-style-type: none; " data-name="{{product.name}}" data-price="{{product.price}}" data-rating="{{product.avg_rating}}">
 					<a href = "{% url 'product_page' product.slug_str %}">
 				<img class="thumbnail" style="object-fit:cover;" src="{{product.imageURL}}">
 			</a>
@@ -140,5 +139,30 @@
 			$(this).append(" from " + $(this).data("n-reviews") + " reviews");
 	});
 
+</script>
+<script type="text/javascript">
+    if (user == 'AnonymousUser'){
+        $('.add-to-wishlist').hide();
+    }
+    document.querySelectorAll('.add-to-wishlist').forEach(item => {
+        item.addEventListener('click', event => {
+            var productId = item.dataset.product
+            var url = "/add_wishlist/"
+			fetch(url, {
+				method:'POST',
+				headers:{
+					'Content-Type':'applicaiton/json',
+					'X-CSRFToken':csrftoken,
+				}, 
+				body:JSON.stringify({'productId':productId}),
+				
+			})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log('Data sent:', data);
+				location.reload()
+				})
+        })
+    })
 </script>
 {% endblock content %}

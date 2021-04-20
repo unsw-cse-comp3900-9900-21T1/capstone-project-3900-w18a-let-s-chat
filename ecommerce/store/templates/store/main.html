@@ -93,11 +93,11 @@
 					<div id="myDropdown" class="dropdown-content">
 						<a href="/new_product"><i class="bi-plus-square dropdown-icon"></i>New listing</a>
 						<a href="/my_listings"><i class="bi-card-checklist dropdown-icon"></i>Manage my listings</a>
-						<a href="/wishlist"><i class="bi-bookmark-heart dropdown-icon"></i>Wishlist</a>
+						<a href="/wishlist"><i class="bi-bookmark-heart dropdown-icon"></i>Wishlist/Watchlist</a>
 						<a href="/purchase_history"> <i class="bi-clock-history dropdown-icon"></i>Purchase history</a>
 						<hr class="dropdown-divider">
 						<a href="{% url 'user_profile' request.user.customer.slug_str %}"><i class="bi-person dropdown-icon"></i>User profile</a>
-						<a href="{% url 'pinax_messages:inbox' %}"><i class="bi bi-envelope"></i></i> {% trans "Message Inbox" %}</a>
+						<a href="{% url 'pinax_messages:inbox' %}"><i class="bi bi-envelope"></i>&nbsp;&nbsp;Message Inbox</a>
 						<a href="/logout"><i class="bi-power dropdown-icon"></i>Log out</a>
 					</div>
 				</div>
