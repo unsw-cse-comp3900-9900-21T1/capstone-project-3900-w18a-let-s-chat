@@ -20,7 +20,23 @@
 		<button class="btn btn-link" data-toggle="collapse" data-target="#filter">Advanced Filter</button>
 		<div id="filter" class="collapse">
 			<form method="get">
-				{{myFilter.form}}
+				
+				<div class="fieldWrapper">
+					<label for="{{ myFilter.form.subject.selling_type }}">Listing type:</label>
+					{{ myFilter.form.selling_type }}
+				</div>
+				<div class="fieldWrapper">
+					<label for="{{ myFilter.form.subject.isAnimal }}">Animal?:</label>
+					{{ myFilter.form.isAnimal }}
+				</div>
+				<div class="fieldWrapper">
+					<label for="{{ myFilter.form.subject.price__gt }}">Min price:</label>
+					{{ myFilter.form.price__gt }}
+				</div>
+				<div class="fieldWrapper">
+					<label for="{{ myFilter.form.subject.price__lt }}">Max price:</label>
+					{{ myFilter.form.price__lt }}
+				</div>
 
 			<button class="btn btn-primary" type="submit" name='cached_q' value='{{query}}'>Search</button>
 			
@@ -67,9 +83,9 @@
 
 				<a class="btn btn-outline-success" href="{% url 'product_page' product.slug_str %}">View</a>
 				{% if product.selling_type == "sale" %}
-					<h4 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h4>
+					<h5 style="display: inline-block; float: right"><strong>${{product.price|floatformat:2}}</strong></h5>
 				{% else %}
-					<h4 style="display: inline-block; float: right"><strong>Bid</strong> ${{product.starting_bid|floatformat:2}}</h4>
+					<h5 style="display: inline-block; float: right"><strong>Bid</strong> ${{product.starting_bid|floatformat:2}}</h5>
 				{% endif %}
 			</div>
 				</li>
