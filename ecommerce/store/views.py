@@ -647,20 +647,16 @@ def restore(request):
     productId = int(data['product'])
     itemId = int(data['itemId'])
 
-    # print('pid:', productId)
-    # print('iid:', itemId)
 
     for item in order_items:
         if item.product.id == productId and item.id == itemId:
     
             try:
                 product = Product.objects.get(id=productId)
-                # print(item.quantity)
                 product.remaining_unit += item.quantity
                 product.sold_unit -= item.quantity
                 product.save()
                 item.delete()
-                # print("cancel")
             except Product.DoesNotExist:
                 print('none')
             break
