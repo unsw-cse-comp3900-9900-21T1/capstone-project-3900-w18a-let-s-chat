@@ -1,7 +1,9 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+
+from .filters import ProductFilter 
 
 from . import views
 
@@ -56,4 +58,5 @@ urlpatterns = [
     path('add_bid/', views.add_bid, name="add_bid"),
     path('add_wishlist/', views.add_wishlist, name="add_wishlist"),
     path('remove_wishlist/', views.remove_wishlist, name="remove_wishlist"),
+    path(r"^messages/", include("pinax.messages.urls", namespace="pinax_messages")),
 ]

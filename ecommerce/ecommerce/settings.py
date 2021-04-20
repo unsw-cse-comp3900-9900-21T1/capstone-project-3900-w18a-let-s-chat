@@ -25,7 +25,7 @@ SECRET_KEY = 'z+ksf@)0d^qojbh4rnp4b1to$hq&*tt(3bs$gf(3i267g$k9ln'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['d8085f03f331.ngrok.io','127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['6d5484517600.ngrok.io','127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'crispy_forms',
 
     'store.apps.StoreConfig',
+    'pinax.messages',
+    'bootstrapform',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pinax.messages.context_processors.user_messages',
             ],
         },
     },
