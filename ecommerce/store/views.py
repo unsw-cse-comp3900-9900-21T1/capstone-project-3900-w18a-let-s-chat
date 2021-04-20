@@ -591,8 +591,9 @@ def searchResult(request):
 
     advancedFilter = ProductFilter(request.GET, queryset=product_list)
     product_list = advancedFilter.qs
+    customer = request.user.customer
 
-    context = {'product_list':product_list, 'cartItems':cartItems,'myFilter':advancedFilter, 'query':query}
+    context = {'product_list':product_list, 'cartItems':cartItems,'myFilter':advancedFilter, 'query':query, 'customer':customer}
     return render(request, 'store/product_list.html', context)
     # return product_list
 
@@ -1429,4 +1430,5 @@ def update_cart (action, productId, customer):
         orderItem.delete()
         print('delete')
 
+check_auction_time()
 check_auction_time()
