@@ -331,8 +331,8 @@ def purchase_history(request):
     purchases = []
     for o in orders:
         order_items = OrderItem.objects.filter(order=o).order_by('-date_added')
-        # print(order_items.estimated_date)
         for item in order_items:
+            if item.product is None: continue # In case deleted
             purchases.append({
                 "iid":item.id,
                 "product":item.product,
