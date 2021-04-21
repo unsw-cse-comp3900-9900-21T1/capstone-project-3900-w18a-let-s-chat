@@ -33,8 +33,9 @@ class Recommender():
         orders = Order.objects.filter(customer=self.customer, complete=True)
         purchases = OrderItem.objects.filter(order__in=orders)
         for order_item in purchases:
-            for tag in order_item.product.tags.names():
-                profile[tag] = float(profile.get(tag, 0) + (1 * purchase_weight))
+            if not order_item.product is None: # Check product not deleted
+                for tag in order_item.product.tags.names():
+                    profile[tag] = float(profile.get(tag, 0) + (1 * purchase_weight))
 
         return profile
 
