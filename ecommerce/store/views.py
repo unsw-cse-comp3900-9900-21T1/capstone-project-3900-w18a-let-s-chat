@@ -1055,7 +1055,7 @@ def check_auction_time():
     process the purchase by the highest bidder
     '''
 
-    threading.Timer(10.0, check_auction_time).start()
+    threading.Timer(15.0, check_auction_time).start()
     # print("checking auction time")
     products = Product.objects.all()
     for product in products:
