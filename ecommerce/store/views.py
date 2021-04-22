@@ -580,10 +580,11 @@ def searchResult(request):
 
     Return a rendered HTML template as a HTTPResponse
     '''
-
+    context = {}
     if request.user.is_authenticated:
         customer = request.user.customer
         cartItems = cart_items(customer)
+        context['customer'] = customer
     else:
         cartItems = 0
 
@@ -594,9 +595,8 @@ def searchResult(request):
 
     advancedFilter = ProductFilter(request.GET, queryset=product_list)
     product_list = advancedFilter.qs
-    customer = request.user.customer
 
-    context = {'product_list':product_list, 'cartItems':cartItems,'myFilter':advancedFilter, 'query':query, 'customer':customer}
+    context.update({'product_list':product_list, 'cartItems':cartItems,'myFilter':advancedFilter, 'query':query})
     return render(request, 'store/product_list.html', context)
     # return product_list
 
