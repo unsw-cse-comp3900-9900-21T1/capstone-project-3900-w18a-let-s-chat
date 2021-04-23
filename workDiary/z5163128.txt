@@ -25,3 +25,10 @@ A little compromise from the supposed chat system because it is more of a messag
 
 Week 8:
 Presenting Sprint 2
+
+Week 9: 
+Researched any open source project related to messaging and found pinax-messages. Spent all of this week and last week trying to integrate the code with our project.
+Since it was made in an older version of Django, many features were deprecated and needed modifying. 
+
+Week 10:
+Presented Final Demo and worked on the Project Report
