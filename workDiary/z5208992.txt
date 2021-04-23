@@ -39,3 +39,5 @@ Week 8
 Improved navbar layout, added icons to some controls
 Implemented review system, with review editing and like/dislike system
 
+Week 9
+Minor bugfixes
