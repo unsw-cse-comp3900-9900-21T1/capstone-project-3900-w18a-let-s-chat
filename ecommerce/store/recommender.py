@@ -52,6 +52,7 @@ class Recommender():
             return 0.0
 
         # Find cosine similarity between two dicts
+        # Source: Willem van Onsem at https://stackoverflow.com/questions/41827983/right-way-to-calculate-the-cosine-similarity-of-two-word-frequency-dictionaries
         numerator = 0.0
         denom_a = 0.0
         for tag, count in product_dict.items():
