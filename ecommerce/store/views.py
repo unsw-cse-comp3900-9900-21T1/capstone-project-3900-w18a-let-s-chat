@@ -414,7 +414,6 @@ def userProfile(request, slug=None):
             new_username = user_form['nickname'].value()
             new_customer = Customer.objects.get(nickname=new_username)
             new_customer.save()
-            # messages.success(request, f'Your account information has been updated!')
             return redirect(f'/user_profile/{new_customer.slug_str}')
     else:
         user_form = UpdateUserForm(instance=request.user.customer)
@@ -1030,7 +1029,6 @@ def add_bid(request):
                 product.highest_bidder = highest_bidder
                 product.bidder.create(name=highest_bidder.nickname, price=new_bid)
                 messages.success(request, f'You have successfully placed a bid!')
-                # product.bidder.save()
                 product.save()
                 return JsonResponse('You have successfully placed a bid!', safe=False)
         else:
@@ -1044,7 +1042,6 @@ def check_auction_time():
     '''
 
     threading.Timer(15.0, check_auction_time).start()
-    # print("checking auction time")
     products = Product.objects.all()
     for product in products:
         if product.is_active == True:
@@ -1258,10 +1255,8 @@ def add_wishlist(request):
                 print("Removing product_id: " + str(productId))
                 print("Removing product name:" + product.name)
                 if product.selling_type == "sale":
-                    # messages.success(request, f'You have remove a product in your wishlist!')
                     return JsonResponse('You have remove a product in your wishlist!', safe=False)
                 else:
-                    # messages.success(request, f'You have remove a product in your watchlist!')
                     return JsonResponse('You have remove a product in your watchlist!', safe=False)
 
         print("Adding product_id: " + str(productId))
@@ -1269,10 +1264,8 @@ def add_wishlist(request):
         customer.wishlist.product.add(product)
         wishlist.save()
         if product.selling_type == "sale":
-            # messages.success(request, f'You have added a product in your wishlist!')
             return JsonResponse('You have added a product in your wishlist!', safe=False)
         else:
-            # messages.success(request, f'You have added a product in your watchlist!')
             return JsonResponse('You have added a product in your watchlist!', safe=False)
 
 def remove_wishlist(request):
@@ -1304,7 +1297,6 @@ def remove_wishlist(request):
         print("Removing product name:" + product.name)
         customer.wishlist.product.remove(product)
         wishlist.save()
-        # messages.success(request, f'You have removed a product in your wishlist!')
 
         return JsonResponse('You have removed a product in your wishlist!', safe=False)
 
@@ -1360,11 +1352,9 @@ def create_element (product_list):
     '''
     elements = []
     for product in product_list:
-        # print(image)
         elements.append({
         "title": product.name,
         "description": product.description,
-        # "imgSrc": json.dumps(str(product.image)),
         "imgSrc": product.imageUri,
         "action": 
             {
