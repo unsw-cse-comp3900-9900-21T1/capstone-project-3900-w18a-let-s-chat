@@ -44,7 +44,7 @@ After the online meeting, some changes has been made to the code:
   - Seller now cannot modify the end date and quantity of the auction product.
   - User profile has deleted the "Your Products" tag.
 I have implemented the bid history feature for auction product.
-Customer will be able to view the 5 recent bidder of the auction product and sellers can also view it in their product management page.
+Customer will be able to view the 5 recent bidder of the auction product and the price they have placed. Sellers can also view it in their product management page.
 
 Week9
 I have implemented the wishlist feature so that the users can now keep track on the products that they are interested in.
