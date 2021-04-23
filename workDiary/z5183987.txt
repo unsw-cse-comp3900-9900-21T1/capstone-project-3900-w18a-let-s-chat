@@ -25,3 +25,15 @@ Cancel button in purchase history now is functioning as expected.
 Week 7
 Created and tested a basic chatbot to answer user question.
 Make modification on searchResult for future uses.
+
+Week 8 
+Create multiple helper functions for the reuse purpose in the future.
+I rewrite a bit query result logic to make it more advanced and accurated.
+Adding the estimated delivery date to purchase history.
+
+Week 9 
+Finished the product searching and place bid functionalities for chatbot.
+
+Week 10 
+Writting all the chatbot releted parts for the final report like functionality, implementation challenges, setup and 
+usage.
