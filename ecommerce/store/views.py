@@ -47,8 +47,6 @@ max_recent = 10
 paginated_size = 9
 # Number of recent orders to display under each product on manage listings page
 recent_orders_display_size = 5
-# Customer
-ca = None
 
 #################
 
@@ -147,7 +145,6 @@ def signup_success(request):
 
     Returns a rendered HTML template as a HTTPResponse
     '''
-
 
     return render(request, 'store/signup_success.html')
 
@@ -513,29 +510,29 @@ def processOrder(request):
             else:
                 total_price = product.starting_bid
 
-            # seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
+            seller_template = render_to_string('store/email_processOrder_to_seller.html', {'name': product.seller.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
 
-            # email = EmailMessage(
-            #     'Your product has been sold!',
-            #     seller_template,
-            #     settings.EMAIL_HOST_USER,
-            #     [product.seller.email],
-            # )
+            email = EmailMessage(
+                'Your product has been sold!',
+                seller_template,
+                settings.EMAIL_HOST_USER,
+                [product.seller.email],
+            )
 
-            # email.fail_silently = False
-            # email.send()
+            email.fail_silently = False
+            email.send()
 
-            # seller_template = render_to_string('store/email_processOrder_to_buyer.html', {'name': customer.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
+            seller_template = render_to_string('store/email_processOrder_to_buyer.html', {'name': customer.nickname, 'product': product.name, 'unit': item.quantity, 'total': total_price})
 
-            # email = EmailMessage(
-            #     'Your have purchased a product successfully!',
-            #     seller_template,
-            #     settings.EMAIL_HOST_USER,
-            #     [customer.email],
-            # )
+            email = EmailMessage(
+                'Your have purchased a product successfully!',
+                seller_template,
+                settings.EMAIL_HOST_USER,
+                [customer.email],
+            )
 
-            # email.fail_silently = False
-            # email.send()
+            email.fail_silently = False
+            email.send()
 
     return JsonResponse('Payment success', safe=False)
 
@@ -827,7 +824,6 @@ def webhook(request):
 
         action = req.get('queryResult').get('action')
         parameters = req.get('queryResult').get('parameters')
-        # parameters is dict
         print(parameters)
         print(action)
         message = "ok"
@@ -877,7 +873,6 @@ def webhook(request):
 
             responseObj = {
                 "fulfillmentText": message,
-                # "fulfillmentMessages": [{"text": {"text": [message]}}],
                 "source": ""
             }          
 
@@ -889,7 +884,6 @@ def webhook(request):
             if keyword == '':
                 responseObj = {
                     "fulfillmentText": "Sorry, I can't found the thing you want. Please ask for something else.",
-                    # "fulfillmentMessages": [{"text": {"text": [message]}}],
                     "source": ""
                 }   
             else: 
@@ -899,7 +893,6 @@ def webhook(request):
                 if not product_list:
                     responseObj = {
                         "fulfillmentText": "Sorry, currently the product that you're searching for is out of stock.",
-                        # "fulfillmentMessages": [{"text": {"text": [message]}}],
                         "source": ""
                     }   
                 else:
@@ -954,7 +947,6 @@ def webhook(request):
 
             responseObj = {
                 "fulfillmentText": message,
-                # "fulfillmentMessages": [{"text": {"text": [message]}}],
                 "source": ""
             }   
             
