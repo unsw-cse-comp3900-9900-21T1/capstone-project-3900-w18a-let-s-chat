@@ -39,7 +39,19 @@ I have finished implementing all of the auction and email features:
   - Once an auction has ended, the product will be added to the highest bidder's cart.
 
 Week8
-After the online meeting, some changes has been made:
+After the online meeting, some changes has been made to the code:
   - Seller now cannot place bid to their own product.
   - Seller now cannot modify the end date and quantity of the auction product.
   - User profile has deleted the "Your Products" tag.
+I have implemented the bid history feature for auction product.
+Customer will be able to view the 5 recent bidder of the auction product and the price they have placed. Sellers can also view it in their product management page.
+
+Week9
+I have implemented the wishlist feature so that the users can now keep track on the products that they are interested in.
+With Daniel's help, the "Add to Wishlist" button has been added a bookmark icon to shows its functionality.
+
+Week10
+Fixed minor bugs.
+Completed the final report together with the rest of the developers, each of us is in charge of writting description for their own work. 
+For example, I have written the implementation challenges I have encountered about the user authentication, user profile, auction, email feature,
+wishlist, etc. Also, I have wrote most of the description text for the screenshots under the Usage part of our report. In which, Matthew has corrected some of the lines and added a few paragraphs to further explain the features.
