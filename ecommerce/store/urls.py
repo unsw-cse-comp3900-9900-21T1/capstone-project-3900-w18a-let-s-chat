@@ -6,7 +6,6 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-	#Leave as empty string for base url
 	path('', views.store, name="store"),
     path('signup/', views.signup, name="signup"),
     path('signup_success/', views.signup_success, name="signup_success"),
@@ -50,8 +49,6 @@ urlpatterns = [
     path('update_item/', views.updateItem, name="update_item"),
     path('add_multiple/', views.add_multiple, name="add_multiple"),
     path('restore/', views.restore, name="restore"),
-    # path('chat_index/', views.index_view, name='index'),
-    # path('chat/', views.chat_view, name="chat_view"),
     path('webhook/', views.webhook, name="webhook"),
     path('add_bid/', views.add_bid, name="add_bid"),
     path('add_wishlist/', views.add_wishlist, name="add_wishlist"),
