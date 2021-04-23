@@ -1408,4 +1408,6 @@ def update_cart (action, productId, customer):
     if orderItem.quantity <= 0:
         orderItem.delete()
 
+# Comment out this line before running a migration
+# Uncomment it after the migration and before you run the server
 check_auction_time()
