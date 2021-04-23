@@ -22,7 +22,8 @@ functionality are located in the project report.
 Please refer to the project report for an easier to follow version of these instructions with images.
 
 Our team has set "ali.darejeh@unsw.edu.au" as one of the developers for the DialogFlow agent (Petiverse). Please contact him or wellsontan@hotmail.co.uk to grant permission for the further action.
-The chatbot with all the working functionalities will require a public url generator, corresponding DialogFlow agent and Kommunicate web script. Currently, the github code has included a working chatbot which has a valid Kommunicate appID that can last for 30 days (expires in 21 May 2021). If the appID is no longer working, please refer to “If the Kommunicate free trial has expired” section. Or else just follow “Getting a public url to enable DialogFlow webhook functionality” to start the chatbot. 
+The chatbot with all the working functionalities will require a public url generator, the corresponding DialogFlow agent (Petiverse) and Kommunicate web script. Currently, the github code has included a working chatbot which has a valid Kommunicate appID that can last for 30 days (expires in 21 May 2021). If the chatbot is missing from the web pages that could mean the appID is no longer working, please refer to “Kommunicate free trial expired do this” section. Or else just follow “Get a public url to enable DialogFlow webhook functionality” to start the chatbot. 
+
 
 ### Getting a public url to enable DialogFlow webhook functionality
 **Download:**
