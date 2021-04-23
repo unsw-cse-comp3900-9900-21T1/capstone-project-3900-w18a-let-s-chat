@@ -19,68 +19,19 @@
             </div>
             <div class="profile-nav-info">
                 <h3 class="user-name">{{customer.nickname}}</h3>
-                <div class="address">
-                    {% if customer.shipping_address == "" %}
-                        <p class="address-line">{{customer.shipping_address.address}}, </p>
-                        <p class="city">{{customer.shipping_address.city}}, </p>
-                        <p class="state">{{customer.shipping_address.state}}, </p>
-                        <p class="postcode">{{customer.shipping_address.postcode}}.</p>
-                    {% else %}
-                        <p class="empty-address">No address</p>
-                    {% endif %}
-                    <!--<span class="country">USA.</span>-->
-                </div>
             </div>
-            <!-- Commented out the notification icon cuz notification feature is not implemented yet-->
-            <!-- <div class="profile-option">
-                <div class="notification">
-                    <i class="fa fa-bell"></i>
-                    <span class="alert-message">1</span>
-                </div>
-            </div> -->
         </div>
         <div class="main-bd">
             <div class="left-side">
                 <div class="profile-side">
                     <p class="mobile-no"><i class="fa fa-phone"></i>{{customer.contactNo}}</p>
                     <p class="user-mail"><i class="fa fa-envelope"></i>{{customer.email}}</p>
-                    <!--
-                    <div class="user-bio">
-                        <h3>About Me</h3>
-                        <p class="bio">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit atque dolor quidem, ullam, voluptate molestias! Lorem ipsum dolor sit amet.</p>
-                    </div>
-                    -->
-                    <!--
-                    <div class="profile-btn">
-                        <button class="chatbtn">
-                            <i class="fa fa-comment"></i> Chat
-                        </button>
-                        <button class="createbtn">
-                            <i class="fa fa-plus"></i>Create
-                        </button>
-                    </div>
-                    <div class="user-rating">
-                        <h3 class="rating">4.5</h3>
-                        <div class="rate">
-                            <div class="stars">
-                                
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            </div>
-                            <span class="no-user"><span>123</span>&nbsp;&nbsp; reviews</span>
-                        </div>
-                    </div>
-                    -->
                 </div>
             </div>
             <div class="right-side">
                 <div class="nav">
                     <ul>
                         <li onclick="tabs(0)" class="user-product active">{{customer.nickname}}'s Products</li>
-                        <!-- <li onclick="tabs(1)" class="user-review">Reviews</li> -->
                         {% if customer == request.user.customer%}
                             <li onclick="tabs(1)" class="user-setting">Settings</li>
                         {% endif %}
@@ -134,9 +85,6 @@
                             </ul>
                         </div>
                     </div>
-                    <!-- <div class="profile-reviews tab">
-                        <h1>User Reviews</h1>
-                    </div> -->
                     {% if request.user.customer == customer %}
                         <div class="profile-settings tab">
                             <h1>Account Setting</h1>
