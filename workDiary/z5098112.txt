@@ -52,6 +52,6 @@ With Daniel's help, the "Add to Wishlist" button has been added a bookmark icon 
 
 Week10
 Fixed minor bugs.
-Completed the final report together with the rest of the developers, each of us is in charge of written description for their own work. 
+Completed the final report together with the rest of the developers, each of us is in charge of writting description for their own work. 
 For example, I have written the implementation challenges I have encountered about the user authentication, user profile, auction, email feature,
 wishlist, etc. Also, I have wrote most of the description text for the screenshots under the Usage part of our report. In which, Matthew has corrected some of the lines and added a few paragraphs to further explain the features.
